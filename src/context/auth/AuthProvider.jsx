@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import { verifyToken, logout as apiLogout } from './authService';
+import { verifyToken, logout as apiLogout, hasRole, hasAnyRole, login as authLogin } from './authService';
 
 export const AuthContext = createContext();
 
@@ -7,25 +7,38 @@ const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({
     user: null,
     isLoading: true,
-    isAuthenticated: true
+    isAuthenticated: false,
+    role: null
   });
 
   // Check auth status on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await verifyToken();
-      if (user) {
+      try {
+        const user = await verifyToken();
+        
+        if (user) {
+          setAuthState({
+            user: user.username,
+            isLoading: false,
+            isAuthenticated: true,
+            role: user.role
+          });
+        } else {
+          setAuthState({
+            user: null,
+            isLoading: false,
+            isAuthenticated: false,
+            role: null
+          });
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
         setAuthState({
-          user,
+          user: null,
           isLoading: false,
-          isAuthenticated: true
-        });
-      } else {
-        setAuthState({
-          role:"sales",
-          user: "jay",
-          isLoading: false,
-          isAuthenticated: true
+          isAuthenticated: false,
+          role: null
         });
       }
     };
@@ -35,41 +48,54 @@ const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const user = await login(credentials);
+      const user = await authLogin(credentials);
       setAuthState({
-        user,
+        user: user.username,
         isLoading: false,
-        isAuthenticated: true
+        isAuthenticated: true,
+        role: user.role
       });
       return true;
     } catch (error) {
       setAuthState({
         user: null,
         isLoading: false,
-        isAuthenticated: false
+        isAuthenticated: false,
+        role: null
       });
-      return false;
+      throw error;
     }
   };
-
+  
   const logout = () => {
     apiLogout();
     setAuthState({
       user: null,
       isLoading: false,
-      isAuthenticated: false
+      isAuthenticated: false,
+      role: null
     });
   };
+  
+  const checkRole = (requiredRole) => {
+    return hasRole(requiredRole);
+  };
 
+  const checkAnyRole = (requiredRoles) => {
+    return hasAnyRole(requiredRoles);
+  };
+  
   return (
     <AuthContext.Provider value={{
       ...authState,
       login,
-      logout
+      logout,
+      checkRole,
+      checkAnyRole
     }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthProvider
+export default AuthProvider;

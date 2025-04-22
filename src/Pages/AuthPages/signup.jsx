@@ -1,22 +1,21 @@
-import { useState, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router';
-import { AuthContext } from '../../context/auth/AuthProvider';
-import { login as authLogin } from '../../context/auth/authService';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router';
+import { signup } from '../../context/auth/authService';
 
-const Login = () => {
-  const [credentials, setCredentials] = useState({
+const Signup = () => {
+  const [formData, setFormData] = useState({
     username: '',
     password: '',
+    confirmPassword: '',
+    role: 'sales' // Default role
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -25,15 +24,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login(credentials);
-      // Redirect to the page they tried to visit or home
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      // Remove confirmPassword before sending to API
+      const { confirmPassword, ...userData } = formData;
+      await signup(userData);
+      navigate('/'); // Redirect to home after successful signup
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -44,24 +50,38 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Create your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="username" className="sr-only">
-                User ID
+                Username
               </label>
               <input
                 id="username"
                 name="username"
                 type="text"
-                autoComplete="username"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="User ID"
-                value={credentials.username}
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="username" className="sr-only">
+                Username
+              </label>
+              <input
+                id="role"
+                name="role"
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="sales..."
+                value={formData.role}
                 onChange={handleChange}
               />
             </div>
@@ -73,11 +93,25 @@ const Login = () => {
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="sr-only">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={credentials.password}
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
                 onChange={handleChange}
               />
             </div>
@@ -107,13 +141,22 @@ const Login = () => {
                   </svg>
                 </span>
               ) : null}
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? 'Creating account...' : 'Sign up'}
             </button>
           </div>
         </form>
+
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Login; 
+export default Signup; 

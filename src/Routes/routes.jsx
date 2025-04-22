@@ -7,7 +7,8 @@ import {roles} from './roles'
 
 import HomePage from "../Pages/homePage";
 import Login from "../Pages/AuthPages/login";
-import Unauth from "../Pages/AuthPages/unauth";
+import Signup from "../Pages/AuthPages/signup";
+import Unauthorized from "../Pages/AuthPages/unauthorized";
 import StockPage from '../Pages/stockPage';
 import SchemePage from '../Pages/schemePage';
 import QuotationPage from '../Pages/quotationPage'
@@ -20,20 +21,24 @@ import bookingSuccess from "../Pages/booking/bookingSuccess";
 
 export const routes = createBrowserRouter([
     {
-        path:'/',
-        Component:HomePage,
-    },
-    {
         path:'/login',
         Component: Login
     },
     {
-        path:'/unauthorized',
-        Component: Unauth
+        path:'/signup',
+        Component: Signup
     },
     {
-        element:<ProtectedRoute roles={[roles.SALES]}/>,
+        path:'/unauthorized',
+        Component: Unauthorized
+    },
+    {
+        element:<ProtectedRoute roles={[roles.SALES,roles.ADMIN]}/>,
         children:[
+            {
+                path:'/',
+                Component:HomePage,
+            },
             {
                 path:'/stock-sheet',
                 Component:StockPage
