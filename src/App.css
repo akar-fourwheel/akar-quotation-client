@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+.react-select__menu-list {
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .react-select__menu-list::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
+  .css-1nmdiq5-menu {
+    width: 98% !important;
+  }

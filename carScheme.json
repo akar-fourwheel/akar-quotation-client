@@ -1,0 +1,23 @@
+{
+    "2024": {
+      "Curvv": ["Electric", "Petrol", "Diesel"],
+      "Nexon": ["Electric", "Petrol", "Diesel", "CNG"],
+      "Punch": ["Electric", "Petrol", "CNG"],
+      "Tiago": ["Electric", "Petrol", "CNG"],
+      "Altroz": ["CNG", "Petrol", "Diesel"],
+      "Harrier": ["Diesel"],
+      "Safari": ["Diesel"],
+      "Tigor": ["Petrol", "CNG"]
+    },
+    "2025": {
+      "Curvv": ["Electric", "Petrol", "Diesel"],
+      "Nexon": ["Electric", "Petrol", "Diesel", "CNG"],
+      "Punch": ["Electric", "Petrol", "CNG"],
+      "Tiago": ["Electric", "Petrol", "CNG"],
+      "Altroz": ["CNG", "Petrol", "Diesel"],
+      "Harrier": ["Diesel"],
+      "Safari": ["Diesel"],
+      "Tigor": ["Petrol", "CNG"]
+    }
+  }
+  
