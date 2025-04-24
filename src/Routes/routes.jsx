@@ -68,11 +68,17 @@ export const routes = createBrowserRouter([
                 Component:bookingSuccess
             },
             {
-                path:'/545d65n85g',
+                path:'/all-quotations',
                 Component:AllQuotation
             }
         ]
-    }
+    },
+    // {
+    //     element:<ProtectedRoute roles={[roles.ADMIN]}/>,
+    //     children:[
+
+    //     ]
+    // }
 ])
 
 export default routes

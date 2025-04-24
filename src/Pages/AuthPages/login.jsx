@@ -5,7 +5,7 @@ import { login as authLogin } from '../../context/auth/authService';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
-    username: '',
+    userId: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -50,18 +50,18 @@ const Login = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="username" className="sr-only">
+              <label htmlFor="userId" className="sr-only">
                 User ID
               </label>
               <input
-                id="username"
-                name="username"
+                id="userId"
+                name="userId"
                 type="text"
-                autoComplete="username"
+                autoComplete="userId"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="User ID"
-                value={credentials.username}
+                value={credentials.userId}
                 onChange={handleChange}
               />
             </div>

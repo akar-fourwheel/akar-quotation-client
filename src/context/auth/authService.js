@@ -55,7 +55,9 @@ export const signup = async (userData) => {
     const { data } = response.data;
     
     // Store user data
-    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('userId', JSON.stringify(data.userId));
+    localStorage.setItem('role', data.user.role);
+    localStorage.setItem('username',data.user.username);
     
     // Store auth tokens
     localStorage.setItem('accessToken', data.auth.accessToken);
@@ -75,8 +77,9 @@ export const login = async (credentials) => {
     const { data } = response.data;
     
     // Store user data
-    localStorage.setItem('user', data.user.username);
+    localStorage.setItem('userId', data.user.userId);
     localStorage.setItem('role', data.user.role);
+    localStorage.setItem('username',data.user.username);
     
     // Store auth tokens
     localStorage.setItem('accessToken', data.auth.accessToken);
@@ -93,7 +96,8 @@ export const login = async (credentials) => {
 export const logout = () => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
-  localStorage.removeItem('user');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('username');
 };
 
 // Get current user
@@ -115,7 +119,8 @@ export const verifyToken = async () => {
     if (response.status===200) {
       // Return user data in the same format as login 
       return {
-        username: localStorage.getItem('user'),
+        userId:localStorage.getItem('userId'),
+        username: localStorage.getItem('username'),
         role: localStorage.getItem('role')
       };
     }

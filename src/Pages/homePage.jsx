@@ -2,7 +2,9 @@ import { Link } from "react-router";
 import { BellIcon } from "@heroicons/react/24/outline";
 
 import NotificationOverlay from "../Components/homePage/NotificationOverlay";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../context/auth/AuthProvider";
+import { roles } from "../Routes/roles";
 
 
 const HomePage = (req, res) => {
@@ -57,36 +59,35 @@ const HomePage = (req, res) => {
               </button>
             </Link>
           </div>
-
-          {/* <div className="mt-6 lg:mt-8 hidden lg:flex justify-center gap-4">
-            <Link to="/quotation-list">
-              <button
-                type="button"
-                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-              >
-                Quotation List
-              </button>
-            </Link>
-            <Link to="/booking-list">
-              <button
-                type="button"
-                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-              >
-                Booking List
-              </button>
-            </Link>
-          </div> */}
+            <div className="mt-6 lg:mt-8 hidden lg:flex justify-center gap-4">
+              <Link to="/all-quotations">
+                <button
+                  type="button"
+                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+                >
+                  All Quotations
+                </button>
+              </Link>
+              <Link to="/booking-list">
+                <button
+                  type="button"
+                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+                >
+                  Booking List
+                </button>
+              </Link>
+            </div>
         </div>
       </div>
 
-      {/* <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white p-4 shadow-lg">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white p-4 shadow-lg">
         <div className="flex justify-center gap-4">
-          <Link to="/quotation-list">
+          <Link to="/all-quotations">
             <button
               type="button"
               className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
             >
-              Quotation List
+              All Quotations
             </button>
           </Link>
           <Link to="/booking-list">
@@ -98,7 +99,8 @@ const HomePage = (req, res) => {
             </button>
           </Link>
         </div>
-      </div> */}
+      </div>
+
     </>
   );
 };

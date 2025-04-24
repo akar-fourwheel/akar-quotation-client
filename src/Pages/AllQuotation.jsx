@@ -1,28 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { roles } from '../Routes/roles';
+import { AuthContext } from '../context/auth/AuthProvider';
 
 function AllQuotation() {
 
     const [quotaData,setQuotaData] = useState([]);
-
+    const { role,username } = useContext(AuthContext);
+    
   useEffect(() => {
-    axios.get(`/all-quotations`)
-    .then((response)=> {
+    if(role==roles.ADMIN){
+
+      axios.get(`/admin/all-quotations`)
+      .then((response)=> {
         try{
-            setQuotaData(response.data);
+          setQuotaData(response.data);
         }
         catch(e){
-            console.log("quotation data could not be set");
-            
+          console.log("quotation data could not be set");
+          
         }
-    })
+      })
+    }
+    if(role==roles.SALES){
+      axios.get(`/my-quotation`,{
+        params:{
+          name:localStorage.getItem('username')
+        }
+      })
+      .then((response)=> {
+        try{
+          setQuotaData(response.data);
+        }
+        catch(e){
+          console.log("quotation data could not be set");
+          
+        }
+      })
+    }
   },[])
 
-  const sortedQuotaData = quotaData.sort((a, b) => {  
-    const dateA = new Date(a[0]);
-    const dateB = new Date(b[0]);
-    return dateB - dateA; // For ascending order
-  });
+  const sortedQuotaData = quotaData.sort((a, b) => new Date(b[1].slice(5,14)) - new Date(a[1].slice(5,14)));
+  
 
   return (
     <div className="container mx-auto w-half p-6">
@@ -34,7 +53,9 @@ function AllQuotation() {
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">Created_on</th>
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">Unique_ID</th>
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">Customer_Name</th>
+      {!role==roles.SALES && 
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">Sales_Person</th>
+      }
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">Variant</th>
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">PDF</th>
       <th className="sm:px-4 sm:py-3 px-1 py-2 text-left text-sm sm:text-base font-medium text-gray-700">WhatsApp</th>
@@ -45,7 +66,9 @@ function AllQuotation() {
       <tr key={row} className="border-b hover:bg-gray-50">
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-900">{row[1]}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-900">{row[0]}</td>
+        {!role==roles.SALES &&
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base font-medium text-gray-700">{row[2]}</td>
+        }
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-900">{row[3]}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-700">{row[4]}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-700">

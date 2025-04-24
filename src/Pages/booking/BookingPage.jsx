@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { roles } from '../../Routes/roles';
+import { AuthContext } from '../../context/auth/AuthProvider';
 
 function BookingPage() {
 
     const navigate = useNavigate();
+    const {role,username} = useContext(AuthContext);
 
     const [quotaData,setQuotaData] = useState([]);
     const [filterOption, setFilterOption] = useState("all");
@@ -33,16 +36,30 @@ function BookingPage() {
     }
 
   useEffect(() => {
-    axios.get(`/booking-page`)
+    if(role==roles.ADMIN)
+    axios.get(`/admin/all-bookings`)
     .then((response)=> {
         try{
             setQuotaData(response.data);
         }
         catch(e){
-            console.log("quotation data could not be set");
+            console.log("booking data could not be set");
             
         }
     })
+    if(role==roles.SALES)
+      axios.get(`/my-bookings`,{params:{name:username}})
+      .then((response)=> {
+          try{
+              setQuotaData(response.data);
+              console.log(quotaData);
+              
+          }
+          catch(e){
+              console.log("booking data could not be set");
+              
+          }
+      })
   },[])
 
   return (
@@ -78,7 +95,7 @@ function BookingPage() {
     </tr>
   </thead>
   <tbody>
-  {quotaData
+  {quotaData.length!=0 ? (quotaData
   .filter((row) => {
     if (filterOption === "cancelled") return row[7] === "cancelled";
     if (filterOption === "bookings") return row[7] === null;
@@ -94,7 +111,6 @@ function BookingPage() {
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-700">{row[4]}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-700">{row[5]}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-sm w-50 sm:text-base text-gray-700">{row[6]}</td>
-        {console.log(console.log(row[7]))}
         <td>
         <button
             onClick={()=> handleNavi(row[6])}
@@ -115,7 +131,13 @@ function BookingPage() {
           }
           </td>
       </tr>
-    ))}
+    ))):(
+      <tr>
+        <td colSpan="9" className="text-center py-4 text-gray-500">
+          No bookings found.
+        </td>
+      </tr>
+    )}
   </tbody>
 </table>
 
