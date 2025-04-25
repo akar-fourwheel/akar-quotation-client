@@ -10,8 +10,8 @@ const Signup = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({
-    userId:'',
-    username: '',
+    userId:'jay100',
+    username: 'jay',
     role: '',
     password: '',
     confirmPassword: '',

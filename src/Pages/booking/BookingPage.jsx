@@ -16,12 +16,12 @@ function BookingPage() {
       navigate(`/booking-success/${ChassisNo}`);
     }
 
-    function handleCancel(ChassisNo){
+    function handleCancel(bookingId){
       try{
 
         axios.get('/booking-cancel',{
           params:{
-            chassis:ChassisNo
+            bookingId
           }
         }).then(res => {
           console.log(res.data);
@@ -64,7 +64,7 @@ function BookingPage() {
 
   return (
     <div className="container mx-auto w-half p-6">
-      <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800">All Quotation Data</h2>
+      <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800">Booking Data</h2>
       <div className="overflow-x-auto">
       <div className="mb-4 flex justify-end">
       <div className="mb-4 flex justify-end">
@@ -122,7 +122,7 @@ function BookingPage() {
           </td>
           <td>
         {!row[7] && <button
-            onClick={()=> handleCancel(row[6])}
+            onClick={()=> handleCancel(row[0])}
             className="px-4 py-2 px-1 mx-4 bg-rose-600 sm:w-50 text-white rounded-lg hover:bg-rose-400"
             aria-label="Book"
           >

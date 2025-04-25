@@ -590,7 +590,7 @@ const quotationPage = () => {
           value={selectedSalesPerson}
           onChange={(e) => setSelectedSalesPerson(e.target.value)}
           className={`w-full p-2 border ${errors.selectedSalesPerson ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-          isSearchable={true}
+          // isSearchable={true}
         >
           <option value="">Select a Sales Person</option>
           {salesPersonList.map((salesPerson, index) => (

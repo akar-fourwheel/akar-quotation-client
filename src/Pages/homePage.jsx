@@ -12,7 +12,7 @@ const HomePage = (req, res) => {
 
   return (
     <>
-      <div className="absolute top-6 right-6 z-10">
+      <div className="absolute top-28 right-12 z-10">
         <button
           onClick={() => setShowOverlay(true)}
           className="relative p-2 rounded-full bg-white shadow hover:bg-gray-100 transition"
@@ -24,7 +24,7 @@ const HomePage = (req, res) => {
 
       {showOverlay && <NotificationOverlay onClose={() => setShowOverlay(false)} />}
 
-      <div className="min-h-screen bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center p-6">
+      <div className="h-full bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center p-6">
         <div className="bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full">
           <div>
             <img src="./logo.jpg" alt="Logo" className="h-40 mx-auto" />
