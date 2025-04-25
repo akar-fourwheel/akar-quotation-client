@@ -47,12 +47,12 @@ function AllQuotation() {
     }
   },[])
 
-  const sortedQuotaData = quotaData.sort((a, b) => new Date(b[1].slice(5,14)) - new Date(a[1].slice(5,14)));
+  const sortedQuotaData = quotaData?.sort((a, b) => new Date(b[1].slice(5,14)) - new Date(a[1].slice(5,14)));
   
 
   return (
     <div className="container mx-auto w-half p-2 md:p-6">
-      <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800">All Quotation Data</h2>
+      <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800 uppercase">All Quotation Data</h2>
       <div className="overflow-x-auto">
       <table className="w-auto bg-white shadow-md rounded-lg overflow-hidden table-fixed">
   <thead>

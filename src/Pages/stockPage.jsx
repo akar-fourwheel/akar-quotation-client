@@ -77,7 +77,7 @@ const stockPage = () => {
 
   return (
     <div className="m-auto w-full max-w-4xl p-4">
-  <h2 className="text-2xl font-semibold text-center mb-6">Test form for the dealer-stock API</h2>
+  <h2 className="text-2xl font-semibold text-center mb-6 uppercase">Check Stock availability</h2>
   
   <form onSubmit={handleSubmit} className="space-y-4">
     <div className="space-y-2">

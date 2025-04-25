@@ -12,7 +12,7 @@ const Header = ({ toggleSidebar }) => {
             {/* Sidebar Toggle Button */}
             <button
               onClick={toggleSidebar}
-              className="px-4 border-r border-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="pr-3 border-r border-white text-gray-500 focus:outline-none"
             >
               <span className="sr-only">Open sidebar</span>
               <svg
@@ -30,15 +30,14 @@ const Header = ({ toggleSidebar }) => {
               </svg>
             </button>
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+              <h1 className="sm:text-xl sm:font-bold text-lg font-light text-gray-900">Dashboard</h1>
             </div>
           </div>
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="flex items-center">
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700">{user?.username}</p>
-                  <p className="text-xs text-gray-500">ID: {user?.userId}</p>
+                  <p className="sm:text-xl sm:font-medium text-lg font-lighter text-gray-700">Welcome,  {user?.username}</p>
                 </div>
               </div>
             </div>

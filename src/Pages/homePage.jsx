@@ -65,7 +65,7 @@ const HomePage = (req, res) => {
                   type="button"
                   className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
                 >
-                  All Quotations
+                  Quotations
                 </button>
               </Link>
               <Link to="/booking-list">
@@ -87,7 +87,7 @@ const HomePage = (req, res) => {
               type="button"
               className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
             >
-              All Quotations
+              Quotations
             </button>
           </Link>
           <Link to="/booking-list">

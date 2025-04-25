@@ -98,6 +98,7 @@ export const logout = () => {
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('userId');
   localStorage.removeItem('username');
+  localStorage.removeItem('role');
 };
 
 // Get current user

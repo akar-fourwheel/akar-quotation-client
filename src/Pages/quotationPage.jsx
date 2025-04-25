@@ -544,7 +544,7 @@ const quotationPage = () => {
 
   return (
     <div className="m-auto w-full max-w-4xl p-4">
-  <h2 className="text-2xl font-semibold text-center mb-6">Test form for Quotation</h2>
+  <h2 className="text-2xl font-semibold text-center mb-6 uppercase">Create new quotation</h2>
   
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
@@ -931,7 +931,7 @@ const quotationPage = () => {
          onClick={()=> {
           navigate('/all-quotation')
          }}>
-          All Quotation
+          Quotation List
         </button>
         </div>
         }
