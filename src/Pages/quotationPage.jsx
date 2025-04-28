@@ -23,7 +23,7 @@ const quotationPage = () => {
   const [corpOffer, setCorpOffer] = useState("");
   const [addDisc, setAddDisc] = useState(0);
   const [sss, setSss] = useState(0);
-  const [rto, setRto] = useState("RTO");
+  const [rto, setRto] = useState({ value: 'RTO', label: 'Normal RTO' });
   const [totalDisc, setTotalDisc] = useState(0);
   const [ew, setEw] = useState();
   const [accessories, setAccessories] = useState([]);
@@ -31,7 +31,7 @@ const quotationPage = () => {
   const [color, setColor] = useState([]);
   const [selectedColor, setSelectedColor] = useState();
   const [selectedVas, setSelectedVas] = useState();
-  const [selectedHpn, setSelectedHpn] = useState();
+  const [selectedHpn, setSelectedHpn] = useState({ label: "Not for Loan Use", value: "N/A" });
   const [totalAddOns, setTotalAddOns] = useState(0);
   const [accTotal, setAccTotal] = useState(0);
   const [loyaltyType, setLoyaltyType] = useState();
@@ -44,9 +44,13 @@ const quotationPage = () => {
   const [selectedSalesPerson, setSelectedSalesPerson] = useState("");
   const [pdfUrl,setPdfUrl] = useState('');
   const [cod, setCod] = useState(0);
+  const [hpn, setHpn] = useState("");
   const [whatsAppUrl,setWhatsAppUrl] = useState('');
+  const [ins, setIns] = useState(0);
+  const [insType, setInsType] = useState("Dealer")
   const [showWarning, setShowWarning] = useState(false);
   const [maxAddDisc, setMaxAddDisc] = useState(0);
+  const [inhouse, setInhouse] = useState(true);
   const [errors, setErrors] = useState({
       name: false,
       address: false,
@@ -56,7 +60,7 @@ const quotationPage = () => {
     });
   const [loading, setLoading] = useState(false);
   const  navigate = useNavigate();
-
+  
   let tcs, totalESP;
 
   const discounts = [
@@ -86,33 +90,41 @@ const quotationPage = () => {
 
   const vasOptions = [
     { label: 'Ceramic Coating', value: 25000 },
-    { label: 'Teflon Coating', value: 15000 },
+    { label: 'Teflon Coating', value: 15000 }
   ];
 
   const hpnOptions = [
-    { "label": "Axis Bank", "value": "Axis Bank" },
-    { "label": "Bandhan Bank", "value": "Bandhan Bank" },
-    { "label": "Bank of Baroda", "value": "Bank of Baroda" },
-    { "label": "Bank of India", "value": "Bank of India" },
-    { "label": "Canara Bank", "value": "Canara Bank" },
-    { "label": "Central Bank of India", "value": "Central Bank of India" },
-    { "label": "Federal Bank", "value": "Federal Bank" },
-    { "label": "HDFC Bank", "value": "HDFC Bank" },
-    { "label": "ICICI Bank", "value": "ICICI Bank" },
-    { "label": "IDBI Bank", "value": "IDBI Bank" },
-    { "label": "IDFC First Bank", "value": "IDFC First Bank" },
-    { "label": "IndusInd Bank", "value": "IndusInd Bank" },
-    { "label": "Kotak Mahindra Bank", "value": "Kotak Mahindra Bank" },
-    { "label": "Punjab National Bank", "value": "Punjab National Bank" },
-    { "label": "RBL Bank", "value": "RBL Bank" },
-    { "label": "State Bank of India", "value": "State Bank of India" },
-    { "label": "UCO Bank", "value": "UCO Bank" },
-    { "label": "Union Bank of India", "value": "Union Bank of India" },
-    { "label": "Yes Bank", "value": "Yes Bank" },
-    { "label": "N/A", "value": "N/A" }
+    { label: "Axis Bank", value: "Axis Bank" },
+    { label: "Bandhan Bank", value: "Bandhan Bank" },
+    { label: "Bank of Baroda", value: "Bank of Baroda" },
+    { label: "Bank of India", value: "Bank of India" },
+    { label: "Canara Bank", value: "Canara Bank" },
+    { label: "Central Bank of India", value: "Central Bank of India" },
+    { label: "Federal Bank", value: "Federal Bank" },
+    { label: "HDFC Bank", value: "HDFC Bank" },
+    { label: "ICICI Bank", value: "ICICI Bank" },
+    { label: "IDBI Bank", value: "IDBI Bank" },
+    { label: "IDFC First Bank", value: "IDFC First Bank" },
+    { label: "IndusInd Bank", value: "IndusInd Bank" },
+    { label: "Kotak Mahindra Bank", value: "Kotak Mahindra Bank" },
+    { label: "Kotak Mahindra Prime Limited", value: "Kotak Mahindra Prime Limited" },
+    { label: "Punjab National Bank", value: "Punjab National Bank" },
+    { label: "RBL Bank", value: "RBL Bank" },
+    { label: "State Bank of India", value: "State Bank of India" },
+    { label: "UCO Bank", value: "UCO Bank" },
+    { label: "Union Bank of India", value: "Union Bank of India" },
+    { label: "Yes Bank", value: "Yes Bank" },
+    { label: "Mahindra & Mahindra Financial Services Ltd.", value: "Mahindra & Mahindra Financial Services Ltd." },
+    { label: "Rajasthan Marudhar Gramin Bank", value: "Rajasthan Marudhar Gramin Bank" },
+    { label: "Sundaram Finance", value: "Sundaram Finance" },
+    { label: "Sriram Finance", value: "Sriram Finance" },
+    { label: "SK Finance", value: "SK Finance" },
+    { label: "Cholamandalam Investment and Finance Company", value: "Cholamandalam Investment and Finance Company" },
+    { label: "Not for Loan Use", value: "N/A" },
+    { label: "Cash", value: "Cash" }
   ];
 
-  const restState = () => {
+  const restState = (insAmount, year, maxDisc) => {
     setSelectedInsurance([]);
     setSelectedDiscounts([]);
     setAddExc(0);
@@ -120,28 +132,32 @@ const quotationPage = () => {
     setCorpOffer("");
     setAddDisc(0);
     setSss(0);
-    setRto("RTO");
+    setRto({ value: 'RTO', label: 'Normal RTO' });
     setTotalDisc(0);
     setEw();
-    setAccessories([]);
     setSelectedAcc([]);
     setSelectedColor();
     setSelectedVas();
-    setSelectedHpn();
+    setSelectedHpn({ label: "Not for Loan Use", value: "N/A" });
+    setHpn("");
     setTotalAddOns(0);
     setAccTotal(0);
     setLoyaltyType();
     setScrap();
     setCod(0);
     setShowWarning(false);
+    setIns(insAmount);
+    setInsType("Dealer");
+    if (year == 2025) {
+      setMaxAddDisc(maxDisc);
+    }
   }
   
 
   // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    restState();
-    
+
     axios.get(`/quotation-data`, {
       params: {
         year: year,
@@ -157,6 +173,7 @@ const quotationPage = () => {
       setColor(data2);
       setAccessories(data1)
       setFinalData(data);
+      restState(data.Insurance, data.YEAR, data.AddDiscLim);      
     });
   };
 
@@ -308,7 +325,7 @@ const quotationPage = () => {
       return;
     }
   
-    if (finalData.YEAR == 2025) {
+    if (finalData.YEAR == 2025 && finalData.Fuel == "Electric") {
       let max = finalData.AddDiscLim;
   
       const pplUpper = finalData.PPL?.toUpperCase();
@@ -328,7 +345,6 @@ const quotationPage = () => {
       }
   
       setMaxAddDisc(max);
-      console.log(maxAddDisc, cod, max);
       
     } else {
       setAddDisc(val);
@@ -338,7 +354,7 @@ const quotationPage = () => {
 
   useEffect(() => {
     const maxAmount = finalData.AddDiscLim;
-    if (addDisc > maxAmount) {
+    if (finalData.YEAR == 2025 && finalData.Fuel == "Electric" &&addDisc > maxAmount) {
       setAddDisc(maxAmount);
     }
   }, [addDisc, rto]);
@@ -349,20 +365,21 @@ const quotationPage = () => {
   }
 
   const handleRto = (selected) => {
-    setRto(selected.value)
+    setRto(selected)
     setShowWarning(false)
     
     if (finalData.YEAR == 2025) {
       setMaxAddDisc(finalData.AddDiscLim);
     }
 
-    if ("Scrap RTO" == selected.value) { 
-      setCod(finalData.COD)
+    if ("Scrap RTO" == selected.value) {      
+      scrap ? setCod(finalData.COD) : setCod(0)      
       const pplUpper = finalData.PPL?.toUpperCase();
       if (2025 == finalData.YEAR && (pplUpper == "SAFARI" || pplUpper == "HARRIER")) {
         setAddDisc(0);
         setShowWarning(false);
-      } }
+      }
+      }
     else { setCod(0) }
     }
 
@@ -417,6 +434,8 @@ const quotationPage = () => {
       validationErrors.selectedSalesPerson = true;
       isValid = false;
     }
+    console.log(addDisc, maxAddDisc);
+    
     if (addDisc > maxAddDisc) {
       validationErrors.addDisc = true;
       isValid = false;
@@ -446,7 +465,7 @@ const quotationPage = () => {
       email: email,
       address: address, 
       salesPerson: selectedSalesPerson, 
-      HPN: (selectedHpn ? selectedHpn.value : "N/A"),
+      HPN: (inhouse ? selectedHpn.label + ": In-House" : hpn + ": Out-House"),
       year: finalData.YEAR, 
       model: finalData.PPL, 
       fuel: finalData.Fuel, 
@@ -471,10 +490,10 @@ const quotationPage = () => {
       totalDisc: totalDisc,  
       billingPrice: finalData.ESP - totalDisc, 
       tcs: tcs, 
-      rtoType: rto, 
-      rtoAmt: finalData[rto],
-      scrapBy: (scrap ? "Dealer" : rto == "Scrap RTO" ? "Self" : "N/A"), 
-      cod: (scrap ? 35000 : 0), 
+      rtoType: rto.value, 
+      rtoAmt: finalData[rto.value],
+      scrapBy: (scrap ? "Dealer" : rto.value == "Scrap RTO" ? "Self" : "N/A"), 
+      cod: cod, 
       mudflap: (selectedAcc.some((opt) => opt.label === "Mudflap") ? selectedAcc.find((opt) => opt.label === "Mudflap").value : 0), 
       uniMatting: (selectedAcc.some((opt) => opt.label === "Universal Matting") ? selectedAcc.find((opt) => opt.label === "Universal Matting").value : 0), 
       seatCover: (selectedAcc.some((opt) => opt.label === "Seat Cover") ? selectedAcc.find((opt) => opt.label === "Seat Cover").value : 0), 
@@ -491,7 +510,7 @@ const quotationPage = () => {
       cameraVal: (cameraOption ? cameraOption.value : 0),
       bodyCover: (selectedAcc.some((opt) => opt.label === "Car Cover") ? selectedAcc.find((opt) => opt.label === "Car Cover").value : 0),
       accTotal: accTotal, 
-      inc: finalData.Insurance, 
+      inc: ins, 
       rsa: (selectedInsurance.some((opt) => opt.value === "RSA") ? finalData["RSA"] : 0), 
       keyRep: (selectedInsurance.some((opt) => opt.value === "Key Replacement") ? finalData["Key Replacement"] : 0), 
       engineProtect: (selectedInsurance.some((opt) => opt.value === "Engine Protection") ? finalData["Engine Protection"] : 0), 
@@ -500,15 +519,13 @@ const quotationPage = () => {
       consumables: (selectedInsurance.some((opt) => opt.value === "Consumables") ? finalData["Consumables"] : 0), 
       personalBelong: (selectedInsurance.some((opt) => opt.value === "Personal Belongings") ? finalData["Personal Belongings"] : 0), 
       batteryP: (selectedInsurance.some((opt) => opt.value === "Battery Protection") ? finalData["Battery Protection"] : 0), 
-      incTotal: totalAddOns + finalData.Insurance, 
+      incTotal: totalAddOns + ins, 
       ewType: ew ? ew : " ", 
       ew: ew ? finalData[ew] : " ", 
       vasType: selectedVas ? selectedVas.label : " ", 
       vas: selectedVas ? selectedVas.value : " ", 
       fasttag: finalData.FastTag, 
       grandTotal: totalESP, };
-
-      console.log(Qdata);
       
       try {
         setLoading(true);
@@ -544,7 +561,7 @@ const quotationPage = () => {
 
   return (
     <div className="m-auto w-full max-w-4xl p-4">
-  <h2 className="text-2xl font-semibold text-center mb-6 uppercase">Create new quotation</h2>
+  <h2 className="text-2xl font-semibold text-center mb-6">Test form for Quotation</h2>
   
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
@@ -590,7 +607,7 @@ const quotationPage = () => {
           value={selectedSalesPerson}
           onChange={(e) => setSelectedSalesPerson(e.target.value)}
           className={`w-full p-2 border ${errors.selectedSalesPerson ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-          // isSearchable={true}
+          isSearchable={true}
         >
           <option value="">Select a Sales Person</option>
           {salesPersonList.map((salesPerson, index) => (
@@ -681,9 +698,23 @@ const quotationPage = () => {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 overflow-y-hidden">
           {Object.keys(finalData).map((key, i) => (
             <Fragment key={i}>
-              {(i >= 20 && i<= 26) ?
-                i == 20 &&
+              {(i >= 19 && i<= 26) ?
+                i == 19 &&
                   <>
+                    <div>Insurance Type:</div>
+                    <Select
+                        options={[{value: 'Dealer', label: 'Dealer' }, { value: 'Self', label: 'Self' }]}
+                        onChange={(selected) => {setInsType(selected && selected.value);
+                          selected.value === 'Self' ? setIns(0) : setIns(finalData.Insurance)
+                        }}
+                        className="w-full p-1 rounded-lg"
+                        defaultValue={{value: 'Dealer', label: 'Dealer' }}
+                      />
+                    {insType === 'Dealer' && <>
+                    <div>Insurance Amount:</div>
+                    <div className="w-full p-2 border border-gray-300 rounded-lg">
+                        {ins}
+                      </div>
                     <div>Select Insurance Add-ons:</div>
                     <Select
                       options={Object.keys(finalData)
@@ -699,9 +730,10 @@ const quotationPage = () => {
                       maxMenuHeight={200}
                       classNamePrefix="react-select"
                     />
+                    </>}
                       <div>Insurance Total:</div>
                       <div className="w-full p-2 border border-gray-300 rounded-lg">
-                        {totalAddOns + finalData.Insurance}
+                        {totalAddOns + ins}
                       </div>
                       <div>TCS:</div>
                       <div className="w-full p-2 border border-gray-300 rounded-lg">
@@ -724,6 +756,34 @@ const quotationPage = () => {
                       isSearchable={false}
                       classNamePrefix="react-select"
                       />
+                      <div>Finance Type: </div>
+                      <Select
+                        options={[{value: true, label: 'In-House' }, { value: false, label: 'Out-House' }]}
+                        onChange={(selected) => {selected && setInhouse(selected.value); setSelectedHpn()}}
+                        className="w-full p-1 rounded-lg"
+                      />
+                      <div>HPN: </div>
+                      {inhouse ? <>
+                      <Select
+                      isSearchable={false}
+                      options={hpnOptions}
+                      onChange={handleHpn}
+                      value={selectedHpn}
+                      menuPlacement="auto" // 👈 auto will try top if no space at bottom
+                      menuPosition="absolute"
+                      menuPortalTarget={document.body} // 👈 render dropdown at the top of the DOM
+                      styles={{
+                        menuPortal: base => ({ ...base, zIndex: 9999 }) // 👈 ensure it's on top
+                      }}
+                      className="w-full p-1 rounded-lg"
+                    /></> :
+                      <>
+                      <input className="w-full p-2 border border-gray-300 rounded-lg" 
+                      type="text"
+                      value={hpn}
+                      onChange={(e) => {setHpn(e.target.value)}}
+                      />
+                      </>}
                       </>}
                     <div>Select Discount Type:</div>
                     <Select
@@ -805,15 +865,15 @@ const quotationPage = () => {
                     />
                     <div>RTO Amount: </div>
                       <div className="w-full p-2 border border-gray-300 rounded-lg">
-                        {finalData[rto]}
+                        {finalData[rto.value]}
                       </div>
-                    {(cod > 0) &&
+                    {(rto.value == "Scrap RTO") &&
                     <>
                       <div>Scrap by: </div>
                       <Select
                       isClearable
                         options={[{value: true, label: 'Dealer' }, { value: false, label: 'Self' }]}
-                        onChange={(selected) => {setScrap(selected && selected.value)}}
+                        onChange={(selected) => {setScrap(selected && selected.value); setCod((selected && selected.value) ? finalData.COD : 0)}}
                         className="w-full p-1 rounded-lg"
                       />
                     </>
@@ -844,7 +904,6 @@ const quotationPage = () => {
                       isSearchable={false}
                       closeMenuOnSelect={false}
                       menuIsOpen={undefined}
-                      maxMenuHeight={200}
                       classNamePrefix="react-select"
                       menuPlacement="auto" // 👈 auto will try top if no space at bottom
                       menuPosition="absolute"
@@ -864,34 +923,31 @@ const quotationPage = () => {
                       options={vasOptions}
                       onChange={handleVas}
                       className="w-full p-1 rounded-lg"
-                    />
-                    <div>VAS Amount: </div>
-                      <div className="w-full p-2 border border-gray-300 rounded-lg">
-                        {selectedVas ? selectedVas.value : 0}
-                      </div>
-                      <div>HPN: </div>
-                      <Select
-                      isSearchable={false}
-                      options={hpnOptions}
-                      onChange={handleHpn}
-                      value={selectedHpn}
                       menuPlacement="auto" // 👈 auto will try top if no space at bottom
                       menuPosition="absolute"
                       menuPortalTarget={document.body} // 👈 render dropdown at the top of the DOM
                       styles={{
                         menuPortal: base => ({ ...base, zIndex: 9999 }) // 👈 ensure it's on top
                       }}
-                      className="w-full p-1 rounded-lg"
                     />
+                    <div>VAS Amount: </div>
+                      <div className="w-full p-2 border border-gray-300 rounded-lg">
+                        {selectedVas ? selectedVas.value : 0}
+                      </div>
                   </> :
-                <>
-                  <div key={i}>{key} :</div>
-                  <div className="w-full p-2 border border-gray-300 rounded-lg">{finalData[key]}</div>
-                  {i == 30 && <>
-                  <div>Total Price:</div>
-                  <div className="w-full p-2 border border-gray-300 rounded-lg">{ totalESP = finalData.ESP - totalDisc + (finalData[rto] ? finalData[rto] : 0) + totalAddOns + finalData.Insurance + tcs + (finalData[ew] ? finalData[ew] : 0) + accTotal + (selectedVas ? selectedVas.value : 0) + finalData.FastTag + cod}</div> 
-                  </>}
-                </>}
+                      <>
+                        {i < 31 && <>
+                          <div>{key} :</div>
+                          <div className="w-full p-2 border border-gray-300 rounded-lg">{finalData[key]}</div>
+                        </>}
+                        { i === 31 && <>
+                          <div>Total Price:</div>
+                          <div className="w-full p-2 border border-gray-300 rounded-lg">
+                            {console.log(cod)}
+                            { totalESP = finalData.ESP - totalDisc + (finalData[rto.value] ? finalData[rto.value] : 0) + totalAddOns + ins + tcs + (finalData[ew] ? finalData[ew] : 0) + accTotal + (selectedVas ? selectedVas.value : 0) + finalData.FastTag + cod}
+                          </div>
+                        </>}
+                      </>}
                 </Fragment>
           ))}
         </div>
@@ -931,7 +987,7 @@ const quotationPage = () => {
          onClick={()=> {
           navigate('/all-quotation')
          }}>
-          Quotation List
+          All Quotation
         </button>
         </div>
         }
