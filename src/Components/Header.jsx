@@ -37,7 +37,7 @@ const Header = ({ toggleSidebar }) => {
             <div className="flex-shrink-0">
               <div className="flex items-center">
                 <div className="ml-3">
-                  <p className="sm:text-xl sm:font-medium text-lg font-lighter text-gray-700">Welcome,  {user?.username}</p>
+                  <p className="sm:text-xl sm:font-medium text-lg font-lighter text-gray-700">Welcome,  {user?.username?.split(' ').slice(0, 2).map((word, i) => i === 1 ? word[0] + '...' : word).join(' ')}</p>
                 </div>
               </div>
             </div>

@@ -7,7 +7,7 @@ import { roles } from './roles';
 import HomePage from "../Pages/homePage";
 import Login from "../Pages/AuthPages/login";
 import Signup from "../Pages/AuthPages/signup";
-import Unauthorized from "../Pages/AuthPages/unauthorized";
+import Unauthorized from "../Pages/AuthPages/Unauthorized";
 import StockPage from '../Pages/stockPage';
 import SchemePage from '../Pages/schemePage';
 import QuotationPage from '../Pages/quotationPage';

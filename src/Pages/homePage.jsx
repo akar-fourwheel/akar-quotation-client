@@ -2,9 +2,7 @@ import { Link } from "react-router";
 import { BellIcon } from "@heroicons/react/24/outline";
 
 import NotificationOverlay from "../Components/homePage/NotificationOverlay";
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/auth/AuthProvider";
-import { roles } from "../Routes/roles";
+import { useState } from "react";
 
 
 const HomePage = (req, res) => {

@@ -943,7 +943,6 @@ const quotationPage = () => {
                         { i === 31 && <>
                           <div>Total Price:</div>
                           <div className="w-full p-2 border border-gray-300 rounded-lg">
-                            {console.log(cod)}
                             { totalESP = finalData.ESP - totalDisc + (finalData[rto.value] ? finalData[rto.value] : 0) + totalAddOns + ins + tcs + (finalData[ew] ? finalData[ew] : 0) + accTotal + (selectedVas ? selectedVas.value : 0) + finalData.FastTag + cod}
                           </div>
                         </>}
