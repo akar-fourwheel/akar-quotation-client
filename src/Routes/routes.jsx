@@ -31,7 +31,7 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[roles.SALES,roles.ADMIN]} />,
+        element: <ProtectedRoute roles={[roles.SALES,roles.TEAML,roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,

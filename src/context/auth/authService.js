@@ -55,13 +55,13 @@ export const signup = async (userData) => {
     const { data } = response.data;
     
     // Store user data
-    localStorage.setItem('userId', JSON.stringify(data.userId));
-    localStorage.setItem('role', data.user.role);
-    localStorage.setItem('username',data.user.username);
+    // localStorage.setItem('userId', JSON.stringify(data.userId));
+    // localStorage.setItem('role', data.user.role);
+    // localStorage.setItem('username',data.user.username);
     
-    // Store auth tokens
-    localStorage.setItem('accessToken', data.auth.accessToken);
-    localStorage.setItem('refreshToken', data.auth.refreshToken);
+    // // Store auth tokens
+    // localStorage.setItem('accessToken', data.auth.accessToken);
+    // localStorage.setItem('refreshToken', data.auth.refreshToken);
     
     return data.user;
   } catch (error) {
