@@ -41,7 +41,7 @@ const quotationPage = () => {
   const [email,setEmail] = useState('');
   const [address,setAddress] = useState('');
   const [currentDate, setCurrentDate] = useState("");
-  const [selectedSalesPerson, setSelectedSalesPerson] = useState("");
+  const [selectedSalesPerson, setSelectedSalesPerson] = useState(localStorage.getItem("username"));
   const [pdfUrl,setPdfUrl] = useState('');
   const [cod, setCod] = useState(0);
   const [hpn, setHpn] = useState("");
@@ -436,7 +436,7 @@ const quotationPage = () => {
     }
     console.log(addDisc, maxAddDisc);
     
-    if (addDisc > maxAddDisc) {
+    if (maxAddDisc && (addDisc > maxAddDisc)) {
       setShowWarning(true);
       validationErrors.addDisc = true;
       isValid = false;
@@ -492,7 +492,7 @@ const quotationPage = () => {
       billingPrice: finalData.ESP - totalDisc, 
       tcs: tcs, 
       rtoType: rto.value, 
-      rtoAmt: finalData[rto.value],
+      rtoAmt: finalData[rto.value].toFixed(2),
       scrapBy: (scrap ? "Dealer" : rto.value == "Scrap RTO" ? "Self" : "N/A"), 
       cod: cod, 
       mudflap: (selectedAcc.some((opt) => opt.label === "Mudflap") ? selectedAcc.find((opt) => opt.label === "Mudflap").value : 0), 
@@ -583,7 +583,7 @@ const quotationPage = () => {
         />
       </div>
 
-      <div className="col-span-1 sm:col-span-2 lg:col-span-1 space-y-2">
+      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
         <label className="block text-lg">Phone Number:</label>
         <input
           type="text"
@@ -602,9 +602,8 @@ const quotationPage = () => {
         />
       </div>
 
-      <div className="col-span-1 sm:col-span-2 lg:col-span-1 space-y-2">
-        <label className="block text-lg">Sales Person:</label>
-        <select
+      {/* <div className="col-span-1 sm:col-span-2 lg:col-span-1 space-y-2"> */}
+        {/* <select
           value={selectedSalesPerson}
           onChange={(e) => setSelectedSalesPerson(e.target.value)}
           className={`w-full p-2 border ${errors.selectedSalesPerson ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
@@ -616,8 +615,13 @@ const quotationPage = () => {
               {salesPerson}
             </option>
           ))}
-        </select>
-      </div>
+        </select> */}
+      {/* </div> */}
+        <input
+          type="text"
+          value={selectedSalesPerson}
+          disabled hidden
+        />
       </div>
 
   <form onSubmit={handleSubmit} className="space-y-4">
@@ -760,7 +764,8 @@ const quotationPage = () => {
                       <div>Finance Type: </div>
                       <Select
                         options={[{value: true, label: 'In-House' }, { value: false, label: 'Out-House' }]}
-                        onChange={(selected) => {selected && setInhouse(selected.value); setSelectedHpn()}}
+                        value={inhouse && {value: true, label: 'In-House' }}
+                        onChange={(selected) => {selected && setInhouse(selected.value); setSelectedHpn({ label: "Not for Loan Use", value: "N/A" })}}
                         className="w-full p-1 rounded-lg"
                       />
                       <div>HPN: </div>
@@ -866,7 +871,7 @@ const quotationPage = () => {
                     />
                     <div>RTO Amount: </div>
                       <div className="w-full p-2 border border-gray-300 rounded-lg">
-                        {finalData[rto.value]}
+                        {finalData[rto.value].toFixed(2)}
                       </div>
                     {(rto.value == "Scrap RTO") &&
                     <>
