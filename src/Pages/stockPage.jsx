@@ -75,11 +75,17 @@ const stockPage = () => {
     else setSub(true);
   },[year,model,fuel])
 
+  useEffect(()=> {
+    if(selectedOption=='zawlStock') setYear(2024);
+    else setYear('');
+  },[selectedOption])
+
   return (
     <div className="m-auto w-full max-w-4xl p-4">
   <h2 className="text-2xl font-semibold text-center mb-6 uppercase">Check Stock availability</h2>
   
   <form onSubmit={handleSubmit} className="space-y-4">
+    {!(selectedOption==="zawlStock") &&
     <div className="space-y-2">
       <label className="block text-lg">Year:</label>
       <select
@@ -87,7 +93,7 @@ const stockPage = () => {
         onChange={handleYearChange}
         className="w-full p-2 border border-gray-300 rounded-lg"
         value={year}
-      >
+        >
         <option value="">Choose year</option>
         {Object.keys(formInfo).map((yr) => (
           <option value={yr} key={yr}>
@@ -96,6 +102,7 @@ const stockPage = () => {
         ))}
       </select>
     </div>
+    }
 
     <div className="space-y-2">
       <label className="block text-lg">Model:</label>

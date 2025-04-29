@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/auth/AuthProvider';
 import { Link, useNavigate } from 'react-router';
+import { roles } from '../Routes/roles';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const user = useContext(AuthContext);
@@ -64,16 +65,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Logout */}
       <div className="absolute bottom-0 w-full p-4">
-      <button
+        {user.role===roles.ADMIN &&
+          <button
           onClick={() => navigate("/signup")}
           className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-400 hover:bg-sky-400 my-3"
-        >
-          <SignupIcon className="h-5 w-5 mr-2" />
-          <span >Add new user</span>
-        </button>
+          >
+             <SignupIcon className="h-5 w-5 mr-2" />
+            <span >Add new user</span>
+          </button>
+      }
         <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+        onClick={handleLogout}
+        className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
         >
           <LogoutIcon className="h-5 w-5 mr-2" />
           <span >Logout</span>

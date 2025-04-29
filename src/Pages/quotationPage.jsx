@@ -437,6 +437,7 @@ const quotationPage = () => {
     console.log(addDisc, maxAddDisc);
     
     if (addDisc > maxAddDisc) {
+      setShowWarning(true);
       validationErrors.addDisc = true;
       isValid = false;
     }
@@ -445,7 +446,7 @@ const quotationPage = () => {
     if (!isValid) {
       window.scrollTo(0, 0);
     }
-
+    
     return isValid;
   };
 
@@ -831,7 +832,7 @@ const quotationPage = () => {
                       />
                       {showWarning && (
                         <p style={{ color: 'red', marginTop: '0.5rem' }}>
-                          Value cannot exceed {maxAddDisc}.
+                          Value cannot exceed {maxAddDisc || 0}.
                         </p>
                       )}
                       </div>
@@ -984,7 +985,7 @@ const quotationPage = () => {
         disabled={loading}
          className="w-full sm:w-[32%] py-2 mt-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
          onClick={()=> {
-          navigate('/all-quotation')
+          navigate('/all-quotations')
          }}>
           All Quotation
         </button>
