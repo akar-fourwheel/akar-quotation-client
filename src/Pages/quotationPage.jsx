@@ -710,7 +710,8 @@ const quotationPage = () => {
                     <Select
                         options={[{value: 'Dealer', label: 'Dealer' }, { value: 'Self', label: 'Self' }]}
                         onChange={(selected) => {setInsType(selected && selected.value);
-                          selected.value === 'Self' ? setIns(0) : setIns(finalData.Insurance)
+                          selected.value === 'Self' ? setIns(0) : setIns(finalData.Insurance);
+                          setSelectedInsurance([])
                         }}
                         className="w-full p-1 rounded-lg"
                         defaultValue={{value: 'Dealer', label: 'Dealer' }}
