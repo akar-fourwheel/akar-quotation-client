@@ -1,5 +1,6 @@
 export const roles = {
     SALES: 'sales',
     TEAML: 'teamLead',
-    ADMIN: 'admin'
+    ADMIN: 'admin',
+    GUARD: 'guard'
 }

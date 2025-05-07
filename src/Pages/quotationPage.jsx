@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import Select from "react-select";
 import { Fragment } from 'react';
-
-import salesPersonList from '../../salesPerson.json'
 
 const quotationPage = () => {
   const [getYear, setGetYear] = useState([]);
@@ -542,6 +540,10 @@ const quotationPage = () => {
       } finally {
         setLoading(false);
       }  
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+    
+      console.log(`Execution time: ${executionTime} milliseconds`);
     };
 
     // const filteredSalesPersons = salesPersonList.filter(person =>

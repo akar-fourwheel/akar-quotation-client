@@ -16,6 +16,7 @@ import QuotationForBooking from '../Pages/quotationForBooking';
 import BookingPage from "../Pages/booking/BookingPage";
 import BookingForm from "../Pages/booking/bookingForm";
 import bookingSuccess from "../Pages/booking/bookingSuccess";
+import testDrivePage from "../Pages/testDrivePage";
 
 export const routes = createBrowserRouter([
     {
@@ -30,12 +31,35 @@ export const routes = createBrowserRouter([
         path:'/unauthorized',
         Component: Unauthorized
     },
+    // {
+    //     element:<ProtectedRoute roles={[roles.ADMIN]}/>,
+    //     children:[
+    //         {
+    //             element: <Layout />,
+    //             children: [
+    //                 {    
+    //                     path:'/test-drive',
+    //                     Component:testDrivePage
+    //                 }
+    //             ]
+    //         },
+    //     ]
+    // },
     {
         element: <ProtectedRoute roles={[roles.SALES,roles.TEAML,roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
                 children: [
+                    {
+                        element:<ProtectedRoute roles={[roles.ADMIN]}/>,
+                        children: [
+                            {    
+                                                    path:'/test-drive',
+                                                    Component:testDrivePage
+                                                }
+                        ]
+                    },
                     {
                         path:'/',
                         element: <HomePage />,
@@ -76,12 +100,15 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-    // {
-    //     element:<ProtectedRoute roles={[roles.ADMIN]}/>,
-    //     children:[
-
-    //     ]
-    // }
+    {
+        element:<ProtectedRoute roles={[roles.GUARD]}/>,
+        children:[
+            {
+                path:'/test-drive',
+                Component:testDrivePage
+            },
+        ]
+    },
 ])
 
 export default routes
