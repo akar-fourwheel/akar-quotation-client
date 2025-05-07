@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import Select from "react-select";
 import { Fragment } from 'react';
-
-import salesPersonList from '../../salesPerson.json'
 
 const quotationPage = () => {
   const [getYear, setGetYear] = useState([]);
@@ -325,7 +323,7 @@ const quotationPage = () => {
       return;
     }
   
-    if (finalData.YEAR == 2025 && finalData.Fuel == "Electric") {
+    if (!(localStorage.getItem("role") === "admin") && finalData.YEAR == 2025) {
       let max = finalData.AddDiscLim;
   
       const pplUpper = finalData.PPL?.toUpperCase();
@@ -436,11 +434,11 @@ const quotationPage = () => {
     }
     console.log(addDisc, maxAddDisc);
     
-    if (maxAddDisc && (addDisc > maxAddDisc)) {
-      setShowWarning(true);
-      validationErrors.addDisc = true;
-      isValid = false;
-    }
+    // if (maxAddDisc && (addDisc > maxAddDisc)) {
+    //   setShowWarning(true);
+    //   validationErrors.addDisc = true;
+    //   isValid = false;
+    // }
 
     setErrors(validationErrors);
     if (!isValid) {
@@ -451,7 +449,7 @@ const quotationPage = () => {
   };
 
   const handleGeneratePDF = async () => {
-
+    const startTime = performance.now();
     if (!validateForm()) {
       return; // Don't proceed if there are validation errors
     }
@@ -542,6 +540,10 @@ const quotationPage = () => {
       } finally {
         setLoading(false);
       }  
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+    
+      console.log(`Execution time: ${executionTime} milliseconds`);
     };
 
     // const filteredSalesPersons = salesPersonList.filter(person =>
