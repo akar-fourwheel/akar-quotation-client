@@ -83,9 +83,9 @@ const quotationPage = () => {
   ];
 
   const ewOptions = [
-    { value: 'EW 1 Year', label: '1 Year' },
-    { value: 'EW 2 Year', label: '2 Years' },
-    { value: 'EW 3 Year', label: '3 Years'},
+    { value: 'EW_1_Year', label: '1 Year' },
+    { value: 'EW_2_Year', label: '2 Years' },
+    { value: 'EW_3_Year', label: '3 Years'},
   ];
 
   const vasOptions = [
@@ -167,9 +167,9 @@ const quotationPage = () => {
       },
     })
     .then((response) => {      
-      const data = JSON.parse(response.data[0]);
-      const data1 = JSON.parse(response.data[1]);
-      const data2 = JSON.parse(response.data[2]);
+      const data = response.data[0]
+      const data1 = response.data[1]
+      const data2 = response.data[2]
       setColor(data2);
       setAccessories(data1)
       setFinalData(data);
@@ -325,7 +325,7 @@ const quotationPage = () => {
       return;
     }
   
-    if (finalData.YEAR == 2025 && finalData.Fuel == "Electric") {
+    if (!(localStorage.getItem("role")=== "admin") &&  finalData.YEAR == 2025) {
       let max = finalData.AddDiscLim;
   
       const pplUpper = finalData.PPL?.toUpperCase();
@@ -436,11 +436,11 @@ const quotationPage = () => {
     }
     console.log(addDisc, maxAddDisc);
     
-    if (maxAddDisc && (addDisc > maxAddDisc)) {
-      setShowWarning(true);
-      validationErrors.addDisc = true;
-      isValid = false;
-    }
+    // if (maxAddDisc && (addDisc > maxAddDisc)) {
+    //   setShowWarning(true);
+    //   validationErrors.addDisc = true;
+    //   isValid = false;
+    // }
 
     setErrors(validationErrors);
     if (!isValid) {
@@ -513,13 +513,13 @@ const quotationPage = () => {
       accTotal: accTotal, 
       inc: ins, 
       rsa: (selectedInsurance.some((opt) => opt.value === "RSA") ? finalData["RSA"] : 0), 
-      keyRep: (selectedInsurance.some((opt) => opt.value === "Key Replacement") ? finalData["Key Replacement"] : 0), 
-      engineProtect: (selectedInsurance.some((opt) => opt.value === "Engine Protection") ? finalData["Engine Protection"] : 0), 
+      keyRep: (selectedInsurance.some((opt) => opt.value === "Key_Replacement") ? finalData["Key_Replacement"] : 0), 
+      engineProtect: (selectedInsurance.some((opt) => opt.value === "Engine_Protection") ? finalData["Engine_Protection"] : 0), 
       rti: (selectedInsurance.some((opt) => opt.value === "RTI") ? finalData["RTI"] : 0), 
-      tyreNcover: (selectedInsurance.some((opt) => opt.value === "Tyre and Alloy Cover") ? finalData["Tyre and Alloy Cover"] : 0), 
+      tyreNcover: (selectedInsurance.some((opt) => opt.value === "Tyre_and_Alloy_Cover") ? finalData["Tyre_and_Alloy_Cover"] : 0), 
       consumables: (selectedInsurance.some((opt) => opt.value === "Consumables") ? finalData["Consumables"] : 0), 
-      personalBelong: (selectedInsurance.some((opt) => opt.value === "Personal Belongings") ? finalData["Personal Belongings"] : 0), 
-      batteryP: (selectedInsurance.some((opt) => opt.value === "Battery Protection") ? finalData["Battery Protection"] : 0), 
+      personalBelong: (selectedInsurance.some((opt) => opt.value === "Personal_Belongings") ? finalData["Personal_Belongings"] : 0), 
+      batteryP: (selectedInsurance.some((opt) => opt.value === "Battery_Protection") ? finalData["Battery_Protection"] : 0), 
       incTotal: totalAddOns + ins, 
       ewType: ew ? ew : " ", 
       ew: ew ? finalData[ew] : " ", 
@@ -725,7 +725,7 @@ const quotationPage = () => {
                     <Select
                       options={Object.keys(finalData)
                         .filter((key, i) => (i >= 20 && i <= 26 && finalData[key] > 0))
-                        .map((key) => ({ value: key, label: key }))}
+                        .map((key) => ({ value: key, label: key.replace(/_/g," ") }))}
                       isMulti
                       value={selectedInsurance}
                       onChange={handleInsurance}

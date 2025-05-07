@@ -28,16 +28,26 @@ function AllQuotation() {
             let response;
             if(role === roles.ADMIN) {
                 response = await axios.get(`/admin/all-quotations`, {
-                    params: { page, limit: 25 }
+                    params: { role,page, limit: 25 }
                 });
             } else if(role === roles.SALES) {
                 response = await axios.get(`/my-quotation`, {
                     params: {
-                        name: localStorage.getItem('username'),
+                        name: username,
+                        role,
                         page,
                         limit: 25
                     }
                 });
+            } else if(role ==roles.TEAML){
+                response = await axios.get("teamLead/quotations",{
+                    params:{
+                        name:username,
+                        role,
+                        page,
+                        limit:25,
+                    }
+                })
             }
             
             if(response?.data) {
@@ -67,10 +77,10 @@ function AllQuotation() {
                         <tr className="bg-gray-100">
                             <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[100px]">Created_on</th>
                             <th className="px-2 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[80px]">Unique_ID</th>
-                            <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[250px]">Customer_Name</th>
                             {role !== roles.SALES && (
                                 <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 w-[150px]">Sales_Person</th>
                             )}
+                            <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[250px]">Customer_Name</th>
                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 w-[200px]">Variant</th>
                             <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">PDF</th>
                             <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[150px]">WhatsApp</th>

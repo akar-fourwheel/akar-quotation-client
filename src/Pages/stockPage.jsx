@@ -77,7 +77,6 @@ const stockPage = () => {
 
   useEffect(()=> {
     if(selectedOption=='zawlStock') setYear(2024);
-    else setYear('');
   },[selectedOption])
 
   return (

@@ -45,6 +45,7 @@ function ZoneContent({responseData}){
           <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">Age</th>
           <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">Varient</th>
           <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">Color</th>
+          <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">Count</th>
           <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">Enquiry</th>
         </tr>
       </thead>
