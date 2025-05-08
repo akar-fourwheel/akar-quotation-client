@@ -76,8 +76,8 @@ const quotationPage = () => {
 
   const rtoOptions = [
     { value: 'RTO', label: 'Normal RTO' },
-    { value: 'BH RTO', label: 'BH RTO' },
-    { value: 'Scrap RTO', label: 'Scrap RTO'},
+    { value: 'BH_RTO', label: 'BH RTO' },
+    { value: 'Scrap_RTO', label: 'Scrap RTO'},
   ];
 
   const ewOptions = [
@@ -876,7 +876,7 @@ const quotationPage = () => {
                       <div className="w-full p-2 border border-gray-300 rounded-lg">
                         {finalData[rto.value].toFixed(2)}
                       </div>
-                    {(rto.value == "Scrap RTO") &&
+                    {(rto.value == "Scrap_RTO") &&
                     <>
                       <div>Scrap by: </div>
                       <Select
