@@ -51,8 +51,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           { to: '/scheme-sheet', label: 'Scheme Sheet', icon: schemeIcon },
           { to: '/quotation', label: 'Make Quotation', icon: QuotationIcon },
           { to: '/all-quotations', label: 'Quotation List', icon: ListIcon },
-          { to: '/booking-list', label: 'Booking List', icon: BookingIcon }
-        ].map(({ to, label, icon: Icon }, i) => (
+          { to: '/booking-list', label: 'Booking List', icon: BookingIcon },
+          { to: '/test-drive', label: 'Test Drive', icon: CarIcon, restrictedTo: ['admin', 'guard']}
+        ].filter(item => {
+          return !item.restrictedTo || item.restrictedTo.includes(localStorage.role);
+        }).map(({ to, label, icon: Icon }, i) => (
           <Link
             key={i}
             to={to}
@@ -134,6 +137,13 @@ const SignupIcon = (props) => (
   <svg className="h-5 w-5 mr-2 size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
   <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
 </svg>
-)
+);
+
+const CarIcon = (props) => (
+  <svg
+  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-5 w-5 mr-3 size-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 18a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0-2.5-2.5zm0 4a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z"/><path d="M28.5 12.667 27.4 11.2A5.525 5.525 0 0 0 23 9h-3.6a8.517 8.517 0 0 0-5.441 1.97L10.319 14H9.083a5.728 5.728 0 0 0-5.558 4.34l-.51 2.039A.5.5 0 0 0 3.5 21h4a.5.5 0 0 0 0-1H4.141l.359-1.417A4.729 4.729 0 0 1 9.083 15h14.76a4.47 4.47 0 0 0 3.182-1.318l.564-.564.111.149a1.5 1.5 0 0 1 .3.9V19.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 0 0 1h1a1.5 1.5 0 0 0 1.5-1.5v-5.333a2.515 2.515 0 0 0-.5-1.5zM19 14h-7.119l2.719-2.262a7.511 7.511 0 0 1 4.4-1.721zm7.318-1.025A3.477 3.477 0 0 1 23.843 14H20v-4h3a4.521 4.521 0 0 1 3.6 1.8l.383.51z"/><path d="M22.5 18a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0-2.5-2.5zm0 4a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zM18.5 20h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM17.5 17a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1z"/>
+</svg>
+);
 
 export default Sidebar;
