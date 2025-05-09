@@ -40,7 +40,7 @@ function AllQuotation() {
                     }
                 });
             } else if(role ==roles.TEAML){
-                response = await axios.get("teamLead/quotations",{
+                response = await axios.get("/teamLead/quotations",{
                     params:{
                         name:username,
                         role,
@@ -67,6 +67,23 @@ function AllQuotation() {
         setCurrentPage(pageNumber);
         window.scrollTo(0, 0);
     };
+    function setToIst(dateTime) {
+        const dt = new Date(dateTime);
+        const istOffset = 5.5 * 60; // IST is UTC+5:30
+        const utc = dt.getTime() + (dt.getTimezoneOffset() * 60000);
+        const istTime = new Date(utc + (istOffset * 60000));
+    
+        return istTime.toLocaleString('en-GB', {
+            timeZone: 'Asia/Kolkata',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+    }
 
     return (
         <div className="container mx-auto w-half p-2 md:p-6">
@@ -90,7 +107,7 @@ function AllQuotation() {
                     <tbody>
                         {quotaData?.map((row, index) => (
                             <tr key={index} className="border-b hover:bg-gray-50">
-                                <td className="px-4 py-2 text-xs md:text-md text-gray-900 w-[100px]">{row[1]}</td>
+                                <td className="px-4 py-2 text-xs md:text-md text-gray-900 w-[100px]">{setToIst(row[1])}</td>
                                 <td className="px-2 py-2 text-xs md:text-md text-gray-900 w-[80px]">{row[0]}</td>
                                 {role !== roles.SALES && (
                                 <td className="px-4 py-2 text-xs md:text-sm text-gray-900 w-[180px]">{row[2]}</td>
