@@ -519,10 +519,10 @@ const quotationPage = () => {
       personalBelong: (selectedInsurance.some((opt) => opt.value === "Personal_Belongings") ? finalData["Personal_Belongings"] : 0), 
       batteryP: (selectedInsurance.some((opt) => opt.value === "Battery_Protection") ? finalData["Battery_Protection"] : 0), 
       incTotal: totalAddOns + ins, 
-      ewType: ew ? ew : " ", 
-      ew: ew ? finalData[ew] : " ", 
-      vasType: selectedVas ? selectedVas.label : " ", 
-      vas: selectedVas ? selectedVas.value : " ", 
+      ewType: ew ? ew : "", 
+      ew: ew ? finalData[ew] : 0,
+      vasType: selectedVas ? selectedVas.label : "", 
+      vas: selectedVas ? selectedVas.value : 0, 
       fasttag: finalData.FastTag, 
       grandTotal: totalESP, };
       
@@ -551,9 +551,11 @@ const quotationPage = () => {
     // );
 
     useEffect(() => {
-      // Get today's date in YYYY-MM-DD format
-      const today = new Date().toISOString().split('T')[0];
-      setCurrentDate(today);
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 330);
+      const formattedDateTime = now.toISOString().slice(0, 19).replace('T', ' ');
+      setCurrentDate(formattedDateTime);
+      console.log(formattedDateTime);
     }, []);
 
     useEffect(() => {
