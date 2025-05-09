@@ -27,17 +27,12 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
     try {
       const response = await axios.put(`/test-drive/in/${index}`, { availability: "Available" });
 
-      if (avail === "Unavailable") {
+      
         const pushData = await axios.put(`/test-drive/in`, payload, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
-        if (!pushData.status === 200) {
-          throw new Error("Failed to save details");
-        }
-      }
-
-      if (!response.status === 200) {
+      if (!response.status === 200 && !pushData.status === 200) {
         throw new Error("Failed to update vehicle status");
       }
 
@@ -65,7 +60,7 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/20">
       <div className="bg-white rounded-lg w-full max-w-md shadow-lg">
         <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-t-lg">
           <h2 className="text-lg font-semibold">
@@ -80,11 +75,6 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
                 <i className="fas fa-exclamation-circle mr-2"></i>{error}
               </div>
             )}
-
-            {avail === "Workshop" ? (
-              <p className="text-sm text-gray-700">Save Details to register entry of <strong>{model}</strong> from Workshop!</p>
-            ) : (
-              <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <i className="fas fa-gauge text-blue-500 mr-2"></i>Kilometers
@@ -94,23 +84,23 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
                     name="inKM"
                     value={formData.inKM}
                     onChange={handleChange}
-                    required={avail !== "Workshop"}
+                    required
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:ring focus:ring-blue-200"
                     placeholder="Enter the KM reading"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    <i className="fas fa-camera text-blue-500 mr-2"></i>Photo Proof
-                  </label>
+                <div className="mt-4">
+              <label className="block mb-1 font-medium text-gray-700">
+                <i className="fas fa-camera text-blue-600 mr-2"></i>Photo Proof
+              </label>
                   <input
                     type="file"
                     name="photo"
                     accept="image/*"
                     onChange={handleChange}
-                    required={avail !== "Workshop"}
-                    className="block w-full text-sm text-gray-700"
+                    required
+                    className="block w-full border border-gray-300 rounded px-3 py-2"
                   />
                   {previewUrl && (
                     <div className="mt-2">
@@ -118,8 +108,6 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
                     </div>
                   )}
                 </div>
-              </>
-            )}
           </div>
 
           <div className="flex justify-end gap-2 bg-gray-100 p-4 rounded-b-lg">

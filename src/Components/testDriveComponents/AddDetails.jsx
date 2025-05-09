@@ -3,7 +3,17 @@ import axios from "axios";
 
 const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
   const [isOn, setIsOn] = useState(false);
-  const toggle = () => setIsOn(prev => !prev);
+  const toggle = () => {
+    setIsOn(prev => !prev);
+    setFormData({
+      customerName: "",
+      phoneNumber: "",
+      salesPerson: "",
+      outKM: "",
+      model: model,
+      photo: null,
+    });
+  }
 
   const [formData, setFormData] = useState({
     customerName: "",
@@ -19,6 +29,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
 
   const handleClose = () => {
     setShow(false);
+    setIsOn(false);
     setFormData({
       customerName: "",
       phoneNumber: "",
@@ -46,16 +57,11 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
         status: isOn ? "Workshop" : "Unavailable",
       });
 
-      if (!isOn) {
         const detailsResponse = await axios.post(`/test-drive/out`, payload, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        if (!detailsResponse.status === 200) {
-          throw new Error("Failed to save details");
-        }
-      }
 
-      if (!statusResponse.status === 200) {
+      if (!statusResponse.status === 200 && !detailsResponse.status === 200) {
         throw new Error("Failed to update vehicle status");
       }
 
@@ -123,10 +129,10 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
               <input
                 type="text"
                 name="customerName"
-                value={formData.customerName}
+                value={isOn ? formData.customerName = "Workshop" : formData.customerName}
                 onChange={handleChange}
                 disabled={isOn}
-                required={!isOn}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter customer name"
               />
@@ -140,10 +146,10 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
               <input
                 type="tel"
                 name="phoneNumber"
-                value={formData.phoneNumber}
+                value={isOn ? formData.phoneNumber = 9999999999 : formData.phoneNumber}
                 onChange={handleChange}
                 disabled={isOn}
-                required={!isOn}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter phone number"
               />
@@ -157,10 +163,10 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
               <input
                 type="text"
                 name="salesPerson"
-                value={formData.salesPerson}
+                value={isOn ? formData.salesPerson = "Workshop" : formData.salesPerson}
                 onChange={handleChange}
                 disabled={isOn}
-                required={!isOn}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter salesperson name"
               />
@@ -176,8 +182,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
                 name="outKM"
                 value={formData.outKM}
                 onChange={handleChange}
-                disabled={isOn}
-                required={!isOn}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter the KM reading"
               />
@@ -185,7 +190,6 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
           </div>
 
           {/* File Upload */}
-          {!isOn && (
             <div className="mt-4">
               <label className="block mb-1 font-medium text-gray-700">
                 <i className="fas fa-camera text-blue-600 mr-2"></i>Photo Proof
@@ -202,7 +206,6 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
                 <img src={previewUrl} alt="Preview" className="mt-2 rounded border max-h-48" />
               )}
             </div>
-          )}
 
           {/* Footer Buttons */}
           <div className="flex justify-end items-center mt-6 space-x-3">

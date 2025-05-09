@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import { BellIcon } from "@heroicons/react/24/outline";
+import { roles } from "../Routes/roles";
 
 import NotificationOverlay from "../Components/homePage/NotificationOverlay";
 import { useEffect, useState } from "react";
@@ -74,6 +75,16 @@ const HomePage = (req, res) => {
                   Booking List
                 </button>
               </Link>
+              {localStorage.role === roles.ADMIN && (
+                <Link to="/test-drive">
+                <button
+                  type="button"
+                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+                >
+                  Test Drive
+                </button>
+              </Link>
+              )}
             </div>
         </div>
       </div>
