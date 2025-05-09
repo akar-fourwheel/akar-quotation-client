@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { AuthContext } from '../../context/auth/AuthProvider';
 import { login as authLogin } from '../../context/auth/authService';
+import { roles } from '../../Routes/roles';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -30,7 +31,7 @@ const Login = () => {
     try {
       await login(credentials);
       // Redirect to the page they tried to visit or home
-      const from = location.state?.from?.pathname || '/';
+      const from = localStorage.role === roles.GUARD ? '/test-drive' : (location.state?.from?.pathname || '/');
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');

@@ -118,6 +118,7 @@ const quotationPage = () => {
     { label: "Sriram Finance", value: "Sriram Finance" },
     { label: "SK Finance", value: "SK Finance" },
     { label: "Cholamandalam Investment and Finance Company", value: "Cholamandalam Investment and Finance Company" },
+    { label: "AU Small Finance Bank", value: "AU Small Finance Bank"},
     { label: "Not for Loan Use", value: "N/A" },
     { label: "Cash", value: "Cash" }
   ];
@@ -539,11 +540,8 @@ const quotationPage = () => {
         console.error("Error generating PDF", error);
       } finally {
         setLoading(false);
-      }  
-      const endTime = performance.now();
-      const executionTime = endTime - startTime;
-    
-      console.log(`Execution time: ${executionTime} milliseconds`);
+      } 
+
     };
 
     // const filteredSalesPersons = salesPersonList.filter(person =>

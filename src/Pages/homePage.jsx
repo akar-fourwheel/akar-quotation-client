@@ -1,12 +1,12 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { BellIcon } from "@heroicons/react/24/outline";
 
 import NotificationOverlay from "../Components/homePage/NotificationOverlay";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 
 const HomePage = (req, res) => {
   const [showOverlay, setShowOverlay] = useState(false);
+
 
   return (
     <>

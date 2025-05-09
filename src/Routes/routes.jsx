@@ -20,90 +20,72 @@ import testDrivePage from "../Pages/testDrivePage";
 
 export const routes = createBrowserRouter([
     {
-        path:'/login',
+        path: '/login',
         Component: Login
     },
     {
-        path:'/signup',
+        path: '/signup',
         Component: Signup
     },
     {
-        path:'/unauthorized',
+        path: '/unauthorized',
         Component: Unauthorized
     },
-    // {
-    //     element:<ProtectedRoute roles={[roles.ADMIN]}/>,
-    //     children:[
-        //         {
-            //             element: <Layout />,
-    //             children: [
-        //                 {    
-            //                     path:'/test-drive',
-            //                     Component:testDrivePage
-            //                 }
-            //             ]
-            //         },
-            //     ]
-            // },
-            {
-                element:<ProtectedRoute roles={[roles.GUARD]}/>,
-                children:[
-                    {
-                        path:'/test-drive',
-                        Component:testDrivePage
-                    },
-                ]
-            },
-            {
-        element: <ProtectedRoute roles={[roles.SALES,roles.TEAML,roles.ADMIN]} />,
+    {
+        element: <ProtectedRoute roles={[roles.GUARD, roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
                 children: [
                     {
-                        element: <ProtectedRoute roles={[roles.ADMIN]} />,
-                        children: [
-                            {
-                                path: '/test-drive',
-                                Component: testDrivePage
-                            }
-                        ]
-                    },
+                        path: '/test-drive',
+                        Component: testDrivePage
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        element: <ProtectedRoute roles={[roles.SALES, roles.TEAML, roles.ADMIN]} />,
+        children: [
+            {
+                element: <Layout />,
+                children: [
                     {
-                        path:'/',
+                        path: '/',
                         element: <HomePage />,
                     },
                     {
-                        path:'/stock-sheet',
-                        Component:StockPage
+                        path: '/stock-sheet',
+                        Component: StockPage
                     },
                     {
-                        path:'/scheme-sheet',
+                        path: '/scheme-sheet',
                         Component: SchemePage
                     },
                     {
-                        path:'/quotation',
-                        Component:QuotationPage
+                        path: '/quotation',
+                        Component: QuotationPage
                     },
                     {
-                        path:'/quotation-book',
-                        Component:QuotationForBooking
+                        path: '/quotation-book',
+                        Component: QuotationForBooking
                     },
                     {
-                        path:'/booking-list',
-                        Component:BookingPage
+                        path: '/booking-list',
+                        Component: BookingPage
                     },
                     {
-                        path:'/booking-form/:id',
-                        Component:BookingForm
+                        path: '/booking-form/:id',
+                        Component: BookingForm
                     },
                     {
-                        path:'/booking-success/:chassis',
-                        Component:bookingSuccess
+                        path: '/booking-success/:chassis',
+                        Component: bookingSuccess
                     },
                     {
-                        path:'/all-quotations',
-                        Component:AllQuotation
+                        path: '/all-quotations',
+                        Component: AllQuotation
                     }
                 ]
             }

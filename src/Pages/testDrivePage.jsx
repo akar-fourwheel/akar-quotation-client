@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ListGroup from "../Components/testDriveComponents/ListGroup";
 import AllRecords from "../Components/testDriveComponents/AllRecords";
 import axios from "axios";
+import { roles } from '../Routes/roles';
+import { AuthContext } from '../context/auth/AuthProvider';
 
 function TestDrivePage() {
   const [jsonData, setJsonData] = useState(null);
   const [records, setRecords] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { role } = useContext(AuthContext);
+
 
   const getData = () => {
     axios.get("/test-drive")
@@ -55,8 +59,7 @@ function TestDrivePage() {
             )}
           </div>
         </div>
-
-        {/* All Records Card */}
+        {role === roles.ADMIN && (
         <div className="bg-white shadow-lg rounded-lg mt-10">
           <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4">
             <h3 className="text-center text-xl font-semibold flex items-center justify-center gap-2">
@@ -74,6 +77,7 @@ function TestDrivePage() {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );

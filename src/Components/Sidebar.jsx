@@ -5,7 +5,7 @@ import { roles } from '../Routes/roles';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const user = useContext(AuthContext);
-  const { logout } = useContext(AuthContext);
+  const { logout, role } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -43,6 +43,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
 
       {/* Navigation */}
+      {role !== roles.GUARD && (
       <nav className="mt-4">
         {[
           { to: '/', label: 'Home', icon: HomeIcon },
@@ -61,7 +62,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <span >{label}</span>
           </Link>
         ))}
-      </nav>
+      </nav>)}
 
       {/* Logout */}
       <div className="absolute bottom-0 w-full p-4">
