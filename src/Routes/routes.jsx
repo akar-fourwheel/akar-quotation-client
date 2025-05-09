@@ -34,30 +34,39 @@ export const routes = createBrowserRouter([
     // {
     //     element:<ProtectedRoute roles={[roles.ADMIN]}/>,
     //     children:[
-    //         {
-    //             element: <Layout />,
+        //         {
+            //             element: <Layout />,
     //             children: [
-    //                 {    
-    //                     path:'/test-drive',
-    //                     Component:testDrivePage
-    //                 }
-    //             ]
-    //         },
-    //     ]
-    // },
-    {
+        //                 {    
+            //                     path:'/test-drive',
+            //                     Component:testDrivePage
+            //                 }
+            //             ]
+            //         },
+            //     ]
+            // },
+            {
+                element:<ProtectedRoute roles={[roles.GUARD]}/>,
+                children:[
+                    {
+                        path:'/test-drive',
+                        Component:testDrivePage
+                    },
+                ]
+            },
+            {
         element: <ProtectedRoute roles={[roles.SALES,roles.TEAML,roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
                 children: [
                     {
-                        element:<ProtectedRoute roles={[roles.ADMIN]}/>,
+                        element: <ProtectedRoute roles={[roles.ADMIN]} />,
                         children: [
-                            {    
-                                                    path:'/test-drive',
-                                                    Component:testDrivePage
-                                                }
+                            {
+                                path: '/test-drive',
+                                Component: testDrivePage
+                            }
                         ]
                     },
                     {
@@ -98,15 +107,6 @@ export const routes = createBrowserRouter([
                     }
                 ]
             }
-        ]
-    },
-    {
-        element:<ProtectedRoute roles={[roles.GUARD]}/>,
-        children:[
-            {
-                path:'/test-drive',
-                Component:testDrivePage
-            },
         ]
     },
 ])

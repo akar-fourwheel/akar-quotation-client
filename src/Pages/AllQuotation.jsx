@@ -92,10 +92,10 @@ function AllQuotation() {
                             <tr key={index} className="border-b hover:bg-gray-50">
                                 <td className="px-4 py-2 text-xs md:text-md text-gray-900 w-[100px]">{row[1]}</td>
                                 <td className="px-2 py-2 text-xs md:text-md text-gray-900 w-[80px]">{row[0]}</td>
-                                <td className="px-4 py-2 text-xs md:text-sm text-gray-900 w-[180px]">{row[2]}</td>
                                 {role !== roles.SALES && (
-                                    <td className="px-4 py-2 text-sm text-gray-900 w-[150px]">{row[3]}</td>
+                                <td className="px-4 py-2 text-xs md:text-sm text-gray-900 w-[180px]">{row[2]}</td>
                                 )}
+                                <td className="px-4 py-2 text-sm text-gray-900 w-[150px]">{row[3]}</td>
                                 <td className="px-4 py-2 text-sm text-gray-900 w-[150px]">{row[4]}</td>
                                 <td className="px-1 sm:px-4 py-2 text-md text-gray-900 w-[120px]">
                                     <button

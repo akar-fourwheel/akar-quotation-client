@@ -294,7 +294,7 @@ const quotationPage = () => {
   };
 
   const handleAddExch = (selected) => {
-    if (selected.value) {setAddExc(finalData["ADDITIONAL EXCHANGE"])}
+    if (selected.value) {setAddExc(finalData["ADDITIONAL_EXCHANGE"])}
     else setAddExc(0);
   }
 
@@ -478,8 +478,8 @@ const quotationPage = () => {
       loyalty: (!loyalty || loyalty == 0 ? false : true),
       ICEtoEV: (loyaltyType == 'ICE to EV' && finalData[loyaltyType]), 
       EVtoEV: (loyaltyType == 'EV to EV' && finalData[loyaltyType]),  
-      corpTop10Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE TOP 10") ? finalData["CORPORATE TOP 10"] : 0), 
-      corpTop20Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE TOP 20") ? finalData["CORPORATE TOP 20"] : 0), 
+      corpTop10Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE_TOP_10") ? finalData["CORPORATE_TOP_10"] : 0), 
+      corpTop20Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE_TOP_20") ? finalData["CORPORATE_TOP_20"] : 0), 
       corpOfferToggle: (finalData[corpOffer] > 0 ? true : false),
       solarDisc:((corpOffer === "SOLER") ? finalData.SOLER : 0), 
       MSMEDisc: ((corpOffer === "MSME") ? finalData.MSME : 0), 
@@ -491,7 +491,7 @@ const quotationPage = () => {
       tcs: tcs, 
       rtoType: rto.value, 
       rtoAmt: finalData[rto.value].toFixed(2),
-      scrapBy: (scrap ? "Dealer" : rto.value == "Scrap RTO" ? "Self" : "N/A"), 
+      scrapBy: (scrap ? "Dealer" : rto.value == "Scrap_RTO" ? "Self" : "N/A"), 
       cod: cod, 
       mudflap: (selectedAcc.some((opt) => opt.label === "Mudflap") ? selectedAcc.find((opt) => opt.label === "Mudflap").value : 0), 
       uniMatting: (selectedAcc.some((opt) => opt.label === "Universal Matting") ? selectedAcc.find((opt) => opt.label === "Universal Matting").value : 0), 
@@ -796,7 +796,7 @@ const quotationPage = () => {
                       </>}
                     <div>Select Discount Type:</div>
                     <Select
-                      options={[...discounts.filter(x => finalData[x.value] > 0), (finalData['MSME'] || finalData['SOLER']) ? { value: 'CORPORATE OFFER', label: 'Corporate Offer' } : { value: 'None', label: 'None' }, (finalData['EXCHANGE']+finalData['ADDITIONAL EXCHANGE']+finalData['ICE to EV']+finalData['EV to EV'] > 0 ) ? { value: 'EXCHANGE', label: 'Exchange' } : { value: 'None', label: 'None' }].filter(x => x.value != "None")}
+                      options={[...discounts.filter(x => finalData[x.value] > 0), (finalData['MSME'] || finalData['SOLER']) ? { value: 'CORPORATE OFFER', label: 'Corporate Offer' } : { value: 'None', label: 'None' }, (finalData['EXCHANGE']+finalData['ADDITIONAL_EXCHANGE']+finalData['ICE_to_EV']+finalData['EV_to_EV'] > 0 ) ? { value: 'EXCHANGE', label: 'Exchange' } : { value: 'None', label: 'None' }].filter(x => x.value != "None")}
                       isMulti
                       value={selectedDiscounts}
                       onChange={handleDiscount}
@@ -817,7 +817,7 @@ const quotationPage = () => {
                     />
                     <div>Loyalty Bonus: </div>
                     <Select
-                      options={[{value: "ICE to EV", label: 'ICE to EV' }, { value: "EV to EV", label: 'EV to EV' }, { value: "N/A", label: 'N/A'}]}
+                      options={[{value: "ICE_to_EV", label: 'ICE_to_EV' }, { value: "EV_to_EV", label: 'EV_to_EV' }, { value: "N/A", label: 'N/A'}]}
                       onChange={handleLoyalty}
                       className="w-full p-1 rounded-lg"
                     />
