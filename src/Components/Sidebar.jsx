@@ -47,15 +47,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <nav className="mt-4">
         {[
           { to: '/', label: 'Home', icon: HomeIcon },
-          { to: '/stock-sheet', label: 'Search Stock', icon: StockIcon },
+          { to: '/price-list', label: 'Price List', icon: PriceIcon },
           { to: '/scheme-sheet', label: 'Scheme Sheet', icon: schemeIcon },
           { to: '/quotation', label: 'Make Quotation', icon: QuotationIcon },
+          { to: '/stock-sheet', label: 'Search Stock', icon: StockIcon },
           { to: '/all-quotations', label: 'Quotation List', icon: ListIcon },
           { to: '/booking-list', label: 'Booking List', icon: BookingIcon },
-          { to: '/test-drive', label: 'Test Drive', icon: CarIcon, restrictedTo: ['admin', 'guard']}
-        ].filter(item => {
-          return !item.restrictedTo || item.restrictedTo.includes(localStorage.role);
-        }).map(({ to, label, icon: Icon }, i) => (
+          { to: '/test-drive', label: 'Test Drive', icon: CarIcon }
+        ].map(({ to, label, icon: Icon }, i) => (
           <Link
             key={i}
             to={to}
@@ -144,6 +143,13 @@ const CarIcon = (props) => (
   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-5 w-5 mr-3 size-6">
   <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 18a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0-2.5-2.5zm0 4a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z"/><path d="M28.5 12.667 27.4 11.2A5.525 5.525 0 0 0 23 9h-3.6a8.517 8.517 0 0 0-5.441 1.97L10.319 14H9.083a5.728 5.728 0 0 0-5.558 4.34l-.51 2.039A.5.5 0 0 0 3.5 21h4a.5.5 0 0 0 0-1H4.141l.359-1.417A4.729 4.729 0 0 1 9.083 15h14.76a4.47 4.47 0 0 0 3.182-1.318l.564-.564.111.149a1.5 1.5 0 0 1 .3.9V19.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 0 0 1h1a1.5 1.5 0 0 0 1.5-1.5v-5.333a2.515 2.515 0 0 0-.5-1.5zM19 14h-7.119l2.719-2.262a7.511 7.511 0 0 1 4.4-1.721zm7.318-1.025A3.477 3.477 0 0 1 23.843 14H20v-4h3a4.521 4.521 0 0 1 3.6 1.8l.383.51z"/><path d="M22.5 18a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0-2.5-2.5zm0 4a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zM18.5 20h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM17.5 17a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1z"/>
 </svg>
+);
+
+const PriceIcon = (props) => (
+  <svg 
+  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 mr-3 size-6">
+  <path d="M4.5 0h11c.828 0 1.5.677 1.5 1.512v18.21a.2.2 0 01-.334.149l-1.664-1.515a.497.497 0 00-.67 0l-1.664 1.514a.497.497 0 01-.67 0l-1.663-1.514a.497.497 0 00-.67 0L8.002 19.87a.497.497 0 01-.67 0l-1.664-1.514a.497.497 0 00-.67 0l-1.664 1.515a.2.2 0 01-.334-.15V1.512C3 .677 3.672 0 4.5 0zm6.808 13.4l-1.96-2.63c1.342-.21 2.254-1.288 2.552-2.694h.85a.75.75 0 100-1.499h-.763a4.427 4.427 0 00-.432-1.579h.945A1 1 0 1012.5 3h-5a1 1 0 100 1.998h2.135c.449.297.754.86.844 1.58H7.25a.75.75 0 100 1.498h3.1c-.252.756-.791 1.234-1.493 1.234-.285 0-.543-.02-.777-.056a1 1 0 00-1.258 1.489l2.89 3.86a1 1 0 001.596-1.204z" fill="#d1d5dc"/>
+  </svg>
 );
 
 export default Sidebar;

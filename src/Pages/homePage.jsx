@@ -58,34 +58,41 @@ const HomePage = (req, res) => {
               </button>
             </Link>
           </div>
-            <div className="mt-6 lg:mt-8 hidden lg:flex justify-center gap-4">
-              <Link to="/all-quotations">
-                <button
-                  type="button"
-                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-                >
-                  Quotations
-                </button>
-              </Link>
-              <Link to="/booking-list">
-                <button
-                  type="button"
-                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-                >
-                  Booking List
-                </button>
-              </Link>
-              {localStorage.role === roles.ADMIN && (
-                <Link to="/test-drive">
-                <button
-                  type="button"
-                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-                >
-                  Test Drive
-                </button>
-              </Link>
-              )}
-            </div>
+          <div className="mt-6 lg:mt-8 hidden lg:flex justify-center gap-4">
+            <Link to="/all-quotations">
+              <button
+                type="button"
+                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+              >
+                Quotations
+              </button>
+            </Link>
+            {/* <Link to="/booking-list">
+              <button
+                type="button"
+                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+              >
+                Booking List
+              </button>
+            </Link> */}
+
+            <Link to="/test-drive">
+              <button
+                type="button"
+                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+              >
+                Test Drive
+              </button>
+            </Link>
+            <Link to="/price-list">
+              <button
+                type="button"
+                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+              >
+                Price LIst
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -107,16 +114,23 @@ const HomePage = (req, res) => {
               Bookings
             </button>
           </Link> */}
-          {localStorage.role === roles.ADMIN && (
-                <Link to="/test-drive">
-                <button
-                  type="button"
-                  className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-                >
-                  Test Drive
-                </button>
-              </Link>
-              )}
+          <Link to="/test-drive">
+            <button
+              type="button"
+              className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+            >
+              Test Drive
+            </button>
+          </Link>
+          <Link to="/price-list">
+            <button
+              type="button"
+              className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+            >
+              Price List
+            </button>
+          </Link>
+    
         </div>
       </div>
 

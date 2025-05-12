@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AddDetails from "./AddDetails";
 import InData from "./InData";
+import { roles } from "../../Routes/roles";
 
 const ListGroup = ({ data, getData }) => {
   const [rows, setRows] = useState(data);
@@ -33,7 +34,8 @@ const ListGroup = ({ data, getData }) => {
             <th className="px-4 py-3 hidden lg:table-cell">ID</th>
             <th className="px-4 py-3">Model</th>
             <th className="px-4 py-3 text-left">Availability</th>
-            <th className="px-4 py-3 text-center">Actions</th>
+            {(localStorage.role === roles.GUARD || localStorage.role === roles.ADMIN) && 
+            <th className="px-4 py-3 text-center">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -59,10 +61,11 @@ const ListGroup = ({ data, getData }) => {
                     : "bg-red-500"
                 }`}>
                   {row.status}
-                </span>
+                </span>                
                 {row.status !== "Workshop" && <span className="sm:ml-2 m-0 text-sm text-gray-600 flex-column text-center sm:text-left">{row.sales_agent}</span>}
                 </div>
               </td>
+              {(localStorage.role === roles.GUARD || localStorage.role === roles.ADMIN) && 
               <td className="px-4 py-2 text-center">
                 <div className="flex flex-col sm:flex-row justify-center gap-2">
                   <button
@@ -88,7 +91,7 @@ const ListGroup = ({ data, getData }) => {
                   >In
                   </button>
                 </div>
-              </td>
+              </td>}
             </tr>
           ))}
         </tbody>
