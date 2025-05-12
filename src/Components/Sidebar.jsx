@@ -53,9 +53,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           { to: '/all-quotations', label: 'Quotation List', icon: ListIcon },
           { to: '/booking-list', label: 'Booking List', icon: BookingIcon },
           { to: '/test-drive', label: 'Test Drive', icon: CarIcon, restrictedTo: ['admin', 'guard']}
-        ].filter(item => {
-          return !item.restrictedTo || item.restrictedTo.includes(localStorage.role);
-        }).map(({ to, label, icon: Icon }, i) => (
+        ].map(({ to, label, icon: Icon }, i) => (
           <Link
             key={i}
             to={to}

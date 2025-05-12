@@ -75,7 +75,6 @@ const HomePage = (req, res) => {
                   Booking List
                 </button>
               </Link>
-              {localStorage.role === roles.ADMIN && (
                 <Link to="/test-drive">
                 <button
                   type="button"
@@ -84,7 +83,6 @@ const HomePage = (req, res) => {
                   Test Drive
                 </button>
               </Link>
-              )}
             </div>
         </div>
       </div>
@@ -107,7 +105,6 @@ const HomePage = (req, res) => {
               Bookings
             </button>
           </Link> */}
-          {localStorage.role === roles.ADMIN && (
                 <Link to="/test-drive">
                 <button
                   type="button"
@@ -116,7 +113,6 @@ const HomePage = (req, res) => {
                   Test Drive
                 </button>
               </Link>
-              )}
         </div>
       </div>
 
