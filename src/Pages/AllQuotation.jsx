@@ -9,6 +9,9 @@ function AllQuotation() {
     const [quotaData, setQuotaData] = useState([]);
     const { role, username } = useContext(AuthContext);
     const [currentPage, setCurrentPage] = useState(1);
+    const [bookTestDrive, setBookTestDrive] = useState([]);
+    const [salesFilter, setSalesFilter] = useState('');
+    const [uniqueCas, setUniqueCas] = useState([]);
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
@@ -22,14 +25,33 @@ function AllQuotation() {
       const quoteID = row[0];
       navigate(`/booking-form/${quoteID}`)    
     };
+
+    const handleTestDrive = (row) => {
+      setBookTestDrive(row);
+      console.log(row);
+      
+    };
     
     const fetchQuotations = async (page) => {
         try {
             let response;
             if(role === roles.ADMIN) {
+                if(salesFilter !== '') {
+                    response = await axios.get(`/my-quotation`, {
+                    params: {
+                        name: salesFilter,
+                        role,
+                        page,
+                        limit: 25
+                    }
+                });
+                }
+                else {
                 response = await axios.get(`/admin/all-quotations`, {
                     params: { role,page, limit: 25 }
                 });
+                setUniqueCas([...new Set(response.data.data.map(ca => ca[2]))]);
+            }
             } else if(role === roles.SALES) {
                 response = await axios.get(`/my-quotation`, {
                     params: {
@@ -61,12 +83,13 @@ function AllQuotation() {
 
     useEffect(() => {
         fetchQuotations(currentPage);
-    }, [currentPage, role]);
+    }, [currentPage, role, quotaData]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
         window.scrollTo(0, 0);
     };
+
     function setToIst(dateTime) {
         const dt = new Date(dateTime);
         const istOffset = 5.5 * 60; // IST is UTC+5:30
@@ -89,7 +112,25 @@ function AllQuotation() {
         <div className="container mx-auto w-half p-2 md:p-6">
             <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800 uppercase">All Quotation Data</h2>
             <div className="overflow-x-auto">
-                <table className="w-auto bg-white shadow-md rounded-lg overflow-hidden table-fixed">
+                {(quotaData.length > 0 && localStorage.role === roles.ADMIN) && (
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Filter by CA:</label>
+                    <select
+                        value={salesFilter}
+                        onChange={(e) => setSalesFilter(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">All CAs</option>
+                        {uniqueCas.map((ca, index) => (
+                            <option key={index} value={ca}>
+                                {ca}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+            {quotaData.length > 0 &&
+                (<table className="w-auto bg-white shadow-md rounded-lg overflow-hidden table-fixed">
                     <thead>
                         <tr className="bg-gray-100">
                             <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[100px]">Created_on</th>
@@ -102,6 +143,7 @@ function AllQuotation() {
                             <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">PDF</th>
                             <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[150px]">WhatsApp</th>
                             <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">Booking</th>
+                            <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">Test Drive</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,10 +180,19 @@ function AllQuotation() {
                                         Book
                                     </button>
                                 </td>
+                                <td className="px-1 sm:px-4 py-2 text-md text-gray-900 w-[120px]">
+                                    <button
+                                        onClick={() => handleTestDrive(row)}
+                                        className="px-4 py-2 bg-yellow-500 sm:w-32 text-white rounded-lg hover:bg-yellow-600"
+                                    >
+                                        Test Drive
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </table>)
+                }
             </div>
 
             {/* Pagination */}
@@ -174,6 +225,17 @@ function AllQuotation() {
                     Next
                 </button>
             </div>
+            {/* {selectedVehicle && (
+          <AddDetails
+            model={selectedVehicle.model}
+            index={selectedVehicle.id}
+            name={row.}
+            setShow={setShowOut}
+            show={showOut}
+            data={rows}
+            setRow={setRows}
+            onStatusUpdate={handleStatusUpdate}
+          />)} */}
         </div>
     );
 }

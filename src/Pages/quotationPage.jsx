@@ -477,8 +477,8 @@ const quotationPage = () => {
       exchangeScrap: (selectedDiscounts.some((opt) => opt.value === "EXCHANGE") ? finalData.EXCHANGE : 0), 
       addExcDisc: addExc,
       loyalty: (!loyalty || loyalty == 0 ? false : true),
-      ICEtoEV: (loyaltyType == 'ICE to EV' && finalData[loyaltyType]), 
-      EVtoEV: (loyaltyType == 'EV to EV' && finalData[loyaltyType]),  
+      ICEtoEV: (loyaltyType == 'ICE_to_EV' && finalData[loyaltyType]), 
+      EVtoEV: (loyaltyType == 'EV_to_EV' && finalData[loyaltyType]),  
       corpTop10Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE_TOP_10") ? finalData["CORPORATE_TOP_10"] : 0), 
       corpTop20Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE_TOP_20") ? finalData["CORPORATE_TOP_20"] : 0), 
       corpOfferToggle: (finalData[corpOffer] > 0 ? true : false),
@@ -767,8 +767,9 @@ const quotationPage = () => {
                       <div>Finance Type: </div>
                       <Select
                         options={[{value: true, label: 'In-House' }, { value: false, label: 'Out-House' }]}
-                        value={inhouse && {value: true, label: 'In-House' }}
-                        onChange={(selected) => {selected && setInhouse(selected.value); setSelectedHpn({ label: "Not for Loan Use", value: "N/A" })}}
+                        value={inhouse ? {value: true, label: 'In-House' } : { value: false, label: 'Out-House' }}
+                        onChange={(selected) => {selected && setInhouse(selected.value); setSelectedHpn({ label: "Not for Loan Use", value: "N/A" }); console.log(selectedHpn);
+                        }}
                         className="w-full p-1 rounded-lg"
                       />
                       <div>HPN: </div>
@@ -796,7 +797,16 @@ const quotationPage = () => {
                       </>}
                     <div>Select Discount Type:</div>
                     <Select
-                      options={[...discounts.filter(x => finalData[x.value] > 0), (finalData['MSME'] || finalData['SOLER']) ? { value: 'CORPORATE OFFER', label: 'Corporate Offer' } : { value: 'None', label: 'None' }, (finalData['EXCHANGE']+finalData['ADDITIONAL_EXCHANGE']+finalData['ICE_to_EV']+finalData['EV_to_EV'] > 0 ) ? { value: 'EXCHANGE', label: 'Exchange' } : { value: 'None', label: 'None' }].filter(x => x.value != "None")}
+                      options={[...discounts.filter(x => finalData[x.value] > 0),
+                        (finalData['MSME'] || finalData['SOLER']) ? 
+                        { value: 'CORPORATE OFFER', label: 'Corporate Offer' } : 
+                        { value: 'None', label: 'None' }, 
+                        (finalData['EXCHANGE']+finalData['ADDITIONAL_EXCHANGE'] > 0 ) ? 
+                        { value: 'EXCHANGE', label: 'Exchange' } : 
+                        { value: 'None', label: 'None' },
+                        (finalData['ICE_to_EV']+finalData['EV_to_EV'] > 0 ) ?
+                        { value: 'LOYALTY', label: 'Loyalty' } :
+                        { value: 'None', label: 'None' }].filter(x => x.value != "None")}
                       isMulti
                       value={selectedDiscounts}
                       onChange={handleDiscount}
@@ -815,9 +825,12 @@ const quotationPage = () => {
                       onChange={handleAddExch}
                       className="w-full p-1 rounded-lg"
                     />
+                  </>}
+                  {(selectedDiscounts.some((opt) => opt.value === "LOYALTY") && fuel == 'Electric') &&
+                  <>
                     <div>Loyalty Bonus: </div>
                     <Select
-                      options={[{value: "ICE_to_EV", label: 'ICE_to_EV' }, { value: "EV_to_EV", label: 'EV_to_EV' }, { value: "N/A", label: 'N/A'}]}
+                      options={[{value: "ICE_to_EV", label: 'ICE_to_EV' }, { value: "EV_to_EV", label: 'EV_to_EV' }]}
                       onChange={handleLoyalty}
                       className="w-full p-1 rounded-lg"
                     />
