@@ -26,7 +26,7 @@ function AllQuotation() {
     const fetchQuotations = async (page) => {
         try {
             let response;
-            if(role === roles.ADMIN) {
+            if(role === roles.ADMIN || role === roles.MD) {
                 response = await axios.get(`/admin/all-quotations`, {
                     params: { role,page, limit: 25 }
                 });

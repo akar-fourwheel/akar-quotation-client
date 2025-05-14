@@ -66,7 +66,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Logout */}
       <div className="absolute bottom-0 w-full p-4">
-        {user.role===roles.ADMIN &&
+        {(user.role===roles.ADMIN || user.role===roles.MD) &&
           <button
           onClick={() => navigate("/signup")}
           className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-400 hover:bg-sky-400 my-3"

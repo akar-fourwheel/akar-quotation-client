@@ -324,7 +324,7 @@ const quotationPage = () => {
       return;
     }
   
-    if (!(localStorage.getItem("role")=== "admin") &&  finalData.YEAR == 2025) {
+    if (!(localStorage.getItem("role")=== "md") &&  finalData.YEAR == 2025) {
       let max = finalData.AddDiscLim;
   
       const pplUpper = finalData.PPL?.toUpperCase();
