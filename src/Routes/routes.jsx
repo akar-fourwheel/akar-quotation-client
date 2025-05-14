@@ -17,6 +17,7 @@ import BookingPage from "../Pages/booking/BookingPage";
 import BookingForm from "../Pages/booking/bookingForm";
 import bookingSuccess from "../Pages/booking/bookingSuccess";
 import testDrivePage from "../Pages/testDrivePage";
+import PriceList from "../Pages/priceList";
 
 export const routes = createBrowserRouter([
     {
@@ -32,20 +33,6 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[ roles.MD,roles.GUARD]} />,
-        children: [
-            {
-                element: <Layout />,
-                children: [
-                    {
-                        path: '/test-drive',
-                        Component: testDrivePage
-                    }
-                ]
-            },
-        ]
-    },
-    {
         element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.ADMIN]} />,
         children: [
             {
@@ -54,6 +41,10 @@ export const routes = createBrowserRouter([
                     {
                         path: '/',
                         element: <HomePage />,
+                    },
+                    {
+                        path: '/test-drive',
+                        Component: testDrivePage
                     },
                     {
                         path: '/stock-sheet',
@@ -86,9 +77,27 @@ export const routes = createBrowserRouter([
                     {
                         path: '/all-quotations',
                         Component: AllQuotation
+                    },
+                    {
+                        path: '/price-list',
+                        Component: PriceList
                     }
                 ]
             }
+        ]
+    },
+    {
+        element: <ProtectedRoute roles={[roles.MD,roles.GUARD]} />,
+        children: [
+            {
+                element: <Layout />,
+                children: [
+                    {
+                        path: '/test-drive',
+                        Component: testDrivePage
+                    }
+                ]
+            },
         ]
     },
 ])

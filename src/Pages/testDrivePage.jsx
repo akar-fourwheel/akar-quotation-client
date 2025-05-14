@@ -14,11 +14,15 @@ function TestDrivePage() {
 
 
   const getData = () => {
-    axios.get("/test-drive")
+    axios.get("/test-drive", {params: {
+      role
+    }})
       .then((response) => {
         const jsonData = response.data;
         setJsonData(jsonData.joined);
         setRecords(jsonData.records || []);
+        console.log(jsonData);
+        
         setLoading(false);
       })
       .catch((error) => {
