@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router'
 import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
+import AddDetails from '../Components/testDriveComponents/AddDetails';
 
 function AllQuotation() {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ function AllQuotation() {
     const [bookTestDrive, setBookTestDrive] = useState([]);
     const [salesFilter, setSalesFilter] = useState('');
     const [uniqueCas, setUniqueCas] = useState([]);
+    const [showOut, setShowOut] = useState(false);
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
@@ -26,11 +28,42 @@ function AllQuotation() {
       navigate(`/booking-form/${quoteID}`)    
     };
 
-    const handleTestDrive = (row) => {
-      setBookTestDrive(row);
-      console.log(row);
-      
-    };
+    const handleTestDrive = async (row) => {
+        try {
+            const model = await fetchDemoCar(row[4]);
+            if (model) {
+                row.push(model.model);
+                row.push(model.id);
+                console.log(row);
+                setBookTestDrive(row);
+                setShowOut(true);
+            };
+        }
+        catch (e) {
+            console.error("Error in setting test drive data:", error);
+        }
+    }
+
+    const fetchDemoCar = async (model) => {
+        try {
+            const response = await axios.get('/test-drive');
+            const variant = model.split(" ")[0];
+            const jsonData = response.data
+            const matchedCar = jsonData.joined.data.find(
+                car => car.status === 'Available' && car.model === variant
+            );
+
+            if (matchedCar) {
+                return({'model': matchedCar.model, 'id': matchedCar.id});
+            } else {
+                return
+            }
+            
+        }
+        catch(e) {
+            console.log("Error fetching Demo Vehicle data:", e);
+        }
+    }
     
     const fetchQuotations = async (page) => {
         try {
@@ -225,17 +258,14 @@ function AllQuotation() {
                     Next
                 </button>
             </div>
-            {/* {selectedVehicle && (
+            {bookTestDrive && (
           <AddDetails
-            model={selectedVehicle.model}
-            index={selectedVehicle.id}
-            name={row.}
+            model={bookTestDrive[7]}
+            index={bookTestDrive[8]}
+            
             setShow={setShowOut}
             show={showOut}
-            data={rows}
-            setRow={setRows}
-            onStatusUpdate={handleStatusUpdate}
-          />)} */}
+          />)}
         </div>
     );
 }
