@@ -54,7 +54,7 @@ const AllRecords = ({ data }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-6 text-gray-500">
+                <td colSpan="9" className="text-center py-6 text-gray-500">
                   <i className="fas fa-info-circle mr-2 text-blue-500"></i>
                   No records found
                 </td>

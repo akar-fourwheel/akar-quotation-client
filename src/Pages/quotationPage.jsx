@@ -764,6 +764,7 @@ const quotationPage = () => {
                       isSearchable={false}
                       classNamePrefix="react-select"
                       />
+                      </>}
                       <div>Finance Type: </div>
                       <Select
                         options={[{value: true, label: 'In-House' }, { value: false, label: 'Out-House' }]}
@@ -793,7 +794,6 @@ const quotationPage = () => {
                       value={hpn}
                       onChange={(e) => {setHpn(e.target.value)}}
                       />
-                      </>}
                       </>}
                     <div>Select Discount Type:</div>
                     <Select
