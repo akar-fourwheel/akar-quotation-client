@@ -30,14 +30,14 @@ const Header = ({ toggleSidebar }) => {
               </svg>
             </button>
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="sm:text-xl sm:font-bold text-lg font-light text-gray-900">Dashboard</h1>
+              <h1 className="sm:text-xl sm:font-bold text-lg font-light text-gray-900">{user?.username}</h1>
             </div>
           </div>
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="flex items-center">
-                <div className="ml-3">
-                  <p className="sm:text-xl sm:font-medium text-lg font-lighter text-gray-700">Welcome,  {user?.username?.split(' ').slice(0, 2).map((word, i) => i === 1 ? word[0] + '...' : word).join(' ')}</p>
+                <div className="py-2 px-3 text-lg font-semibold rounded-lg border border-transparent bg-amber-400 text-white">
+                  <p className="sm:text-xl sm:font-medium text-lg font-lighter">Target : 24</p>
                 </div>
               </div>
             </div>

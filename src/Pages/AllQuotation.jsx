@@ -107,8 +107,8 @@ function AllQuotation() {
     const fetchQuotations = async (page) => {
         try {
             let response;
-            if (role === roles.ADMIN) {
-                if (salesFilter !== '') {
+            if(role === roles.ADMIN || role === roles.MD) {
+                if(salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
                         params: {
                             name: salesFilter,
