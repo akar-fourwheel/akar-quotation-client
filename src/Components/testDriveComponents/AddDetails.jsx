@@ -12,6 +12,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
       outKM: "",
       model: model,
       photo: null,
+      status: 1
     });
   }
 
@@ -22,6 +23,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
     outKM: "",
     model: model,
     photo: null,
+      status: 1
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -37,6 +39,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
       outKM: "",
       model: "",
       photo: null,
+      status: 1
     });
     setPreviewUrl(null);
     setError(null);
