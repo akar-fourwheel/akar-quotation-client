@@ -34,7 +34,7 @@ const ListGroup = ({ data, getData }) => {
             <th className="px-4 py-3 hidden lg:table-cell">ID</th>
             <th className="px-4 py-3">Model</th>
             <th className="px-4 py-3 text-left">Availability</th>
-            {(localStorage.role === roles.GUARD || localStorage.role === roles.ADMIN) && 
+            {(localStorage.role === roles.GUARD || localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && 
             <th className="px-4 py-3 text-center">Actions</th>}
           </tr>
         </thead>
@@ -65,7 +65,7 @@ const ListGroup = ({ data, getData }) => {
                 {row.status !== "Workshop" && <span className="sm:ml-2 m-0 text-sm text-gray-600 flex-column text-center sm:text-left">{row.sales_agent}</span>}
                 </div>
               </td>
-              {(localStorage.role === roles.GUARD || localStorage.role === roles.ADMIN) && 
+              {(localStorage.role === roles.GUARD || localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && 
               <td className="px-4 py-2 text-center">
                 <div className="flex flex-col sm:flex-row justify-center gap-2">
                   <button

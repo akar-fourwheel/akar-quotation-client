@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router';
 import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
@@ -11,6 +11,7 @@ function AllQuotation() {
     const [currentPage, setCurrentPage] = useState(1);
     const [salesFilter, setSalesFilter] = useState('');
     const [uniqueCas, setUniqueCas] = useState([]);
+    const [selectedRow, setSelectedRow] = useState(null);
     const [modalData, setModalData] = useState({ show: false, success: false, message: '', model: '' });
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -21,20 +22,23 @@ function AllQuotation() {
         hasPreviousPage: false
     });
 
-    const handleBooking = (row) => {
-        const quoteID = row[0];
-        navigate(`/booking-form/${quoteID}`)
+    const handleBooking = () => {
+        if (!selectedRow) return;
+        const quoteID = selectedRow[0];
+        navigate(`/booking-form/${quoteID}`);
     };
 
-    const handleTestDrive = async (row) => {
+    const handleTestDrive = async () => {
+        if (!selectedRow) return;
+
         try {
-            const variant = row[4].split(" ")[0];
+            const variant = selectedRow[4].split(" ")[0];
             const model = await fetchDemoCar(variant);
             if (model) {
                 const formData = {
-                    customerName: row[3],
-                    phoneNumber: row[7],
-                    salesPerson: row[2],
+                    customerName: selectedRow[3],
+                    phoneNumber: selectedRow[7],
+                    salesPerson: selectedRow[2],
                     model: model.model,
                     status: 0
                 }
@@ -75,10 +79,20 @@ function AllQuotation() {
                 show: true,
                 success: false,
                 message: 'An error occurred while processing your request.',
-                model: row[4].split(" ")[0]
+                model: selectedRow[4].split(" ")[0]
             });
         }
     }
+
+    const handleOpenPDF = () => {
+        if (!selectedRow) return;
+        window.open(selectedRow[5], '_blank');
+    };
+
+    const handleSendWhatsApp = () => {
+        if (!selectedRow) return;
+        window.location.href = selectedRow[6];
+    };
 
     const closeModal = () => {
         setModalData({ ...modalData, show: false });
@@ -97,7 +111,6 @@ function AllQuotation() {
             } else {
                 return
             }
-
         }
         catch (e) {
             console.log("Error fetching Demo Vehicle data:", e);
@@ -107,8 +120,8 @@ function AllQuotation() {
     const fetchQuotations = async (page) => {
         try {
             let response;
-            if(role === roles.ADMIN || role === roles.MD) {
-                if(salesFilter !== '') {
+            if (role === roles.ADMIN || role === roles.MD) {
+                if (salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
                         params: {
                             name: salesFilter,
@@ -159,7 +172,12 @@ function AllQuotation() {
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
+        setSelectedRow(null); // Clear selection when changing page
         window.scrollTo(0, 0);
+    };
+
+    const handleRowClick = (row) => {
+        setSelectedRow(row === selectedRow ? null : row);
     };
 
     function setToIst(dateTime) {
@@ -245,8 +263,9 @@ function AllQuotation() {
             )}
 
             <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800 uppercase">All Quotation Data</h2>
+
             <div className="overflow-x-auto">
-                {(quotaData.length > 0 && localStorage.role === roles.ADMIN) && (
+                {(quotaData.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Filter by CA:</label>
                         <select
@@ -263,74 +282,79 @@ function AllQuotation() {
                         </select>
                     </div>
                 )}
-                {quotaData.length > 0 &&
-                    (<table className="w-auto bg-white shadow-md rounded-lg overflow-hidden table-fixed">
+
+                {quotaData.length > 0 && (
+                    <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
                         <thead>
                             <tr className="bg-gray-100">
-                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[100px]">Created_on</th>
-                                <th className="px-2 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[80px]">Unique_ID</th>
+                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Created_on</th>
+                                <th className="px-2 py-2 text-left text-sm md:text-md font-medium text-gray-700">Unique_ID</th>
                                 {role !== roles.SALES && (
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 w-[150px]">Sales_Person</th>
+                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Sales_Person</th>
                                 )}
-                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700 w-[250px]">Customer_Name</th>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 w-[200px]">Variant</th>
-                                <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">PDF</th>
-                                <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[150px]">WhatsApp</th>
-                                <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">Booking</th>
-                                <th className="px-4 py-2 text-left text-md font-medium text-gray-700 w-[120px]">Test Drive</th>
+                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Customer_Name</th>
+                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Variant</th>
                             </tr>
                         </thead>
                         <tbody>
                             {quotaData?.map((row, index) => (
-                                <tr key={index} className="border-b hover:bg-gray-50">
-                                    <td className="px-4 py-2 text-xs md:text-md text-gray-900 w-[100px]">{setToIst(row[1])}</td>
-                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900 w-[80px]">{row[0]}</td>
+                                <tr
+                                    key={index}
+                                    className={`border-b hover:bg-gray-50 cursor-pointer ${selectedRow === row ? 'bg-blue-50' : ''}`}
+                                    onClick={() => handleRowClick(row)}
+                                >
+                                    <td className="px-4 py-2 text-xs md:text-md text-gray-900">{setToIst(row[1])}</td>
+                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900">{row[0]}</td>
                                     {role !== roles.SALES && (
-                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900 w-[180px]">{row[2]}</td>
+                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900">{row[2]}</td>
                                     )}
-                                    <td className="px-4 py-2 text-sm text-gray-900 w-[150px]">{row[3]}</td>
-                                    <td className="px-4 py-2 text-sm text-gray-900 w-[150px]">{row[4]}</td>
-                                    <td className="px-1 sm:px-4 py-2 text-md text-gray-900 w-[120px]">
-                                        <button
-                                            onClick={() => window.open(row[5], '_blank')}
-                                            className="px-4 py-2 bg-rose-400 sm:w-32 text-white rounded-lg hover:bg-rose-500"
-                                        >
-                                            Open
-                                        </button>
-                                    </td>
-                                    <td className="px-1 sm:px-4 py-2 text-md text-gray-900 w-[150px]">
-                                        <button
-                                            onClick={() => window.location.href = row[6]}
-                                            className="px-3 py-2 bg-green-500 sm:w-32 text-white rounded-lg hover:bg-green-600"
-                                        >
-                                            WhatsApp
-                                        </button>
-                                    </td>
-                                    <td className="px-1 sm:px-4 py-2 text-md text-gray-900 w-[120px]">
-                                        <button
-                                            onClick={() => handleBooking(row)}
-                                            className="px-4 py-2 bg-blue-500 sm:w-32 text-white rounded-lg hover:bg-blue-600"
-                                        >
-                                            Book
-                                        </button>
-                                    </td>
-                                    <td className="px-1 sm:px-4 py-2 text-md text-gray-900 w-[120px]">
-                                        <button
-                                            onClick={() => handleTestDrive(row)}
-                                            className="px-4 py-2 bg-yellow-500 sm:w-32 text-white rounded-lg hover:bg-yellow-600"
-                                        >
-                                            Test Drive
-                                        </button>
-                                    </td>
+                                    <td className="px-4 py-2 text-sm text-gray-900">{row[3]}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-900">{row[4]}</td>
                                 </tr>
                             ))}
                         </tbody>
-                    </table>)
-                }
+                    </table>
+                )}
             </div>
 
+            {/* Operations Panel */}
+            {selectedRow && (
+                <div className="sticky bottom-0 bg-gray-50 p-2 rounded-lg shadow-md z-10">
+                    <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+                        <div className="mb-2 md:mb-0 text-sm">
+                            <span className="font-semibold">Selected:</span> {selectedRow[3]} - {selectedRow[4]}
+                        </div>
+                        <div className="flex flex-wrap gap-1 justify-center text-xs">
+                            <button
+                                onClick={handleOpenPDF}
+                                className="px-4 py-2 bg-rose-400 text-white rounded-lg hover:bg-rose-500"
+                            >
+                                View PDF
+                            </button>
+                            <button
+                                onClick={handleSendWhatsApp}
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                            >
+                                WhatsApp
+                            </button>
+                            <button
+                                onClick={handleBooking}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            >
+                                Book
+                            </button>
+                            <button
+                                onClick={handleTestDrive}
+                                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                            >
+                                Test Drive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Pagination */}
-            <div className="flex flex-wrap gap-3 justify-center mt-4 space-x-2">
+            <div className=" text-xs flex flex-wrap gap-2 justify-center mt-4">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={!pagination?.hasPreviousPage}
@@ -338,18 +362,59 @@ function AllQuotation() {
                 >
                     Previous
                 </button>
-                {[...Array(pagination?.totalPages || 1)].map((_, index) => (
+
+                {/* First Page */}
+                <button
+                    onClick={() => handlePageChange(1)}
+                    className={`px-3 py-1 rounded-lg ${currentPage === 1
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                >
+                    1
+                </button>
+
+                {/* Leading Ellipsis */}
+                {currentPage > 4 && <span className="px-2">...</span>}
+
+                {/* Middle Pages */}
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                    .filter((page) =>
+                        page === currentPage ||
+                        page === currentPage - 1 ||
+                        page === currentPage + 1
+                    )
+                    .map((page) => (
+                        page !== 1 && page !== pagination.totalPages && (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`px-3 py-1 rounded-lg ${currentPage === page
+                                    ? 'bg-blue-500 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                            >
+                                {page}
+                            </button>
+                        )
+                    ))}
+
+                {/* Trailing Ellipsis */}
+                {currentPage < pagination.totalPages - 3 && <span className="px-2">...</span>}
+
+                {/* Last Page */}
+                {pagination.totalPages > 1 && (
                     <button
-                        key={index + 1}
-                        onClick={() => handlePageChange(index + 1)}
-                        className={`px-3 py-1 rounded-lg ${currentPage === index + 1
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        onClick={() => handlePageChange(pagination.totalPages)}
+                        className={`px-3 py-1 rounded-lg ${currentPage === pagination.totalPages
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                     >
-                        {index + 1}
+                        {pagination.totalPages}
                     </button>
-                ))}
+                )}
+
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={!pagination?.hasNextPage}
@@ -358,6 +423,7 @@ function AllQuotation() {
                     Next
                 </button>
             </div>
+
         </div>
     );
 }

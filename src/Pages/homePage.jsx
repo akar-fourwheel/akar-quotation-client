@@ -60,7 +60,7 @@ const HomePage = (req, res) => {
             <Link to="/all-quotations">
               <button
                 type="button"
-                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-teal-600 text-white hover:bg-purple-600 transition ease-in-out duration-300"
+                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-teal-600 text-white hover:bg-teal-400 transition ease-in-out duration-300"
               >
                 Quotation list
               </button>
@@ -68,7 +68,7 @@ const HomePage = (req, res) => {
             <Link to="/price-list">
               <button
                 type="button"
-                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-rose-600 text-white hover:bg-purple-600 transition ease-in-out duration-300"
+                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-rose-600 text-white hover:bg-rose-400 transition ease-in-out duration-300"
               >
                 Price list
               </button>
@@ -76,7 +76,7 @@ const HomePage = (req, res) => {
             <Link to="/test-drive">
               <button
                 type="button"
-                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-amber-600 text-white hover:bg-purple-600 transition ease-in-out duration-300"
+                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-amber-600 text-white hover:bg-amber-400 transition ease-in-out duration-300"
               >
                 Test Drive
               </button>
