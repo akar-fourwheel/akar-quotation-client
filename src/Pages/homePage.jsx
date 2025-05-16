@@ -23,7 +23,7 @@ const HomePage = (req, res) => {
 
       {showOverlay && <NotificationOverlay onClose={() => setShowOverlay(false)} />}
 
-      <div className="h-full bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center p-6">
+      <div className="h-full bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full">
           <div>
             <img src="./logo.jpg" alt="Logo" className="h-40 mx-auto" />
@@ -57,80 +57,31 @@ const HomePage = (req, res) => {
                 Quotation
               </button>
             </Link>
-          </div>
-          <div className="mt-6 lg:mt-8 hidden lg:flex justify-center gap-4">
             <Link to="/all-quotations">
               <button
                 type="button"
-                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-teal-600 text-white hover:bg-purple-600 transition ease-in-out duration-300"
               >
-                Quotations
-              </button>
-            </Link>
-            {/* <Link to="/booking-list">
-              <button
-                type="button"
-                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-              >
-                Booking List
-              </button>
-            </Link> */}
-
-            <Link to="/test-drive">
-              <button
-                type="button"
-                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-              >
-                Test Drive
+                Quotation list
               </button>
             </Link>
             <Link to="/price-list">
               <button
                 type="button"
-                className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
+                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-rose-600 text-white hover:bg-purple-600 transition ease-in-out duration-300"
               >
-                Price LIst
+                Price list
+              </button>
+            </Link>
+            <Link to="/test-drive">
+              <button
+                type="button"
+                className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-amber-600 text-white hover:bg-purple-600 transition ease-in-out duration-300"
+              >
+                Test Drive
               </button>
             </Link>
           </div>
-        </div>
-      </div>
-
-      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white p-4 shadow-lg">
-        <div className="flex justify-center gap-4">
-          <Link to="/all-quotations">
-            <button
-              type="button"
-              className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-            >
-              Quotations
-            </button>
-          </Link>
-          {/* <Link to="/booking-list">
-            <button
-              type="button"
-              className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-            >
-              Bookings
-            </button>
-          </Link> */}
-          <Link to="/test-drive">
-            <button
-              type="button"
-              className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-            >
-              Test Drive
-            </button>
-          </Link>
-          <Link to="/price-list">
-            <button
-              type="button"
-              className="py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-slate-600 text-white hover:bg-slate-500 transition ease-in-out duration-300"
-            >
-              Price List
-            </button>
-          </Link>
-    
         </div>
       </div>
 

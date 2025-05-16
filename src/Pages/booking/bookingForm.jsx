@@ -36,14 +36,11 @@ const BookingForm = () => {
         orderC,
         remark
       })
-      .then(response =>{
-        console.log( response.data?.chassisNo);
-        console.log(response.data);
-        
-        const chassisNo = response.data?.chassisNo;
-        console.log(response.data);
-        
-        if (chassisNo) {
+      .then(response =>{  
+        const chassisNo = response.data;
+        console.log(chassisNo);
+               
+        if (!(chassisNo==="empty")) {
           navigate(`/booking-success/${chassisNo}`);
         } else {
           try{
@@ -58,14 +55,14 @@ const BookingForm = () => {
               fuel:resData[8],
               color,
             })
-            .then(res => {
-              if(res.data = "request raised"){
+            .then(res => {              
+              if(res.data === "request raised!"){
                 setErrorColor("amber");
                 setBookingError("Sorry, the car is not available in Dealer Stock. Request raised for the desired car.");
               }
               else{
                 setErrorColor("red")
-                setBookingError("Sorry, could not request stock.");
+                setBookingError("Sorry, could not request stock. There may already be a booking with the same id!");
               }
           })
         }
