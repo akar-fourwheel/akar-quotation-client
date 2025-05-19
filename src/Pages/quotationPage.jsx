@@ -324,7 +324,7 @@ const quotationPage = () => {
       return;
     }
   
-    if (!(localStorage.getItem("role")=== "md") &&  finalData.YEAR == 2025) {
+    if (!(localStorage.role === "md" || localStorage.role === "admin") &&  finalData.YEAR == 2025) {
       let max = finalData.AddDiscLim;
   
       const pplUpper = finalData.PPL?.toUpperCase();
@@ -353,9 +353,11 @@ const quotationPage = () => {
 
   useEffect(() => {
     const maxAmount = finalData.AddDiscLim;
-    if (finalData.YEAR == 2025 && finalData.Fuel == "Electric" &&addDisc > maxAmount) {
+    if (!(localStorage.role === "md" || localStorage.role === "admin")) {
+    if (finalData.YEAR == 2025 && finalData.Fuel == "Electric" && addDisc > maxAmount) {
       setAddDisc(maxAmount);
     }
+  }
   }, [addDisc, rto]);
 
   const handleSss = (e) => {

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
+const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData }) => {
   const [isOn, setIsOn] = useState(false);
   const toggle = () => {
     setIsOn(prev => !prev);
@@ -23,11 +23,38 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
     outKM: "",
     model: model,
     photo: null,
-      status: 1
+    status: 1
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  useEffect(() => {
+  if (isOn) {
+    setFormData({
+      customerName: "Workshop",
+      phoneNumber: "9999999999",
+      salesPerson: "Workshop",
+      outKM: "",
+      model: model,
+      photo: null,
+      status: 1
+    });
+  } else if (initialData) {
+    setFormData({
+      customerName: initialData.cx_name,
+      phoneNumber: initialData.cx_phone,
+      salesPerson: initialData.sales_person,
+      outKM: "",
+      model: model,
+      photo: null,
+      status: 1
+    });
+  } else {
+    setFormData(prev => ({ ...prev, model }));
+  }
+}, [isOn, initialData, model]);
+
 
   const handleClose = () => {
     setShow(false);
@@ -54,21 +81,39 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
     for (const key in formData) {
       payload.append(key, formData[key]);
     }
+    console.log(formData);
+    
 
-    try {
-      const statusResponse = await axios.put(`/test-drive/out/${index}`, {
+    try {      
+      const statusResponse = await axios.put(`/test-drive/out/post`, {
         status: isOn ? "Workshop" : "Unavailable",
+        model
       });
 
-        const detailsResponse = await axios.post(`/test-drive/out`, payload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+      console.log(model);
+
+      const detailsResponse = initialData ?
+        await axios.put(`/test-drive/out/update`, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+        })
+       :
+        await axios.post(`/test-drive/out`, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+
+      // const detailsResponse = initialData ?
+      //   `/test-drive/out/update`
+      //  :
+      //   `/test-drive/out`
+
+      console.log(detailsResponse);
+      
 
       if (!statusResponse.status === 200 && !detailsResponse.status === 200) {
         throw new Error("Failed to update vehicle status");
       }
 
-      onStatusUpdate(index, isOn ? "Workshop" : "Unavailable", formData.salesPerson);
+      onStatusUpdate(model, isOn ? "Workshop" : "Unavailable", formData.salesPerson);
       handleClose();
     } catch (err) {
       setError(err.message);
@@ -103,6 +148,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
         </div>
 
         {/* Toggle */}
+        {!initialData && (
         <div className="flex justify-center mt-4">
           <button
             type="button"
@@ -113,7 +159,7 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
           >
             Workshop
           </button>
-        </div>
+        </div>)}
 
         <form onSubmit={handleSubmit} className="px-6 py-4">
           {error && (
@@ -132,9 +178,9 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
               <input
                 type="text"
                 name="customerName"
-                value={isOn ? formData.customerName = "Workshop" : formData.customerName}
+                value={formData.customerName}
+                disabled={isOn || initialData}
                 onChange={handleChange}
-                disabled={isOn}
                 required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter customer name"
@@ -149,9 +195,9 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
               <input
                 type="tel"
                 name="phoneNumber"
-                value={isOn ? formData.phoneNumber = 9999999999 : formData.phoneNumber}
+                value={formData.phoneNumber}
                 onChange={handleChange}
-                disabled={isOn}
+                disabled={isOn || initialData}
                 required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter phone number"
@@ -166,9 +212,9 @@ const AddDetails = ({ model, index, setShow, show, onStatusUpdate }) => {
               <input
                 type="text"
                 name="salesPerson"
-                value={isOn ? formData.salesPerson = "Workshop" : formData.salesPerson}
+                value={formData.salesPerson}
                 onChange={handleChange}
-                disabled={isOn}
+                disabled={isOn || initialData}
                 required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter salesperson name"
