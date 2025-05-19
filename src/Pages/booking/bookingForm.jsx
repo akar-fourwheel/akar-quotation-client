@@ -9,6 +9,7 @@ const BookingForm = () => {
   const navigate = useNavigate();
 
   const [bookingAmount, setBookingAmount] = useState(0);
+  const [optiId,setOptiId] = useState('');
   const [resData, setResData] = useState({});
   const [color, setColor] = useState("");
   const [colorList,setColorList] = useState([]);
@@ -28,6 +29,7 @@ const BookingForm = () => {
         customer:resData[0],
         contact:resData[1],
         sales_adv:resData[7],
+        optiId,
         year: resData[2],
         bookingAmount: bookingAmount,
         RemainingAmount: RemainingAmt,
@@ -36,14 +38,11 @@ const BookingForm = () => {
         orderC,
         remark
       })
-      .then(response =>{
-        console.log( response.data?.chassisNo);
-        console.log(response.data);
-        
-        const chassisNo = response.data?.chassisNo;
-        console.log(response.data);
-        
-        if (chassisNo) {
+      .then(response =>{  
+        const chassisNo = response.data;
+        console.log(chassisNo);
+               
+        if (!(chassisNo==="empty")) {
           navigate(`/booking-success/${chassisNo}`);
         } else {
           try{
@@ -53,19 +52,20 @@ const BookingForm = () => {
               sales_adv:resData[7],
               customer:resData[0],
               contact:resData[1],
+              optiId,
               year:resData[2],
               variant:resData[3],
               fuel:resData[8],
               color,
             })
-            .then(res => {
-              if(res.data = "request raised"){
+            .then(res => {              
+              if(res.data === "request raised!"){
                 setErrorColor("amber");
                 setBookingError("Sorry, the car is not available in Dealer Stock. Request raised for the desired car.");
               }
               else{
                 setErrorColor("red")
-                setBookingError("Sorry, could not request stock.");
+                setBookingError("Sorry, could not request stock. There may already be a booking with the same id!");
               }
           })
         }
@@ -120,6 +120,15 @@ const BookingForm = () => {
       <Field label="Customer Name" value={resData[0]} />
       <Field label="Contat Number" value={resData[1]} />
       <Field label="Sales Executive" value={resData[7]} />
+      <div className="flex flex-col">
+        <label className="text-gray-600 mb-1 font-medium">Opti ID</label>
+        <input
+          type="text"
+          className="p-2 border border-gray-300 rounded-lg"
+          value={optiId} 
+          onChange={(e) => setOptiId(e.target.value)}
+        />
+      </div>
       <Field label="Model Year" value={resData[2]} />
       <Field label="Variant" value={resData[3]} />
 

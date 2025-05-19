@@ -155,24 +155,24 @@ function TestDrivePage() {
             )}
           </div>
         </div>
-        {role === roles.ADMIN && (
-          <div className="bg-white shadow-lg rounded-lg mt-10">
-            <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4">
-              <h3 className="text-center text-xl font-semibold flex items-center justify-center gap-2">
-                <i className="fas fa-history"></i>
-                All Records
-              </h3>
-            </div>
-            <div className="p-6">
-              {loading ? (
-                <div className="flex justify-center items-center py-10">
-                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
-                </div>
-              ) : (
-                <AllRecords data={records.data.filter(record => record.in_km !== 0) || []} />
-              )}
-            </div>
+        {role === roles.ADMIN && role === roles.MD (
+        <div className="bg-white shadow-lg rounded-lg mt-10">
+          <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4">
+            <h3 className="text-center text-xl font-semibold flex items-center justify-center gap-2">
+              <i className="fas fa-history"></i>
+              All Records
+            </h3>
           </div>
+          <div className="p-6">
+            {loading ? (
+              <div className="flex justify-center items-center py-10">
+                <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+              </div>
+            ) : (
+              <AllRecords data={records.data.filter(record => record.in_km !== 0) || []} />
+            )}
+          </div>
+        </div>
         )}
       </div>
     </div>

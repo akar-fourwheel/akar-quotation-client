@@ -36,7 +36,7 @@ function BookingPage() {
     }
 
   useEffect(() => {
-    if(role==roles.ADMIN)
+    if(role==roles.ADMIN || role===roles.MD)
     axios.get(`/admin/all-bookings`)
     .then((response)=> {
         try{
