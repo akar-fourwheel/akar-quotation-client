@@ -22,7 +22,20 @@ const BookingForm = () => {
   const finalAmt = parseFloat(resData[6]) || 0;
   const RemainingAmt = finalAmt - parseFloat(bookingAmount || 0);
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
+    try {
+      await bookingCar();
+      await axios.patch('/teamLead/inc-target', {
+        id: localStorage.userId,
+      });
+    } catch (e) {
+      console.error(e);
+      console.log("Booking registration failed to update target.");
+    }
+  };
+  
+
+  const bookingCar = async() => {
     try {      
       axios.post(`/booking-process`, {
         quoteID,
@@ -80,7 +93,7 @@ const BookingForm = () => {
     } catch (e) {
       console.error("Booking error", e);
     }
-  };
+  }
 
   useEffect(() => {
     if (!quoteID) return;
