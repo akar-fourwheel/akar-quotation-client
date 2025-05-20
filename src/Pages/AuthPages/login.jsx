@@ -31,7 +31,7 @@ const Login = () => {
     try {
       await login(credentials);
       // Redirect to the page they tried to visit or home
-      const from = localStorage.role === roles.GUARD ? '/test-drive' : (location.state?.from?.pathname || '/');
+      const from = localStorage.role === roles.GUARD ? '/guard/test-drive' : (location.state?.from?.pathname || '/');
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');

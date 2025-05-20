@@ -87,13 +87,13 @@ export const routes = createBrowserRouter([
         ]
     },
     {
-        element: <ProtectedRoute roles={[roles.MD,roles.GUARD]} />,
+        element: <ProtectedRoute roles={[roles.GUARD]} />,
         children: [
             {
                 element: <Layout />,
                 children: [
                     {
-                        path: '/test-drive',
+                        path: '/guard/test-drive',
                         Component: testDrivePage
                     }
                 ]

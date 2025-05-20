@@ -37,7 +37,7 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
       }
 
       getData();
-      onStatusUpdate(index, "Available", "");
+      onStatusUpdate(model, "Available", "");
       handleClose();
     } catch (err) {
       console.error("Error updating vehicle:", err);
