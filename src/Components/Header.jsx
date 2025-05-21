@@ -1,8 +1,32 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/auth/AuthProvider';
+import axios from 'axios';
 
 const Header = ({ toggleSidebar }) => {
   const user = useContext(AuthContext);
+  const [target,setTarget] = useState(0);
+  const [remainingTarget,setRemainingTarget] = useState('');
+
+  const col =Number(remainingTarget.split(" ")[1]) <= target;
+
+  useEffect(()=> {
+    axios.get('/teamLead/tl-target',{
+      params:{
+        id:'TES_01'
+      }
+    })
+    .then(res =>{
+      setTarget(res.data[0]);
+      const tg = res.data[0]-res.data[1];
+      if(tg<0){
+        setRemainingTarget("Achieved: "+ res.data[1]);
+      }
+      else{
+        setRemainingTarget("Target: "+tg)
+      }
+      
+    })
+  },[])
 
   return (
     <header className="bg-white shadow">
@@ -33,15 +57,16 @@ const Header = ({ toggleSidebar }) => {
               <h1 className="sm:text-xl sm:font-bold text-lg font-light text-gray-900">{user?.username}</h1>
             </div>
           </div>
-          <div className="flex items-center">
+          { localStorage.role == "teamLead" &&  <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="flex items-center">
-                <div className="py-2 px-3 text-lg font-semibold rounded-lg border border-transparent bg-amber-400 text-white">
-                  <p className="sm:text-xl sm:font-medium text-lg font-lighter">Target : 24</p>
+                <div className={`py-2 px-3 text-lg font-semibold rounded-lg border border-transparent ${col ? 'bg-amber-400': 'bg-emerald-600'} text-white`}>
+                  <p className="sm:text-xl sm:font-medium text-lg font-lighter">{remainingTarget}</p>
                 </div>
               </div>
             </div>
           </div>
+          }
         </div>
       </div>
     </header>

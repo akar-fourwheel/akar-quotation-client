@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
 import axios from 'axios';
 import { roles } from '../Routes/roles';
@@ -21,6 +21,9 @@ function AllQuotation() {
         hasNextPage: false,
         hasPreviousPage: false
     });
+
+    // Ref for the operations panel
+    const operationsPanelRef = useRef(null);
 
     const handleBooking = () => {
         if (!selectedRow) return;
@@ -97,6 +100,30 @@ function AllQuotation() {
     const closeModal = () => {
         setModalData({ ...modalData, show: false });
     };
+
+    // Function to close the operations panel
+    const closeOperationsPanel = () => {
+        setSelectedRow(null);
+    };
+
+    // Handle clicks outside the operations panel
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (operationsPanelRef.current && !operationsPanelRef.current.contains(event.target)) {
+                closeOperationsPanel();
+            }
+        }
+
+        // Add event listener when the panel is open
+        if (selectedRow) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        // Clean up the event listener
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [selectedRow]);
 
     const fetchDemoCar = async (model) => {
         try {
@@ -199,7 +226,12 @@ function AllQuotation() {
     }
 
     return (
-        <div className="container mx-auto w-half p-2 md:p-6">
+        <div className={`container mx-auto w-half p-2 md:p-6 ${selectedRow ? 'relative' : ''}`}>
+            {/* Backdrop with blur effect when operations panel is open */}
+            {selectedRow && (
+                <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-10" onClick={closeOperationsPanel}></div>
+            )}
+
             {/* Test Drive Status Modal */}
             {modalData.show && (
                 <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
@@ -264,6 +296,59 @@ function AllQuotation() {
 
             <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800 uppercase">All Quotation Data</h2>
 
+            {/* Operations Panel */}
+            {selectedRow && (
+                <div
+                    ref={operationsPanelRef}
+                    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white py-4 px-4 rounded-lg shadow-md z-20 border border-gray-200 max-w-md w-full"
+                >
+                    {/* Close button */}
+                    <button
+                        onClick={closeOperationsPanel}
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <div className="flex flex-col items-center justify-between mb-4">
+                        <div className="mb-4 text-sm text-center">
+                            <span className="font-semibold">Selected:</span> {selectedRow[3]} - {selectedRow[4]}
+                        </div>
+
+                        {/* 2x2 Button Grid */}
+                        <div className="grid grid-cols-2 grid-rows-2 gap-2 w-64 h-26">
+                            <button
+                                onClick={handleOpenPDF}
+                                className="bg-rose-400 text-white hover:bg-rose-500 text-sm rounded-lg flex items-center justify-center"
+                            >
+                                View PDF
+                            </button>
+                            <button
+                                onClick={handleSendWhatsApp}
+                                className="bg-green-500 text-white hover:bg-green-600 text-sm rounded-lg flex items-center justify-center"
+                            >
+                                WhatsApp
+                            </button>
+                            <button
+                                onClick={handleBooking}
+                                className="bg-blue-500 text-white hover:bg-blue-600 text-sm rounded-lg flex items-center justify-center"
+                            >
+                                Book
+                            </button>
+                            <button
+                                onClick={handleTestDrive}
+                                className="bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg flex items-center justify-center"
+                            >
+                                Test Drive
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            )}
+
             <div className="overflow-x-auto">
                 {(quotaData.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
                     <div className="mb-4">
@@ -318,44 +403,8 @@ function AllQuotation() {
                 )}
             </div>
 
-            {/* Operations Panel */}
-            {selectedRow && (
-                <div className="sticky bottom-0 bg-gray-50 p-2 rounded-lg shadow-md z-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-                        <div className="mb-2 md:mb-0 text-sm">
-                            <span className="font-semibold">Selected:</span> {selectedRow[3]} - {selectedRow[4]}
-                        </div>
-                        <div className="flex flex-wrap gap-1 justify-center text-xs">
-                            <button
-                                onClick={handleOpenPDF}
-                                className="px-4 py-2 bg-rose-400 text-white rounded-lg hover:bg-rose-500"
-                            >
-                                View PDF
-                            </button>
-                            <button
-                                onClick={handleSendWhatsApp}
-                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                            >
-                                WhatsApp
-                            </button>
-                            <button
-                                onClick={handleBooking}
-                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                            >
-                                Book
-                            </button>
-                            <button
-                                onClick={handleTestDrive}
-                                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
-                            >
-                                Test Drive
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
             {/* Pagination */}
-            <div className=" text-xs flex flex-wrap gap-2 justify-center mt-4">
+            <div className="text-xs flex flex-wrap gap-2 justify-center mt-4">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={!pagination?.hasPreviousPage}
