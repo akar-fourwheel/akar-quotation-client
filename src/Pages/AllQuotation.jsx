@@ -300,7 +300,7 @@ function AllQuotation() {
                             {quotaData?.map((row, index) => (
                                 <tr
                                     key={index}
-                                    className={`border-b hover:bg-gray-50 cursor-pointer ${selectedRow === row ? 'bg-blue-50' : ''}`}
+                                    className={`border-b cursor-pointer ${selectedRow === row ? 'bg-blue-50' : ''} ${row[8] === 0 ? 'bg-yellow-100 hover:bg-yellow-200' : row[8] === 1 ? 'bg-green-100 hover:bg-green-200' : 'hover:bg-gray-50'}`}
                                     onClick={() => handleRowClick(row)}
                                 >
                                     <td className="px-4 py-2 text-xs md:text-md text-gray-900">{setToIst(row[1])}</td>
@@ -310,6 +310,7 @@ function AllQuotation() {
                                     )}
                                     <td className="px-4 py-2 text-sm text-gray-900">{row[3]}</td>
                                     <td className="px-4 py-2 text-sm text-gray-900">{row[4]}</td>
+
                                 </tr>
                             ))}
                         </tbody>

@@ -6,8 +6,16 @@ const NotificationModal = ({
   onClose,
   pendingRequests = [],
   onBookTestDrive,
+  allRecords
 }) => {
   if (!show) return null;
+
+  const getStatus = (data, carName) => {  
+  const car = data.find(row => row.model === carName); 
+  return car.status !== 'Available' ? true : false;
+  };
+
+  //const modelDetail = allRecords.find(modelDetail => modelDetail[0] === request.model)
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -55,10 +63,16 @@ const NotificationModal = ({
                     </span>
                   </div>
                   <button
+                    disabled={getStatus(allRecords, request.model)}
                     onClick={() => onBookTestDrive(request)}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                    className={`px-3 py-1 
+                      ${getStatus(allRecords, request.model) ?
+                      'bg-red-500' : 'bg-blue-600 hover:bg-blue-700'
+                    } text-white text-sm rounded-md transition-colors`}
                   >
-                    Book Test Drive
+                    {getStatus(allRecords, request.model) ?
+                      'Vehicle Not Available' : 'Book Test Drive'
+                    }
                   </button>
                 </div>
               </div>

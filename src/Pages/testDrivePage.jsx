@@ -107,6 +107,7 @@ function TestDrivePage() {
                 Vehicle Availability Dashboard
               </h2>
               {/* Notification Bell */}
+              {(role === roles.ADMIN || role === roles.MD || role === roles.GUARD) && ( 
               <button
                 onClick={handleNotificationClick}
                 className="relative p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
@@ -129,7 +130,7 @@ function TestDrivePage() {
                 {hasNewRecords && (
                   <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
                 )}
-              </button>
+              </button>)}
             </div>
           </div>
 
@@ -155,7 +156,7 @@ function TestDrivePage() {
             )}
           </div>
         </div>
-        {role === roles.ADMIN && role === roles.MD (
+        {(role === roles.ADMIN || role === roles.MD) && ( 
         <div className="bg-white shadow-lg rounded-lg mt-10">
           <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4">
             <h3 className="text-center text-xl font-semibold flex items-center justify-center gap-2">
