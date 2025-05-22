@@ -195,7 +195,7 @@ function AllQuotation() {
 
     useEffect(() => {
         fetchQuotations(currentPage);
-    }, [currentPage, role, quotaData]);
+    }, [currentPage, role]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
