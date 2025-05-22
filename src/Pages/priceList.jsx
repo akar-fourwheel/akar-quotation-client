@@ -10,6 +10,9 @@ const PriceList = () => {
     const [getModel, setGetModel] = useState([]);
     const [getFuel, setGetFuel] = useState([]);
     const [variantFilter, setVariantFilter] = useState('');
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     const [matchedVehicles, setMatchedVehicles] = useState([]);
 
@@ -184,7 +187,14 @@ const PriceList = () => {
                                 const total = esp + rto + insurance + fastTag + extraTax;
 
                                 return (
-                                    <tr key={index} className="border-b hover:bg-gray-50">
+                                    <tr
+                                        key={index}
+                                        className="border-b hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => {
+                                            setSelectedVehicle({ ...vehicle, index });
+                                            setIsModalOpen(true);
+                                        }}
+                                    >
                                         <td className="px-4 py-2 text-sm text-gray-900">{index + 1}</td>
                                         <td className="px-4 py-2 text-sm text-gray-900">{vehicle.Variant}</td>
                                         <td className="px-4 py-2 text-sm font-semibold text-green-700">
@@ -195,6 +205,37 @@ const PriceList = () => {
                             })}
                         </tbody>
                     </table>
+                </div>
+            )}
+            {isModalOpen && selectedVehicle && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
+                    <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            ✕
+                        </button>
+                        <h2 className="text-xl font-semibold mb-4">Price Breakup - {selectedVehicle.Variant}</h2>
+                        <ul className="text-sm text-gray-700 space-y-2">
+                            <li><strong>Ex-Showroom Price:</strong> ₹ {Number(selectedVehicle.ESP).toLocaleString()}</li>
+                            <li><strong>RTO:</strong> ₹ {Number(selectedVehicle.RTO).toLocaleString()}</li>
+                            <li><strong>Insurance:</strong> ₹ {Number(selectedVehicle.Insurance).toLocaleString()}</li>
+                            <li><strong>Fast Tag:</strong> ₹ {Number(selectedVehicle.FastTag).toLocaleString()}</li>
+                            <li><strong>TCS:</strong> ₹ {(Number(selectedVehicle.ESP) > 1000000 ? (Number(selectedVehicle.ESP) * 0.01).toLocaleString() : '0')}</li>
+                            <li className="font-bold mt-2 border-t pt-2">
+                                <strong>Total:</strong> ₹ {
+                                    (
+                                        Number(selectedVehicle.ESP || 0) +
+                                        Number(selectedVehicle.RTO || 0) +
+                                        Number(selectedVehicle.Insurance || 0) +
+                                        Number(selectedVehicle.FastTag || 0) +
+                                        (Number(selectedVehicle.ESP) > 1000000 ? Number(selectedVehicle.ESP) * 0.01 : 0)
+                                    ).toLocaleString()
+                                }
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             )}
         </div>

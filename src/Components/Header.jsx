@@ -10,6 +10,7 @@ const Header = ({ toggleSidebar }) => {
   const col =Number(remainingTarget.split(" ")[1]) <= target;
 
   useEffect(()=> {
+    if (localStorage.role === 'teamLead') {
     axios.get('/teamLead/tl-target',{
       params:{
         id:'TES_01'
@@ -24,9 +25,8 @@ const Header = ({ toggleSidebar }) => {
       else{
         setRemainingTarget("Target: "+tg)
       }
-      
     })
-  },[])
+  }},[])
 
   return (
     <header className="bg-white shadow">

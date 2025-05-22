@@ -80,7 +80,7 @@ function TestDrivePage() {
   useEffect(() => {
     getData();
     // Poll for new records every 10 seconds
-    const interval = setInterval(getData, 10000);
+    const interval = setInterval(getData, 30000);
     return () => clearInterval(interval);
   }, []);
 
