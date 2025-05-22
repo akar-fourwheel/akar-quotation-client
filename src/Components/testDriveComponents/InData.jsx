@@ -25,7 +25,7 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
     }
 
     try {
-      const response = await axios.put(`/test-drive/in/${index}`, { availability: "Available" });
+      const response = await axios.put(`/test-drive/in/${model}`, { availability: "Available" });
 
       
         const pushData = await axios.put(`/test-drive/in`, payload, {
