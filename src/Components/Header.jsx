@@ -9,24 +9,26 @@ const Header = ({ toggleSidebar }) => {
 
   const col =Number(remainingTarget.split(" ")[1]) <= target;
 
-  useEffect(()=> {
-    axios.get('/teamLead/tl-target',{
-      params:{
-        id:localStorage.userId
-      }
-    })
-    .then(res =>{
-      setTarget(res.data[0]);      
-      const tg = Number(res.data[0])-Number(res.data[1]);
-      if(tg<0){
-        setRemainingTarget("Achieved: "+ res.data[1]);
-      }
-      else{
-        setRemainingTarget("Target: "+tg)
-      }
-      
-    })
-  },[])
+  // useEffect(()=> {
+  //   if(localStorage.role=="teamLead"){
+  //     axios.get('/teamLead/tl-target',{
+  //       params:{
+  //         id:localStorage.userId
+  //       }
+  //     })
+  //     .then(res =>{
+  //       setTarget(res.data[0]);      
+  //       const tg = Number(res.data[0])-Number(res.data[1]);
+  //       if(tg<0){
+  //         setRemainingTarget("Achieved: "+ res.data[1]);
+  //       }
+  //       else{
+  //         setRemainingTarget("Target: "+tg)
+  //       }
+        
+  //     })
+  //   }
+  // },[])
 
   return (
     <header className="bg-white shadow">
@@ -57,7 +59,8 @@ const Header = ({ toggleSidebar }) => {
               <h1 className="sm:text-xl sm:font-bold text-lg font-light text-gray-900">{user?.username}</h1>
             </div>
           </div>
-          { localStorage.role == "teamLead" &&  <div className="flex items-center">
+          {/* { localStorage.role == "teamLead" &&
+          <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="flex items-center">
                 <div className={`py-2 px-3 text-lg font-semibold rounded-lg border border-transparent ${col ? 'bg-amber-400': 'bg-emerald-600'} text-white`}>
@@ -66,7 +69,7 @@ const Header = ({ toggleSidebar }) => {
               </div>
             </div>
           </div>
-          }
+          } */}
         </div>
       </div>
     </header>
