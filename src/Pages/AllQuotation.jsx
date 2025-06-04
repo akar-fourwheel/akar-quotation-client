@@ -127,7 +127,7 @@ function AllQuotation() {
 
     const fetchDemoCar = async (model) => {
         try {
-            const response = await axios.get('/test-drive');
+            const response = await axios.get('/test-drive/status');
             const jsonData = response.data
             const matchedCar = jsonData.joined.data.find(
                 car => car.status === 'Available' && car.model === model
@@ -144,7 +144,25 @@ function AllQuotation() {
         }
     }
 
-    const fetchQuotations = async (page) => {
+    const fetchCas = async () => {
+        try {
+            let cas;
+            if (role === roles.ADMIN || role === roles.MD) {
+                cas = await axios.get('/admin/get-all-ca')
+            } else if (role === roles.TEAML) {
+                cas = await axios.get('/teamLead/get-tl-ca', {
+                    params: {
+                        tl: username
+                    }
+                })
+            }
+            setUniqueCas(cas.data);
+        } catch (e) {
+            console.log("Error fetching CA data:", e);
+        }
+    }
+
+    const fetchQuotations = async (page) => {        
         try {
             let response;
             if (role === roles.ADMIN || role === roles.MD) {
@@ -162,7 +180,6 @@ function AllQuotation() {
                     response = await axios.get(`/admin/all-quotations`, {
                         params: { role, page, limit: 25 }
                     });
-                    setUniqueCas([...new Set(response.data.data.map(ca => ca[2]))]);
                 }
             } else if (role === roles.SALES) {
                 response = await axios.get(`/my-quotation`, {
@@ -195,7 +212,8 @@ function AllQuotation() {
 
     useEffect(() => {
         fetchQuotations(currentPage);
-    }, [currentPage, role, quotaData]);
+        fetchCas();
+    }, [currentPage, role, salesFilter, modalData]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -350,7 +368,7 @@ function AllQuotation() {
             )}
 
             <div className="overflow-x-auto">
-                {(quotaData.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
+                {(uniqueCas.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Filter by CA:</label>
                         <select
