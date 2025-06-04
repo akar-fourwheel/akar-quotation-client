@@ -13,12 +13,12 @@ const Header = ({ toggleSidebar }) => {
     if (localStorage.role === 'teamLead') {
     axios.get('/teamLead/tl-target',{
       params:{
-        id:'TES_01'
+        id:localStorage.userId
       }
     })
     .then(res =>{
-      setTarget(res.data[0]);
-      const tg = res.data[0]-res.data[1];
+      setTarget(res.data[0]);      
+      const tg = Number(res.data[0])-Number(res.data[1]);
       if(tg<0){
         setRemainingTarget("Achieved: "+ res.data[1]);
       }
