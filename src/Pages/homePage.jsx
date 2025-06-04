@@ -81,6 +81,25 @@ const HomePage = (req, res) => {
                 Test Drive
               </button>
             </Link>
+            {localStorage.role == roles.AUDITOR && (
+              <>
+              <Link to="/update-quotation">
+                <button
+                  type="button"
+                  className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-400 transition ease-in-out duration-300"
+                >
+                  Update Quotation
+                </button>
+              </Link><Link to="/update-stock">
+                  <button
+                    type="button"
+                    className="w-full py-3 px-6 text-lg font-semibold rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-400 transition ease-in-out duration-300"
+                  >
+                    Update Stock
+                  </button>
+                </Link>
+                </>
+              )}
           </div>
         </div>
       </div>

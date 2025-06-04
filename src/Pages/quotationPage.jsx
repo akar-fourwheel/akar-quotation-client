@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router";
 import Select from "react-select";
@@ -12,6 +12,7 @@ const quotationPage = () => {
   const [getYear, setGetYear] = useState([]);
   const [year, setYear] = useState('');
   const [getModel, setGetModel] = useState([]);
+  const [currModelList, setCurrModelList] = useState([]);
   const [model, setModel] = useState('');
   const [getFuel, setGetFuel] = useState([]);
   const [fuel, setFuel] = useState('');
@@ -38,11 +39,10 @@ const quotationPage = () => {
   const [accTotal, setAccTotal] = useState(0);
   const [loyaltyType, setLoyaltyType] = useState();
   const [scrap, setScrap] = useState();
-  const [name, setName] = useState('');
-  const [phoneNo, setPhoneNo] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
-  const [currentDate, setCurrentDate] = useState("");
+  const [name,setName] = useState('');
+  const [phoneNo,setPhoneNo] = useState('');
+  const [email,setEmail] = useState('');
+  const [address,setAddress] = useState('');
   const [selectedSalesPerson, setSelectedSalesPerson] = useState(localStorage.getItem("username"));
   const [pdfUrl, setPdfUrl] = useState('');
   const [cod, setCod] = useState(0);
@@ -53,6 +53,14 @@ const quotationPage = () => {
   const [showWarning, setShowWarning] = useState(false);
   const [maxAddDisc, setMaxAddDisc] = useState(0);
   const [inhouse, setInhouse] = useState(true);
+  const [gender,setGender] = useState('');
+  const [newCx,setNewCx] = useState(false);
+  const [newAllot,setNewAllot] = useState(false);
+  const [cxId,setCxId] = useState();
+  const [cxAllot,setcxAllot] = useState();
+  const [customerList, setCustomerList] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
   const [errors, setErrors] = useState({
     name: false,
     address: false,
@@ -61,8 +69,61 @@ const quotationPage = () => {
     selectedSalesPerson: false,
   });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const  navigate = useNavigate();
 
+  const filteredCustomers = customerList.filter(customer => {
+  if (!customerSearchQuery) return true;
+  
+  const query = customerSearchQuery.toLowerCase();
+  const name = (customer[1] || '').toLowerCase();
+  const phone = (customer[2] || '').toLowerCase();
+  const email = (customer[4] || '').toLowerCase();
+  const model = (customer[6] || '').toLowerCase();
+  
+  return name.includes(query) || 
+         phone.includes(query) || 
+         email.includes(query) || 
+         model.includes(query);
+});
+
+const handleCustomerSelect = (customer) => {
+  setSelectedCustomer(customer);
+  setNewAllot(false); // Reset new allotment state when a customer is selected
+  
+  // Reset all form fields
+  setYear('');
+  setModel('');
+  setFuel('');
+  setVariant('');
+  setCurrModelList([]);
+  setGetFuel([]);
+  setGetVariant([]);
+  setFinalData({});
+  
+  // Reset discounts and other dependent fields
+  restState(0, '', 0);
+  
+  // Fill form data (excluding car model which is at index 6)
+  setCxId(customer[0]); // customer ID
+  setName(customer[1] || ''); // customer name
+  setPhoneNo(customer[2] || ''); // phone number
+  setGender(customer[3] || ''); // gender
+  setEmail(customer[4] || ''); // email
+  setAddress(customer[5] || ''); // address
+  setcxAllot(customer[7] || ''); // allotment ID, assuming it's at index 7
+  // Index 6 is car model which we don't set in the form
+
+  // Re-fetch the years to ensure dropdown is populated
+  axios.get(`/quotation`)
+    .then((response) => {
+      const fetchedYears = response.data.flat();
+      setGetYear(fetchedYears);
+    })
+    .catch((error) => {
+      console.error('Error fetching years:', error);
+    });
+};
+  
   let tcs, totalESP;
 
   const restState = (insAmount, year, maxDisc) => {
@@ -94,9 +155,50 @@ const quotationPage = () => {
     }
   }
 
+
+  // Fetch customer list
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get('/customer-info', {
+        params: {
+          role: localStorage.role,
+          name: localStorage.userId
+        }
+      });
+      setCustomerList(response.data);
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+    }
+  };
+
   // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    let cxId=null;
+    
+    if (newCx === true) {
+
+      const cxData = {
+        name: name.toUpperCase(),
+        gender,
+        mobile: phoneNo,
+        email: email || null,
+        address: address
+      }
+
+      try {
+        const response = await axios.post(`/create-cx`, cxData)
+        cxId= response.data.inserrtedId;
+        setCxId(cxId);
+
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    
+    if (cxId || newAllot) {
+      createNewAllotment();
+    }
 
     axios.get(`/quotation-data`, {
       params: {
@@ -117,33 +219,55 @@ const quotationPage = () => {
       });
   };
 
-  const dataBasedOnYear = (e) => {
-    const selectedYear = e.target.value;
-    setYear(selectedYear);
+  const createNewAllotment = async() => {
+      const cxAll = {
+        cx_id: cxId,
+        lead_type: 'outside',
+        exe_name: 'self',
+        ca_name : localStorage.userId,
+        model,
+      }
+        try {
+          const response = await axios.post(`/create-allot`, cxAll)
+          setcxAllot(response.data.insertedId);
+        } catch (e) {
+          console.log(e);
+        }
+  }
 
-    setGetModel([]);
-    setModel('');
-    setFuel('')
-    setGetFuel([]); // Clear fuel options when the year is changed
-    setVariant('');
-    setGetVariant([]);
+const dataBasedOnYear = (e) => {
+  const selectedYear = e.target.value;
+  setYear(selectedYear);
+  
+  setCurrModelList([]);
+  setModel('');
+  setFuel('')
+  setGetFuel([]); // Clear fuel options when the year is changed
+  setVariant('');
+  setGetVariant([]);
 
-    // Fetch models based on selected year
-    axios
-      .get(`/quotation-data`, {
-        params: { year: selectedYear },
-      })
-      .then((response) => {
-        const data = response.data.flat();
-        setGetModel(data);
-      });
-  };
+  // Fetch models based on selected year
+  axios
+    .get(`/quotation-data`, {
+      params: { year: selectedYear },
+    })
+    .then((response) => {
+      const data = response.data.flat();
+      setGetModel(data); // Assuming models are returned based on year
+      // If it's a new customer OR adding new car (newAllot is true), show all models
+      if (newCx || newAllot) {
+        setCurrModelList(data);
+      } else {
+        // For existing customers, filter to show only their specific model
+        setCurrModelList(data.filter((model) => model == selectedCustomer[6]));
+      }
+    });
+};
 
   // Fetch fuel based on year and model
   const dataBasedOnYearAndModel = (e) => {
     const selectedModel = e.target.value;
     setModel(selectedModel);
-
     setFuel('')
     setGetFuel([]); // Clear fuel options when the year is changed
     setVariant('');
@@ -221,8 +345,19 @@ const quotationPage = () => {
       return accumulator + (item.value || 0);
     }, 0);
 
-    setAccTotal(newAccTotal);
-  }, [selectedAcc]);
+  setAccTotal(newAccTotal);
+}, [selectedAcc]);
+
+  // Fetch customers when component mounts and when toggle changes
+  useEffect(() => {
+    if (!newCx) {
+      fetchCustomers();
+    }
+  }, [newCx]);
+
+  const handleInsurance = (selected) => {
+    setSelectedInsurance(selected);
+  };
 
   const handleDiscount = (selected) => {
     setSelectedDiscounts(selected);
@@ -368,27 +503,108 @@ const quotationPage = () => {
     return isValid;
   };
 
+  const handleNewAllot = () => {
+    setNewAllot(!newAllot);
+    if(!newAllot) {
+    setCurrModelList(getModel);
+    }
+    else {
+      setCurrModelList(getModel.filter((model) => model == selectedCustomer[6])); // Assuming car model is at index 6
+    }
+  }
+
   const handleGeneratePDF = async () => {
 
     if (!validateForm()) {
       return; // Don't proceed if there are validation errors
     }
 
-    const Qdata = buildQuotationData({
-      currentDate, name, phoneNo, email, address, selectedSalesPerson, inhouse, selectedHpn, hpn,
-      finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, sss,
-      totalDisc, tcs, rto, scrap, cod, selectedAcc, accTotal, ins, selectedInsurance, totalAddOns, ew,
-      selectedVas, totalESP
-    });
-
-    try {
-      setLoading(true);
-
-      const response = await axios.post(`/generate-pdf`, Qdata);
-      const { whatsAppUrl, publicUrl } = response.data;
-
-      setWhatsAppUrl(whatsAppUrl);
-      setPdfUrl(publicUrl);
+    const cameraOption = selectedAcc.find(
+      (opt) => opt.label == "Camera" || opt.label == "TFT Display Camera"
+    )
+    var Qdata = {
+      userInfo: {
+        name: name.toUpperCase(),
+        mobile: phoneNo,
+        email: email,
+        address: address, 
+        salesPerson: selectedSalesPerson,
+      },
+      sheetData: {
+        cx_id:cxId,
+        alot_id:cxAllot,
+        HPN: (inhouse ? selectedHpn.label + ": In-House" : hpn + ": Out-House"),
+        year: finalData.YEAR,
+        model: finalData.PPL,
+        fuel: finalData.Fuel,
+        varient: finalData.Variant,
+        color: selectedColor ? selectedColor : "N/A",
+        ESP: finalData.ESP,
+        consumerDisc: (selectedDiscounts.some((opt) => opt.value === "CONSUMER") ? finalData.CONSUMER : 0),
+        interventionDisc: (selectedDiscounts.some((opt) => opt.value === "INTERVENTION") ? finalData.INTERVENTION : 0),
+        exchangeScrap: (selectedDiscounts.some((opt) => opt.value === "EXCHANGE") ? finalData.EXCHANGE : 0),
+        addExcDisc: addExc,
+        loyalty: (!loyalty || loyalty == 0 ? false : true),
+        ICEtoEV: (loyaltyType == 'ICE_to_EV' && finalData[loyaltyType]),
+        EVtoEV: (loyaltyType == 'EV_to_EV' && finalData[loyaltyType]),
+        corpTop10Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE_TOP_10") ? finalData["CORPORATE_TOP_10"] : 0),
+        corpTop20Disc: (selectedDiscounts.some((opt) => opt.value === "CORPORATE_TOP_20") ? finalData["CORPORATE_TOP_20"] : 0),
+        corpOfferToggle: (finalData[corpOffer] > 0 ? true : false),
+        solarDisc: ((corpOffer === "SOLER") ? finalData.SOLER : 0),
+        MSMEDisc: ((corpOffer === "MSME") ? finalData.MSME : 0),
+        gridDisc: (selectedDiscounts.some((opt) => opt.value === "GRID") ? finalData.GRID : 0),
+        addDisc: addDisc,
+        SSS: sss,
+        totalDisc: totalDisc,
+        billingPrice: finalData.ESP - totalDisc,
+        tcs: tcs,
+        rtoType: rto.value,
+        rtoAmt: finalData[rto.value].toFixed(2),
+        scrapBy: (scrap ? "Dealer" : rto.value == "Scrap_RTO" ? "Self" : "N/A"),
+        cod: cod,
+        mudflap: (selectedAcc.some((opt) => opt.label === "Mudflap") ? selectedAcc.find((opt) => opt.label === "Mudflap").value : 0),
+        uniMatting: (selectedAcc.some((opt) => opt.label === "Universal Matting") ? selectedAcc.find((opt) => opt.label === "Universal Matting").value : 0),
+        seatCover: (selectedAcc.some((opt) => opt.label === "Seat Cover") ? selectedAcc.find((opt) => opt.label === "Seat Cover").value : 0),
+        doorVisor: (selectedAcc.some((opt) => opt.label === "Door Visor") ? selectedAcc.find((opt) => opt.label === "Door Visor").value : 0),
+        doorEdge: (selectedAcc.some((opt) => opt.label === "Door Edge Guard") ? selectedAcc.find((opt) => opt.label === "Door Edge Guard").value : 0),
+        bsm: (selectedAcc.some((opt) => opt.label === "BSM") ? selectedAcc.find((opt) => opt.label === "BSM").value : 0),
+        scuffPlate: (selectedAcc.some((opt) => opt.label === "Scuff Plate") ? selectedAcc.find((opt) => opt.label === "Scuff Plate").value : 0),
+        sideStep: (selectedAcc.some((opt) => opt.label === "Side Step") ? selectedAcc.find((opt) => opt.label === "Side Step").value : 0),
+        mat7D: (selectedAcc.some((opt) => opt.label === "7 D Mat") ? selectedAcc.find((opt) => opt.label === "7 D Mat").value : 0),
+        trunkMat: (selectedAcc.some((opt) => opt.label === "Trunk Mat") ? selectedAcc.find((opt) => opt.label === "Trunk Mat").value : 0),
+        perfume: (selectedAcc.some((opt) => opt.label === "Perfume") ? selectedAcc.find((opt) => opt.label === "Perfume").value : 0),
+        ganeshji: (selectedAcc.some((opt) => opt.label === "Ganesh Ji") ? selectedAcc.find((opt) => opt.label === "Ganesh Ji").value : 0),
+        camera: (cameraOption ? cameraOption.label : " "),
+        cameraVal: (cameraOption ? cameraOption.value : 0),
+        bodyCover: (selectedAcc.some((opt) => opt.label === "Car Cover") ? selectedAcc.find((opt) => opt.label === "Car Cover").value : 0),
+        accTotal: accTotal,
+        inc: ins,
+        rsa: (selectedInsurance.some((opt) => opt.value === "RSA") ? finalData["RSA"] : 0),
+        keyRep: (selectedInsurance.some((opt) => opt.value === "Key_Replacement") ? finalData["Key_Replacement"] : 0),
+        engineProtect: (selectedInsurance.some((opt) => opt.value === "Engine_Protection") ? finalData["Engine_Protection"] : 0),
+        rti: (selectedInsurance.some((opt) => opt.value === "RTI") ? finalData["RTI"] : 0),
+        tyreNcover: (selectedInsurance.some((opt) => opt.value === "Tyre_and_Alloy_Cover") ? finalData["Tyre_and_Alloy_Cover"] : 0),
+        consumables: (selectedInsurance.some((opt) => opt.value === "Consumables") ? finalData["Consumables"] : 0),
+        personalBelong: (selectedInsurance.some((opt) => opt.value === "Personal_Belongings") ? finalData["Personal_Belongings"] : 0),
+        batteryP: (selectedInsurance.some((opt) => opt.value === "Battery_Protection") ? finalData["Battery_Protection"] : 0),
+        incTotal: totalAddOns + ins,
+        ewType: ew ? ew : "",
+        ew: ew ? finalData[ew] : 0,
+        vasType: selectedVas ? selectedVas.label : "",
+        vas: selectedVas ? selectedVas.value : 0,
+        fasttag: finalData.FastTag,
+        grandTotal: totalESP,
+      }
+    };
+      
+      try {
+        setLoading(true);
+      
+        const response = await axios.post(`/generate-pdf`, Qdata);
+        const {whatsAppUrl,publicUrl} = response.data;
+        
+        setWhatsAppUrl(whatsAppUrl);
+        setPdfUrl(publicUrl);
 
     } catch (error) {
       console.error("Error generating PDF", error);
@@ -398,61 +614,154 @@ const quotationPage = () => {
 
   };
 
-  useEffect(() => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + 330);
-    const formattedDateTime = now.toISOString().slice(0, 19).replace('T', ' ');
-    setCurrentDate(formattedDateTime);
-  }, []);
+    // const filteredSalesPersons = salesPersonList.filter(person =>
+    //   person.toLowerCase().includes(searchQuery.toLowerCase())
+    // );
 
-  useEffect(() => {
-    setPdfUrl('');
-  }, [
-    getYear, year, getModel, model, getFuel, fuel, getVariant, variant, finalData, selectedInsurance, selectedDiscounts, addExc, loyalty, corpOffer, addDisc, sss, rto, totalDisc, ew, accessories, selectedAcc,
-    color, selectedColor, selectedVas, selectedHpn, totalAddOns, accTotal, loyaltyType, scrap, name, phoneNo, email, address, currentDate, selectedSalesPerson]);
+    useEffect(() => {
+      setPdfUrl('');
+    }, [
+      getYear,year,getModel,model,getFuel,fuel,getVariant,variant,finalData,selectedInsurance,selectedDiscounts,addExc,loyalty,corpOffer,addDisc,sss,rto,totalDisc,ew,accessories,selectedAcc,
+      color,selectedColor,selectedVas,selectedHpn,totalAddOns,accTotal,loyaltyType,scrap,name,phoneNo,email,address,selectedSalesPerson]);
 
   return (
     <div className="m-auto w-full max-w-4xl p-4">
-      <h2 className="text-2xl font-semibold text-center mb-6">Test form for Quotation</h2>
-
-      <CustomerDetailsForm
-        name={name}
-        setName={setName}
-        address={address}
-        setAddress={setAddress}
-        phoneNo={phoneNo}
-        setPhoneNo={setPhoneNo}
-        email={email}
-        setEmail={setEmail}
-        errors={errors}
-      />
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <VehicleSelector
-          getYear={getYear}
-          year={year}
-          setYear={setYear}
-          dataBasedOnYear={dataBasedOnYear}
-          getModel={getModel}
-          model={model}
-          setModel={setModel}
-          dataBasedOnYearAndModel={dataBasedOnYearAndModel}
-          getFuel={getFuel}
-          fuel={fuel}
-          setFuel={setFuel}
-          dataBasedOnYearModelAndFuel={dataBasedOnYearModelAndFuel}
-          getVariant={getVariant}
-          variant={variant}
-          setVariant={setVariant}
+  <h2 className="text-2xl font-semibold text-center mb-6">Test form for Quotation</h2>
+  
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
+        <label className="block text-lg">Customer Name:</label>
+        <input
+          type="text"
+          onChange={(e) => setName(e.target.value)}
+          className={`w-full p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
         />
-        <button
-          type="submit"
-          className="w-full py-2 mt-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
-        >
-          Submit
-        </button>
-      </form>
+      </div>
 
+      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
+        <label className="block text-lg">Address:</label>
+        <input
+          type="text"
+          onChange={(e) => setAddress(e.target.value)}
+          className={`w-full p-2 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
+        />
+      </div>
+
+      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
+        <label className="block text-lg">Phone Number:</label>
+        <input
+          type="text"
+          onChange={(e) => setPhoneNo(e.target.value)}
+          className={`w-full p-2 border ${errors.phoneNo ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
+        />
+      </div>
+
+      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
+        <label className="block text-lg">Email:</label>
+        <input
+          type="text"
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder='Optional'
+          className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
+        />
+      </div>
+
+      {/* <div className="col-span-1 sm:col-span-2 lg:col-span-1 space-y-2"> */}
+        {/* <select
+          value={selectedSalesPerson}
+          onChange={(e) => setSelectedSalesPerson(e.target.value)}
+          className={`w-full p-2 border ${errors.selectedSalesPerson ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
+          isSearchable={true}
+        >
+          <option value="">Select a Sales Person</option>
+          {salesPersonList.map((salesPerson, index) => (
+            <option key={index} value={salesPerson}>
+              {salesPerson}
+            </option>
+          ))}
+        </select> */}
+      {/* </div> */}
+        <input
+          type="text"
+          value={selectedSalesPerson}
+          disabled hidden
+        />
+      </div>
+
+  <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-2">
+      <label className="block text-lg">Year:</label>
+      <select
+        name="selectedYear"
+        onChange={dataBasedOnYear}
+        className="w-full p-2 border border-gray-300 rounded-lg"
+      >
+        <option value="">Choose year</option>
+        {getYear.map((yr) => (
+          <option value={yr} key={yr}>
+            {yr}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="space-y-2">
+      <label className="block text-lg">Model:</label>
+      <select
+        name="selectedModel"
+        onChange={dataBasedOnYearAndModel}
+        className="w-full p-2 border border-gray-300 rounded-lg"
+      >
+        <option value="">Choose model</option>
+        {getModel.map((m) => (
+          <option value={m} key={m}>
+            {m}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="space-y-2">
+      <label className="block text-lg">Fuel:</label>
+        <select
+          name="selectedFuel"
+          onChange={dataBasedOnYearModelAndFuel}
+          className="w-full p-2 border border-gray-300 rounded-lg"
+        >
+        <option value="">Choose fuel type</option>
+        {getFuel.map((f) => (
+          <option value={f} key={f}>
+            {f}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="space-y-2">
+      <label className="block text-lg">Variant:</label>
+      <select
+        name="selectedVariant"
+        onChange={(e) => setVariant(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded-lg"
+        //disabled={!getFuel.length} // Disable fuel select until data is available
+      >
+        <option value="">Choose Variant</option>
+        {getVariant.map((f) => (
+          <option value={f} key={f}>
+            {f}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <button
+      type="submit"
+      className="w-full py-2 mt-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
+    >
+      Submit
+    </button>
+  </form>
+  
 
       <div className="overflow-x-auto mt-6">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 overflow-y-hidden">

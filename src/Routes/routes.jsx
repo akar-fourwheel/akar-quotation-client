@@ -18,6 +18,8 @@ import BookingForm from "../Pages/booking/bookingForm";
 import bookingSuccess from "../Pages/booking/bookingSuccess";
 import testDrivePage from "../Pages/testDrivePage";
 import PriceList from "../Pages/priceList";
+import QuotationUpdateDashboard from "../Pages/updateQuotationPage";
+import StockUpdateDashboard from "../Pages/updateStockPage";
 
 export const routes = createBrowserRouter([
     {
@@ -33,7 +35,7 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.ADMIN]} />,
+        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
@@ -81,6 +83,14 @@ export const routes = createBrowserRouter([
                     {
                         path: '/price-list',
                         Component: PriceList
+                    },
+                    {
+                        path: '/update-quotation',
+                        Component : QuotationUpdateDashboard
+                    },
+                                        {
+                        path: '/update-stock',
+                        Component : StockUpdateDashboard
                     }
                 ]
             }
