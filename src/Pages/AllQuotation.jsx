@@ -165,6 +165,7 @@ function AllQuotation() {
     const fetchQuotations = async (page) => {        
         try {
             let response;
+            
             if (role === roles.ADMIN || role === roles.MD) {
                 if (salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
@@ -377,11 +378,12 @@ function AllQuotation() {
                             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="">All CAs</option>
-                            {uniqueCas.map((ca, index) => (
-                                <option key={index} value={ca}>
-                                    {ca}
-                                </option>
-                            ))}
+                            {uniqueCas
+                                .map(([id, name]) => (
+                                    <option key={id} value={id}>
+                                        {name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                 )}

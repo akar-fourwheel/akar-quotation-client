@@ -556,133 +556,78 @@ const dataBasedOnYear = (e) => {
   return (
     <div className="m-auto w-full max-w-4xl p-4">
   <h2 className="text-2xl font-semibold text-center mb-6">Test form for Quotation</h2>
+
+  {/* <div className="mb-6 flex items-center space-x-3">
+  <label className="flex items-center cursor-pointer">
+    <div className="relative">
+      <input
+        type="checkbox"
+        checked={newCx}
+onChange={(e) => {
+  setNewCx(e.target.checked);
+  // Clear form when switching to new customer
+  if (e.target.checked) {
+    setNewAllot(true);
+    setSelectedCustomer(null);
+    setName('');
+    setPhoneNo('');
+    setEmail('');
+    setAddress('');
+    setGender('');
+    setCustomerSearchQuery(''); // Clear search query
+  }
+}}
+        className="sr-only"
+      />
+      <div className={`block w-14 h-8 rounded-full ${newCx ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-200`}></div>
+      <div className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-200 ${newCx ? 'transform translate-x-6' : ''}`}></div>
+    </div>
+    <span className="ml-3 text-lg font-medium text-gray-700">
+      {newCx ? 'New Customer' : 'Listed Customer'}
+    </span>
+  </label>
+</div> */}
   
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
-        <label className="block text-lg">Customer Name:</label>
-        <input
-          type="text"
-          onChange={(e) => setName(e.target.value)}
-          className={`w-full p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-        />
-      </div>
+    <CustomerDetailsForm
+      newCx={newCx}
+      setNewCx={setNewCx}
+      setNewAllot={setNewAllot}
+      selectedCustomer={selectedCustomer}
+      setSelectedCustomer={setSelectedCustomer}
+      name={name}
+      setName={setName}
+      address={address}
+      setAddress={setAddress}
+      phoneNo={phoneNo}
+      setPhoneNo={setPhoneNo}
+      email={email}
+      setEmail={setEmail}
+      errors={errors}
+      gender={gender}
+      setGender={setGender}
+      customerSearchQuery={customerSearchQuery}
+      setCustomerSearchQuery={setCustomerSearchQuery}
+      filteredCustomers={filteredCustomers}
+      handleCustomerSelect={handleCustomerSelect}
+    />
 
-      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
-        <label className="block text-lg">Address:</label>
-        <input
-          type="text"
-          onChange={(e) => setAddress(e.target.value)}
-          className={`w-full p-2 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-        />
-      </div>
-
-      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
-        <label className="block text-lg">Phone Number:</label>
-        <input
-          type="text"
-          onChange={(e) => setPhoneNo(e.target.value)}
-          className={`w-full p-2 border ${errors.phoneNo ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-        />
-      </div>
-
-      <div className="col-span-1 sm:col-span-2 lg:col-span-2 space-y-2">
-        <label className="block text-lg">Email:</label>
-        <input
-          type="text"
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder='Optional'
-          className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-        />
-      </div>
-
-      {/* <div className="col-span-1 sm:col-span-2 lg:col-span-1 space-y-2"> */}
-        {/* <select
-          value={selectedSalesPerson}
-          onChange={(e) => setSelectedSalesPerson(e.target.value)}
-          className={`w-full p-2 border ${errors.selectedSalesPerson ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
-          isSearchable={true}
-        >
-          <option value="">Select a Sales Person</option>
-          {salesPersonList.map((salesPerson, index) => (
-            <option key={index} value={salesPerson}>
-              {salesPerson}
-            </option>
-          ))}
-        </select> */}
-      {/* </div> */}
         <input
           type="text"
           value={selectedSalesPerson}
           disabled hidden
         />
-      </div>
 
   <form onSubmit={handleSubmit} className="space-y-4">
-    <div className="space-y-2">
-      <label className="block text-lg">Year:</label>
-      <select
-        name="selectedYear"
-        onChange={dataBasedOnYear}
-        className="w-full p-2 border border-gray-300 rounded-lg"
-      >
-        <option value="">Choose year</option>
-        {getYear.map((yr) => (
-          <option value={yr} key={yr}>
-            {yr}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="space-y-2">
-      <label className="block text-lg">Model:</label>
-      <select
-        name="selectedModel"
-        onChange={dataBasedOnYearAndModel}
-        className="w-full p-2 border border-gray-300 rounded-lg"
-      >
-        <option value="">Choose model</option>
-        {getModel.map((m) => (
-          <option value={m} key={m}>
-            {m}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="space-y-2">
-      <label className="block text-lg">Fuel:</label>
-        <select
-          name="selectedFuel"
-          onChange={dataBasedOnYearModelAndFuel}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        >
-        <option value="">Choose fuel type</option>
-        {getFuel.map((f) => (
-          <option value={f} key={f}>
-            {f}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="space-y-2">
-      <label className="block text-lg">Variant:</label>
-      <select
-        name="selectedVariant"
-        onChange={(e) => setVariant(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded-lg"
-        //disabled={!getFuel.length} // Disable fuel select until data is available
-      >
-        <option value="">Choose Variant</option>
-        {getVariant.map((f) => (
-          <option value={f} key={f}>
-            {f}
-          </option>
-        ))}
-      </select>
-    </div>
-
+    <VehicleSelector 
+      getYear={getYear}
+      dataBasedOnYear={dataBasedOnYear}
+      currModelList= {currModelList}
+      dataBasedOnYearAndModel={dataBasedOnYearAndModel}
+      getFuel= {getFuel}
+      dataBasedOnYearModelAndFuel={dataBasedOnYearModelAndFuel}
+      getVariant={getVariant}
+      setVariant={setVariant}
+      handleNewAllot={handleNewAllot} />
     <button
       type="submit"
       className="w-full py-2 mt-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
