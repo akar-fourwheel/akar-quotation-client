@@ -20,6 +20,7 @@ import testDrivePage from "../Pages/testDrivePage";
 import PriceList from "../Pages/priceList";
 import QuotationUpdateDashboard from "../Pages/updateQuotationPage";
 import StockUpdateDashboard from "../Pages/updateStockPage";
+import ReceptionPage from "../Pages/receptionPage";
 
 export const routes = createBrowserRouter([
     {
@@ -88,7 +89,7 @@ export const routes = createBrowserRouter([
                         path: '/update-quotation',
                         Component : QuotationUpdateDashboard
                     },
-                                        {
+                    { 
                         path: '/update-stock',
                         Component : StockUpdateDashboard
                     }
@@ -105,6 +106,20 @@ export const routes = createBrowserRouter([
                     {
                         path: '/guard/test-drive',
                         Component: testDrivePage
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        element: <ProtectedRoute roles={[roles.RECEPTION]} />,
+        children: [
+            {
+                element: <Layout />,
+                children: [
+                    {
+                        path: '/reception',
+                        Component: ReceptionPage
                     }
                 ]
             },

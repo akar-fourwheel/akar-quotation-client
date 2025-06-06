@@ -30,8 +30,15 @@ const Login = () => {
 
     try {
       await login(credentials);
-      // Redirect to the page they tried to visit or home
-      const from = localStorage.role === roles.GUARD ? '/guard/test-drive' : (location.state?.from?.pathname || '/');
+      // Redirect to the page they tried to visit or role-specific page
+      let from = location.state?.from?.pathname || '/';
+
+      if (localStorage.role === roles.GUARD) {
+        from = '/guard/test-drive';
+      } else if (localStorage.role === roles.RECEPTION) {
+        from = '/reception';
+      }
+
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
