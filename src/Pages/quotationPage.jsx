@@ -174,7 +174,7 @@ const handleCustomerSelect = (customer) => {
   // Handle form submit
   const handleSubmit = async(e) => {
     e.preventDefault();
-    let cxId=null;
+    let customerId=null;
     
     if (newCx === true) {
 
@@ -188,16 +188,17 @@ const handleCustomerSelect = (customer) => {
 
       try {
         const response = await axios.post(`/create-cx`, cxData)
-        cxId= response.data.inserrtedId;
-        setCxId(cxId);
+        customerId= response.data.insertedId;
+        setCxId(customerId);
 
       } catch (e) {
         console.log(e);
       }
     }
-    
-    if (cxId || newAllot) {
-      createNewAllotment();
+
+    if (customerId || newAllot) {
+      if(customerId) createNewAllotment(customerId);
+      else createNewAllotment(cxId);
     }
 
     axios.get(`/quotation-data`, {
@@ -219,9 +220,9 @@ const handleCustomerSelect = (customer) => {
       });
   };
 
-  const createNewAllotment = async() => {
+  const createNewAllotment = async(cxIxd) => {
       const cxAll = {
-        cx_id: cxId,
+        cx_id: cxIxd,
         lead_type: 'outside',
         exe_name: 'self',
         ca_name : localStorage.userId,

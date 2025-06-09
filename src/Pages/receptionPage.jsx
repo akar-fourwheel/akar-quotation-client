@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { modelOptions } from '../Components/quotation/staticQuotOptions';
+
 // Define gender options outside the component for better practice
 const genderOptions = [
   { label: 'Male', value: 'M' },
@@ -9,6 +10,17 @@ const genderOptions = [
 ];
 
 function ReceptionPage() {
+  // Get user role from localStorage
+  const userRole = localStorage.getItem('role');
+  
+  // Determine leadType based on user role
+  const getLeadType = () => {
+    if (userRole === 'cre') {
+      return 'digital';
+    }
+    return 'reception'; // Default for 'reception' role or any other role
+  };
+
   // State for form fields
   const [formData, setFormData] = useState({
     name: '',
@@ -18,8 +30,8 @@ function ReceptionPage() {
     address: '',
     ca: '',
     model: '',
-    leadType: 'reception', // Default lead type
-    exeName: localStorage.userId
+    leadType: getLeadType(), // Set leadType based on user role
+    exeName: localStorage.getItem('userId')
   });
   
   // State for dropdown options
@@ -34,27 +46,25 @@ function ReceptionPage() {
   const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
 
   // Fetch CA and Model lists on component mount
-useEffect(() => {
-  const fetchDropdownData = async () => {
-    try {
-      // Fetch endpoints one by one
-      const caResponse = await axios.get('/leads/ca-list');
-      
-      setCaList(caResponse.data || []);
-      setModelList(modelOptions);
+  useEffect(() => {
+    const fetchDropdownData = async () => {
+      try {
+        // Fetch endpoints one by one
+        const caResponse = await axios.get('/leads/ca-list');
+        
+        setCaList(caResponse.data || []);
+        setModelList(modelOptions);
 
-    } catch (error) {
-      console.error("Failed to fetch dropdown data:", error);
-      setFetchError("Could not load required data. Please refresh the page.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      } catch (error) {
+        console.error("Failed to fetch dropdown data:", error);
+        setFetchError("Could not load required data. Please refresh the page.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchDropdownData();
-}, []);
-
-
+    fetchDropdownData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -98,7 +108,15 @@ useEffect(() => {
         .then(response => {
           setSubmitStatus({ message: 'Customer added successfully!', type: 'success' });
           setFormData({
-            name: '', phone: '', gender: '', email: '', address: '', ca: '', model: ''
+            name: '', 
+            phone: '', 
+            gender: '', 
+            email: '', 
+            address: '', 
+            ca: '', 
+            model: '',
+            leadType: getLeadType(), // Reset leadType based on user role
+            exeName: localStorage.getItem('userId')
           });
           setErrors({});
         })
@@ -112,6 +130,14 @@ useEffect(() => {
     }
   };
 
+  // Get page title based on user role
+  const getPageTitle = () => {
+    if (userRole === 'cre') {
+      return 'Digital Lead Entry';
+    }
+    return 'New Customer Entry';
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -119,7 +145,7 @@ useEffect(() => {
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg px-6 py-4">
             <h2 className="text-center text-2xl font-bold flex items-center justify-center gap-3">
               <i className="fas fa-user-plus"></i>
-              New Customer Entry
+              {getPageTitle()}
             </h2>
           </div>
 
@@ -200,7 +226,7 @@ useEffect(() => {
                   <button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center">
                     {isSubmitting ? (
                       <><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div><span>Submitting...</span></>
-                    ) : 'Add Customer'}
+                    ) : userRole === 'cre' ? 'Add Digital Lead' : 'Add Customer'}
                   </button>
                 </div>
               </form>

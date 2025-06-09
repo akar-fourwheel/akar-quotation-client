@@ -112,7 +112,7 @@ export const routes = createBrowserRouter([
         ]
     },
     {
-        element: <ProtectedRoute roles={[roles.RECEPTION]} />,
+        element: <ProtectedRoute roles={[roles.RECEPTION,roles.CRE]} />,
         children: [
             {
                 element: <Layout />,

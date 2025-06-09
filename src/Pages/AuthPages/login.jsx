@@ -37,6 +37,8 @@ const Login = () => {
         from = '/guard/test-drive';
       } else if (localStorage.role === roles.RECEPTION) {
         from = '/reception';
+      } else if (localStorage.role === roles.CRE) {
+        from = '/reception';
       }
 
       navigate(from, { replace: true });
