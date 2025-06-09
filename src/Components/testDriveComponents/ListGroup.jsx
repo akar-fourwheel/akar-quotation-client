@@ -32,6 +32,7 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
   const handleInClick = (row) => {
     setSelectedVehicle(row);
     setShowIn(true);
+    console.log(row);
   };
 
   const handleStatusUpdate = (model, newStatus, salesAgent) => {
@@ -45,7 +46,10 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
   };
 
   const handleBookTestDrive = (request) => {
+    
     setUpdateData({
+      cxID: request.CX_ID, 
+      alotID: request.ALOT_ID,
       model: request.model,
       cx_name: request.cx_name,
       cx_phone: request.cx_phone,
@@ -55,9 +59,8 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
       test_drive_time: request.test_drive_time,
       status: request.status
     });
-    console.log(request.id);
     
-    setSelectedVehicle({id: request.id, model: request.model, status: request.status, sales_agent: request.sales_person})
+    setSelectedVehicle({id: request.id, model: request.model, status: request.status, sales_agent: request.sales_person, alot_id: request.ALOT_ID});
     setShowOut(true);
     setShowNotificationModal(false);
   };
@@ -155,6 +158,7 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
             show={showOut}
             onStatusUpdate={handleStatusUpdate}
             initialData={updateData}
+            id={selectedVehicle.id}
           />
           <InData
             model={selectedVehicle.model}
@@ -165,6 +169,7 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
             setRow={setRows}
             onStatusUpdate={handleStatusUpdate}
             getData={getData}
+            alotId={selectedVehicle.alot_id}
           />
         </>
       )}

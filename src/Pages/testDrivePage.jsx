@@ -9,7 +9,8 @@ function TestDrivePage() {
   const [jsonData, setJsonData] = useState(null);
   const [records, setRecords] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [recordsLoading, setRecordsLoading] = useState(true);
   const [hasNewRecords, setHasNewRecords] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
   const { role } = useContext(AuthContext);
@@ -25,21 +26,27 @@ function TestDrivePage() {
   }, []);
 
   const getData = () => {
-    axios.get("/test-drive", {
-      params: {
-        role
-      }
-    })
+    axios.get("/test-drive/status")
       .then((response) => {
         const jsonData = response.data;
         setJsonData(jsonData.joined);
+        setStatusLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+        setError(error.message);
+        setStatusLoading(false);
+      });
 
-        // Check for records with status 0
-        if (jsonData.records?.data) {
-          const currentRecords = jsonData.records.data;
-          const pendingRecords = currentRecords.filter(record => record.status === 0);
+    if (role === roles.ADMIN || role === roles.MD) {
+      axios.get("/test-drive/records")
+        .then((response) => {
+          const currentRecords = response.data;
+          console.log(currentRecords);
+          
+          
+          const pendingRecords = currentRecords.data.filter(record => record.status === 0);
 
-          // Set hasNewRecords based on whether there are any pending records
           setHasNewRecords(pendingRecords.length > 0);
 
           if (previousRecordsRef.current.length > 0) {
@@ -59,32 +66,36 @@ function TestDrivePage() {
                 console.error('Error with audio playback:', error);
               }
             }
+            previousRecordsRef.current = pendingRecords;
+            setPendingRequests(pendingRecords);            
+            
+          } else {
+            // First run: set both
+            previousRecordsRef.current = pendingRecords;
+            setPendingRequests(pendingRecords);            
           }
-          previousRecordsRef.current = pendingRecords;
-          setPendingRequests(pendingRecords);
-        } else {
+          setRecords(currentRecords || []);
+          setRecordsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching records:', error);
+          setError(error.message);
+          setRecordsLoading(false);
           setPendingRequests([]);
-        }
-
-        setRecords(jsonData.records || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setError(error.message);
-        setLoading(false);
-        setPendingRequests([]);
-      });
-  };
-
+        });
+    }
+  }
+    
   useEffect(() => {
     getData();
     // Poll for new records every 10 seconds
-    const interval = setInterval(getData, 10000);
+    const interval = setInterval(getData, 30000);    
     return () => clearInterval(interval);
   }, []);
 
   const handleNotificationClick = () => {
+    console.log(pendingRequests);
+    
     // Reset audio to beginning
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
@@ -135,7 +146,7 @@ function TestDrivePage() {
           </div>
 
           <div className="p-6">
-            {loading ? (
+            {statusLoading ? (
               <div className="flex justify-center items-center py-10">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
               </div>
@@ -165,7 +176,7 @@ function TestDrivePage() {
             </h3>
           </div>
           <div className="p-6">
-            {loading ? (
+            {recordsLoading ? (
               <div className="flex justify-center items-center py-10">
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
               </div>
