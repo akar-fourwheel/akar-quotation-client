@@ -10,6 +10,7 @@ const PriceList = () => {
     const [getModel, setGetModel] = useState([]);
     const [getFuel, setGetFuel] = useState([]);
     const [variantFilter, setVariantFilter] = useState('');
+    const [expandedRow, setExpandedRow] = useState(null);
 
     const [matchedVehicles, setMatchedVehicles] = useState([]);
 
@@ -93,14 +94,14 @@ const PriceList = () => {
     return (
         <div className="container mx-auto w-half p-2 md:p-6">
             <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800 uppercase">Vehicle Price List</h2>
-            
+
             <div className="bg-white shadow-md rounded-lg p-6 mb-8">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Year:</label>
-                            <select 
-                                onChange={dataBasedOnYear} 
+                            <select
+                                onChange={dataBasedOnYear}
                                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="">Choose year</option>
@@ -112,8 +113,8 @@ const PriceList = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Model:</label>
-                            <select 
-                                onChange={dataBasedOnYearAndModel} 
+                            <select
+                                onChange={dataBasedOnYearAndModel}
                                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="">Choose model</option>
@@ -125,8 +126,8 @@ const PriceList = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Fuel:</label>
-                            <select 
-                                onChange={(e) => setFuel(e.target.value)} 
+                            <select
+                                onChange={(e) => setFuel(e.target.value)}
                                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="">Choose fuel type</option>
@@ -137,8 +138,8 @@ const PriceList = () => {
                         </div>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
                         Show Prices
@@ -182,15 +183,62 @@ const PriceList = () => {
                                 const fastTag = Number(vehicle.FastTag) || 0;
                                 const extraTax = esp > 1000000 ? esp * 0.01 : 0;
                                 const total = esp + rto + insurance + fastTag + extraTax;
+                                console.log(extraTax);
+
+
+                                const isExpanded = expandedRow === index;
 
                                 return (
-                                    <tr key={index} className="border-b hover:bg-gray-50">
-                                        <td className="px-4 py-2 text-sm text-gray-900">{index + 1}</td>
-                                        <td className="px-4 py-2 text-sm text-gray-900">{vehicle.Variant}</td>
-                                        <td className="px-4 py-2 text-sm font-semibold text-green-700">
-                                            ₹ {total.toLocaleString()}
-                                        </td>
-                                    </tr>
+                                    <React.Fragment key={index}>
+                                        <tr
+                                            className="border-b hover:bg-gray-50 cursor-pointer"
+                                            onClick={() => setExpandedRow(isExpanded ? null : index)}
+                                        >
+                                            <td className="px-4 py-2 text-sm text-gray-900">{index + 1}</td>
+                                            <td className="px-4 py-2 text-sm text-gray-900">{vehicle.Variant}</td>
+                                            <td className="px-4 py-2 text-sm font-semibold text-green-700">
+                                                ₹ {total.toLocaleString()}
+                                            </td>
+                                        </tr>
+
+                                        {isExpanded && (
+                                            <tr className="bg-gray-50">
+                                                <td colSpan={3} className="px-4 py-0 text-sm text-gray-700">
+                                                    <div
+                                                        className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[500px] py-4' : 'max-h-0 py-0'
+                                                            }`}
+                                                    >
+                                                        <div className="grid grid-cols-1 gap-x-4">
+                                                            <div className="col-span-1 space-y-1 justify-center">
+                                                                <div className="flex justify-between">
+                                                                    <span>Ex-Showroom Price:</span>
+                                                                    <span>₹ {esp.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span>RTO:</span>
+                                                                    <span>₹ {rto.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span>Insurance:</span>
+                                                                    <span>₹ {insurance.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span>Fast Tag:</span>
+                                                                    <span>₹ {fastTag.toLocaleString()}</span>
+                                                                </div>
+                                                                {extraTax > 0 && (
+                                                                    <div className="flex justify-between">
+                                                                        <span>Additional Tax (1%):</span>
+                                                                        <span>₹ {extraTax.toLocaleString()}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div> 
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 );
                             })}
                         </tbody>

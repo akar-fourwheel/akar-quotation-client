@@ -146,9 +146,28 @@ function AllQuotation() {
         }
     }
 
-    const fetchQuotations = async (page) => {
+    const fetchCas = async () => {
+        try {
+            let cas;
+            if (role === roles.ADMIN || role === roles.MD) {
+                cas = await axios.get('/admin/get-all-ca')
+            } else if (role === roles.TEAML) {
+                cas = await axios.get('/teamLead/get-tl-ca', {
+                    params: {
+                        tl: username
+                    }
+                })
+            }
+            setUniqueCas(cas.data);
+        } catch (e) {
+            console.log("Error fetching CA data:", e);
+        }
+    }
+
+    const fetchQuotations = async (page) => {        
         try {
             let response;
+            
             if (role === roles.ADMIN || role === roles.MD) {
                 if (salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
@@ -164,7 +183,6 @@ function AllQuotation() {
                     response = await axios.get(`/admin/all-quotations`, {
                         params: { role, page, limit: 25 }
                     });
-                    setUniqueCas([...new Set(response.data.data.map(ca => ca[2]))]);
                 }
             } else if (role === roles.SALES) {
                 response = await axios.get(`/my-quotation`, {
@@ -197,7 +215,8 @@ function AllQuotation() {
 
     useEffect(() => {
         fetchQuotations(currentPage);
-    }, [currentPage, role]);
+        fetchCas();
+    }, [currentPage, role, salesFilter, modalData]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -352,7 +371,7 @@ function AllQuotation() {
             )}
 
             <div className="overflow-x-auto">
-                {(quotaData.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
+                {(uniqueCas.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Filter by CA:</label>
                         <select
@@ -361,11 +380,12 @@ function AllQuotation() {
                             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="">All CAs</option>
-                            {uniqueCas.map((ca, index) => (
-                                <option key={index} value={ca}>
-                                    {ca}
-                                </option>
-                            ))}
+                            {uniqueCas
+                                .map(([id, name]) => (
+                                    <option key={id} value={id}>
+                                        {name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                 )}

@@ -43,7 +43,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
 
       {/* Navigation */}
-      {role !== roles.GUARD && (
+      {!(role === roles.GUARD || role === roles.RECEPTION) && (
       <nav className="mt-4">
         {[
           { to: '/', label: 'Home', icon: HomeIcon },

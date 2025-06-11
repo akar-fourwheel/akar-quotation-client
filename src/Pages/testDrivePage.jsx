@@ -42,8 +42,6 @@ function TestDrivePage() {
       axios.get("/test-drive/records")
         .then((response) => {
           const currentRecords = response.data;
-          console.log(currentRecords);
-          
           
           const pendingRecords = currentRecords.data.filter(record => record.status === 0);
 
@@ -67,6 +65,7 @@ function TestDrivePage() {
               }
             }
             previousRecordsRef.current = pendingRecords;
+
             setPendingRequests(pendingRecords);            
             
           } else {

@@ -4,5 +4,7 @@ export const roles = {
     AUDITOR: 'audit',
     ADMIN: 'admin',
     GUARD: 'guard',
+    RECEPTION: 'receptionist',
+    CRE:'cre',
     MD:'md'
-}
+};
