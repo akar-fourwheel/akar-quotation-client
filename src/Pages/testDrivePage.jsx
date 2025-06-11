@@ -65,12 +65,13 @@ function TestDrivePage() {
               }
             }
             previousRecordsRef.current = pendingRecords;
-            setPendingRequests(pendingRecords);
+
+            setPendingRequests(pendingRecords);            
             
           } else {
             // First run: set both
             previousRecordsRef.current = pendingRecords;
-            setPendingRequests(pendingRecords);
+            setPendingRequests(pendingRecords);            
           }
           setRecords(currentRecords || []);
           setRecordsLoading(false);
@@ -92,6 +93,8 @@ function TestDrivePage() {
   }, []);
 
   const handleNotificationClick = () => {
+    console.log(pendingRequests);
+    
     // Reset audio to beginning
     if (audioRef.current) {
       audioRef.current.currentTime = 0;

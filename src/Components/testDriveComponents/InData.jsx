@@ -1,15 +1,18 @@
 import { useState } from "react";
 import axios from "axios";
 
-const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData }) => {
+const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId }) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ inKM: "", model: model, photo: null });
+  const [formData, setFormData] = useState({ inKM: "", model: model, photo: null, alotId: alotId });
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  console.log(alotId);
+  
+
   const handleClose = () => {
     setShow(false);
-    setFormData({ inKM: "", model: "", photo: null });
+    setFormData({ inKM: "", model: "", photo: null, alotId: alotId });
     setPreviewUrl(null);
     setError(null);
   };
@@ -53,7 +56,7 @@ const InData = ({ model, index, avail, setShow, show, onStatusUpdate, getData })
       setFormData((prev) => ({ ...prev, photo: files[0] }));
       setPreviewUrl(URL.createObjectURL(files[0]));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value, model }));
+      setFormData((prev) => ({ ...prev, [name]: value, model, alotId }));
     }
   };
 

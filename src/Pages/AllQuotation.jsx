@@ -33,16 +33,18 @@ function AllQuotation() {
 
     const handleTestDrive = async () => {
         if (!selectedRow) return;
+        console.log(selectedRow);
+        
 
         try {
-            const variant = selectedRow[4].split(" ")[0];
+            const variant = selectedRow[6].split(" ")[0];
             const model = await fetchDemoCar(variant);
+            console.log(selectedRow);
+            
             if (model) {
                 const formData = {
-                    customerName: selectedRow[3],
-                    phoneNumber: selectedRow[7],
-                    salesPerson: selectedRow[2],
-                    model: model.model,
+                    cxID: selectedRow[1],
+                    alotID: selectedRow[0],
                     status: 0
                 }
 
@@ -223,7 +225,7 @@ function AllQuotation() {
     };
 
     const handleRowClick = (row) => {
-        setSelectedRow(row === selectedRow ? null : row);
+        setSelectedRow(row === selectedRow ? null : row);        
     };
 
     function setToIst(dateTime) {

@@ -14,6 +14,8 @@ const NotificationModal = ({
   const car = data.find(row => row.model === carName); 
   return car.status !== 'Available' ? true : false;
   };
+  console.log(pendingRequests);
+  
 
   //const modelDetail = allRecords.find(modelDetail => modelDetail[0] === request.model)
 

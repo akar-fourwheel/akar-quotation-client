@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData }) => {
+const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id }) => {
   const [isOn, setIsOn] = useState(false);
   const toggle = () => {
     setIsOn(prev => !prev);
@@ -38,10 +38,13 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData }) => {
       outKM: "",
       model: model,
       photo: null,
-      status: 1
+      status: 1,
+      id: id
     });
   } else if (initialData) {
     setFormData({
+      cxID: initialData.cxID,
+      alotID: initialData.alotID,
       customerName: initialData.cx_name,
       phoneNumber: initialData.cx_phone,
       salesPerson: initialData.sales_person,
@@ -87,10 +90,9 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData }) => {
     try {      
       const statusResponse = await axios.put(`/test-drive/out/post`, {
         status: isOn ? "Workshop" : "Unavailable",
-        model
+        model,
+        alotID: formData.alotID,
       });
-
-      console.log(model);
 
       const detailsResponse = initialData ?
         await axios.put(`/test-drive/out/update`, payload, {
