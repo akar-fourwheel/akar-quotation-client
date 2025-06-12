@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id }) => {
+const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, getdata }) => {
   const [isOn, setIsOn] = useState(false);
   const toggle = () => {
     setIsOn(prev => !prev);
@@ -92,6 +92,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id }) =
         status: isOn ? "Workshop" : "Unavailable",
         model,
         alotID: formData.alotID,
+        id: formData.id
       });
 
       const detailsResponse = initialData ?
@@ -107,14 +108,12 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id }) =
       //   `/test-drive/out/update`
       //  :
       //   `/test-drive/out`
-
-      console.log(detailsResponse);
       
 
       if (!statusResponse.status === 200 && !detailsResponse.status === 200) {
         throw new Error("Failed to update vehicle status");
       }
-
+      getdata();
       onStatusUpdate(model, isOn ? "Workshop" : "Unavailable", formData.salesPerson);
       handleClose();
     } catch (err) {

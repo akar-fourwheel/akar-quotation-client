@@ -32,7 +32,6 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
   const handleInClick = (row) => {
     setSelectedVehicle(row);
     setShowIn(true);
-    console.log(row);
   };
 
   const handleStatusUpdate = (model, newStatus, salesAgent) => {
@@ -67,6 +66,9 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
 
   // Filter out pending requests from the main list
   const filteredRows = rows.filter(row => row.status !== 0);
+
+  console.log(filteredRows);
+  
 
   return (
     <div>
@@ -159,6 +161,7 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
             onStatusUpdate={handleStatusUpdate}
             initialData={updateData}
             id={selectedVehicle.id}
+            getdata={getData}
           />
           <InData
             model={selectedVehicle.model}
@@ -170,6 +173,7 @@ const ListGroup = forwardRef(({ data, getData, pendingRecords, hasNewRecords }, 
             onStatusUpdate={handleStatusUpdate}
             getData={getData}
             alotId={selectedVehicle.alot_id}
+            id={selectedVehicle.id}
           />
         </>
       )}
