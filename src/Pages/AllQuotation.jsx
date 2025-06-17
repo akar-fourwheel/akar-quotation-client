@@ -27,7 +27,7 @@ function AllQuotation() {
 
     const handleBooking = () => {
         if (!selectedRow) return;
-        const quoteID = selectedRow[0];
+        const quoteID = selectedRow.quotation_id;
         navigate(`/booking-form/${quoteID}`);
     };
 
@@ -410,13 +410,13 @@ function AllQuotation() {
                                     className={`border-b cursor-pointer ${selectedRow === row ? 'bg-blue-50' : ''} ${row[8] === 0 ? 'bg-yellow-100 hover:bg-yellow-200' : row[8] === 1 ? 'bg-green-100 hover:bg-green-200' : 'hover:bg-gray-50'}`}
                                     onClick={() => handleRowClick(row)}
                                 >
-                                    <td className="px-4 py-2 text-xs md:text-md text-gray-900">{setToIst(row[1])}</td>
-                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900">{row[0]}</td>
+                                    <td className="px-4 py-2 text-xs md:text-md text-gray-900">{setToIst(row.date)}</td>
+                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900">{row.ALOT_ID}</td>
                                     {role !== roles.SALES && (
-                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900">{row[2]}</td>
+                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900">{row.CA_NAME}</td>
                                     )}
-                                    <td className="px-4 py-2 text-sm text-gray-900">{row[3]}</td>
-                                    <td className="px-4 py-2 text-sm text-gray-900">{row[4]}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-900">{row.CX_NAME}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-900">{row.variant}</td>
 
                                 </tr>
                             ))}
