@@ -103,7 +103,7 @@ const Signup = () => {
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               >
                 <option value="">Select Username</option>
-                {userInfo.map((user, idx) => (
+                {userInfo?.map((user, idx) => (
                   <option key={idx} value={user[0]}>
                     {user[0]} - {user[1]}
                   </option>
@@ -147,7 +147,7 @@ const Signup = () => {
     <option value="">Select role</option>
     {Object.entries(roles).map(([key, value], idx) => (
       <option key={idx} value={value}>
-        {value}
+        {key}
       </option>
     ))}
   </select>
