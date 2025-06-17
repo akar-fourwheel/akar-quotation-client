@@ -7,6 +7,7 @@ import { buildQuotationData } from '../Components/quotation/BuildQuotationData';
 import CustomerDetailsForm from '../Components/quotation/CustomerDetailsForm';
 import VehicleSelector from '../Components/quotation/VehicleSelector';
 import { discounts, corpOfferOptions, rtoOptions, ewOptions, vasOptions, hpnOptions } from '../Components/quotation/staticQuotOptions';
+import { showSuccess, showError, showInfo } from '../utils/toast';
 
 const quotationPage = () => {
   const [getYear, setGetYear] = useState([]);
@@ -193,6 +194,7 @@ const handleCustomerSelect = (customer) => {
 
       } catch (e) {
         console.log(e);
+        showError("Failed to create new customer. Please try again.");
       }
     }
 
@@ -217,6 +219,11 @@ const handleCustomerSelect = (customer) => {
         setAccessories(data1)
         setFinalData(data);
         restState(data.Insurance, data.YEAR, data.AddDiscLim);
+        showSuccess("Quotation data fetched!");
+      })
+      .catch((error) => {
+        console.error('Error fetching quotation data:', error);
+        showError("Failed to load vehicle data. Please check your selection.");
       });
   };
 
@@ -517,6 +524,7 @@ const dataBasedOnYear = (e) => {
   const handleGeneratePDF = async () => {
 
     if (!validateForm()) {
+      showError("Kindly Recheck field entries!");
       return; // Don't proceed if there are validation errors
     }
     
@@ -529,15 +537,19 @@ const dataBasedOnYear = (e) => {
       
       try {
         setLoading(true);
+        showInfo("Generating PDF... Please wait.");
       
         const response = await axios.post(`/generate-pdf`, Qdata);
         const {whatsAppUrl,publicUrl} = response.data;
         
         setWhatsAppUrl(whatsAppUrl);
         setPdfUrl(publicUrl);
+        
+        showSuccess("PDF generated successfully! You can now view and share the quotation.");
 
     } catch (error) {
       console.error("Error generating PDF", error);
+      showError("Failed to generate PDF. Please try again.");
     } finally {
       setLoading(false);
     }

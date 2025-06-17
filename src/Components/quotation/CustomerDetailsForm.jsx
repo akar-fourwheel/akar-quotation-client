@@ -187,6 +187,7 @@ const CustomerDetailsForm = ({
         }}
         isDisabled={!newCx}
         className="w-full p-1 rounded-lg"
+        required={true}
         styles={{
           control: (base) => ({
             ...base,
