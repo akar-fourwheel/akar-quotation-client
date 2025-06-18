@@ -153,23 +153,29 @@ const BookingForm = () => {
 
       <div className="flex flex-col">
         <label className="text-gray-600 mb-1 font-medium">Color</label>
+
+        {color && color !== "N/A" ? (
           <select
-           className="p-2 border border-gray-300 rounded-lg"
-           value={color}
-           onChange={(e) => setColor(e.target.value)}
-         >
-          <option value="" disabled>Select a color</option>
-       
-           {colorList.length > 0
-             ? colorList.map((clr, index) => (
-                 <option key={index} value={clr}>
-                   {clr}
-                 </option>
-               ))
-             : (
-               <option value={color}>{color}</option>
-             )}
-         </select>
+            className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+            value={color}
+            disabled
+          >
+            <option value={color}>{color}</option>
+          </select>
+        ) : (
+          <select
+            className="p-2 border border-gray-300 rounded-lg"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+          >
+            <option value="">Select a color</option>
+            {colorList.map((clr, index) => (
+              <option key={index} value={clr}>
+                {clr}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div className="flex flex-col">
