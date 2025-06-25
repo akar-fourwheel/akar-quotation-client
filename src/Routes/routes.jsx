@@ -21,6 +21,7 @@ import PriceList from "../Pages/priceList";
 import QuotationUpdateDashboard from "../Pages/updateQuotationPage";
 import StockUpdateDashboard from "../Pages/updateStockPage";
 import ReceptionPage from "../Pages/receptionPage";
+import bookTestDrive from "../Pages/bookTestDrive";
 
 export const routes = createBrowserRouter([
     {
@@ -92,6 +93,10 @@ export const routes = createBrowserRouter([
                     { 
                         path: '/update-stock',
                         Component : StockUpdateDashboard
+                    },
+                    {
+                        path:'/book-test-drive',
+                        Component:bookTestDrive
                     }
                 ]
             }
