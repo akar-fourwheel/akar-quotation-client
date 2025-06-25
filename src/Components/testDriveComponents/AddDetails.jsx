@@ -1,20 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { showSuccess } from "../../utils/toast";
 
-const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, getdata }) => {
-  const [isOn, setIsOn] = useState(false);
-  const toggle = () => {
-    setIsOn(prev => !prev);
-    setFormData({
-      customerName: "",
-      phoneNumber: "",
-      salesPerson: "",
-      outKM: "",
-      model: model,
-      photo: null,
-      status: 1
-    });
-  }
+const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, getdata, pendingRequests = [] }) => {
+  const [selectedRequestId, setSelectedRequestId] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   const [formData, setFormData] = useState({
     customerName: "",
@@ -23,45 +13,57 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
     outKM: "",
     model: model,
     photo: null,
-    status: 1
+    status: 1,
+    reqId:"",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  // Master useEffect for form data based on selection
   useEffect(() => {
-  if (isOn) {
-    setFormData({
-      customerName: "Workshop",
-      phoneNumber: "9999999999",
-      salesPerson: "Workshop",
-      outKM: "",
-      model: model,
-      photo: null,
-      status: 1,
-      id: id
-    });
-  } else if (initialData) {
-    setFormData({
-      cxID: initialData.cxID,
-      alotID: initialData.alotID,
-      customerName: initialData.cx_name,
-      phoneNumber: initialData.cx_phone,
-      salesPerson: initialData.sales_person,
-      outKM: "",
-      model: model,
-      photo: null,
-      status: 1
-    });
-  } else {
-    setFormData(prev => ({ ...prev, model }));
-  }
-}, [isOn, initialData, model]);
+    const baseState = {
+      customerName: "", phoneNumber: "", salesPerson: "", outKM: "",
+      model: model, photo: null, status: 1,
+      id: id, cxID: null, alotID: null
+    };
+
+    if (selectedRequestId === "workshop") {
+      setFormData({
+        ...baseState,
+        customerName: "Workshop",
+        salesPerson: "Workshop",
+        phoneNumber: "9999999999",
+      });
+      setSelectedRequest(null);
+    } else if (selectedRequestId) {
+      const req = pendingRequests.find(r => String(r.id) === String(selectedRequestId));
+      if (req) {
+        setFormData({
+          ...baseState,
+          reqId:req.id,
+          cxID: req.CX_ID || req.cx_id,
+          alotID: req.ALOT_ID || req.alot_id,
+          customerName: req.cx_name || req.customerName,
+          phoneNumber: req.cx_phone || req.phoneNumber,
+          salesPerson: req.sales_person || req.salesPerson,
+          outKM: "",
+          model: req.model || model,
+        });
+        setSelectedRequest(req);
+      }
+    } else if (initialData) { // For updates
+      setFormData({ ...baseState, ...initialData });
+      setSelectedRequest(null);
+    } else { // No selection, reset to blank
+      setFormData(baseState);
+      setSelectedRequest(null);
+    }
+  }, [selectedRequestId, initialData, model, pendingRequests, id]);
 
 
   const handleClose = () => {
     setShow(false);
-    setIsOn(false);
     setFormData({
       customerName: "",
       phoneNumber: "",
@@ -73,6 +75,8 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
     });
     setPreviewUrl(null);
     setError(null);
+    setSelectedRequestId("");
+    setSelectedRequest(null);
   };
 
   const handleSubmit = async (e) => {
@@ -80,47 +84,41 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
     setLoading(true);
     setError(null);
 
-    const payload = new FormData();
-    for (const key in formData) {
-      payload.append(key, formData[key]);
-    }
-    console.log(formData);
-    
+    try {
+      const isUpdateRequest = selectedRequestId && selectedRequestId !== "workshop";
 
-    try {      
-      const statusResponse = await axios.put(`/test-drive/out/post`, {
-        status: isOn ? "Workshop" : "Unavailable",
-        model,
-        alotID: formData.alotID,
-        id: formData.id
-      });
+      if (isUpdateRequest) {
+        const updatePayload = new FormData();
+        updatePayload.append('id', id); // demo_vehicle_id from props
+        updatePayload.append('requestId', formData.reqId);
+        updatePayload.append('photo', formData.photo);
+        updatePayload.append('alot_id', formData.alotID);
+        updatePayload.append('outKM', formData.outKM);
 
-      const detailsResponse = initialData ?
-        await axios.put(`/test-drive/out/update`, payload, {
-        headers: { "Content-Type": "multipart/form-data" },
-        })
-       :
-        await axios.post(`/test-drive/out`, payload, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-
-      // const detailsResponse = initialData ?
-      //   `/test-drive/out/update`
-      //  :
-      //   `/test-drive/out`
-      
-
-      if (!statusResponse.status === 200 && !detailsResponse.status === 200) {
-        throw new Error("Failed to update vehicle status");
+        const outResult = await axios.put(`/test-drive/out/update`, updatePayload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if(outResult?.status == 200){
+          showSuccess("test Drive  Booked!")
+          getdata();
+          onStatusUpdate && onStatusUpdate(model, selectedRequestId === "workshop" ? "Workshop" : "Unavailable", formData.salesPerson);
+        }
+      } else {
+        const createPayload = new FormData();
+        for (const key in formData) {
+          createPayload.append(key, formData[key]);
+        }
+        await axios.post(`/test-drive/out`, createPayload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
       getdata();
-      onStatusUpdate(model, isOn ? "Workshop" : "Unavailable", formData.salesPerson);
+      onStatusUpdate && onStatusUpdate(model, selectedRequestId === "workshop" ? "Workshop" : "Unavailable", formData.salesPerson);
       handleClose();
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-      setIsOn(false);
     }
   };
 
@@ -148,19 +146,30 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
           <button onClick={handleClose} className="text-white text-2xl leading-none">&times;</button>
         </div>
 
-        {/* Toggle */}
-        {!initialData && (
-        <div className="flex justify-center mt-4">
-          <button
-            type="button"
-            onClick={toggle}
-            className={`px-4 py-2 font-semibold rounded-full transition ${
-              isOn ? "bg-green-600 text-white" : "bg-gray-500 text-white"
-            }`}
-          >
-            Workshop
-          </button>
-        </div>)}
+        <div className="px-6 pt-4">
+            <label className="block mb-1 font-medium text-gray-700">
+              <i className="fas fa-list text-blue-600 mr-2"></i>Select an option
+            </label>
+            <select
+              className="w-full border border-gray-300 rounded px-3 py-2 mb-4"
+              value={selectedRequestId}
+              onChange={e => setSelectedRequestId(e.target.value)}
+            >
+              <option value="">-- Select an option --</option>
+              <option value="workshop">Workshop</option>
+              {pendingRequests
+                 .filter(req => {
+                   if (!req.model) return false;
+                   const pattern = new RegExp(`\\b${model}\\b`, 'i');
+                   return pattern.test(req.model);
+                 })
+                 .map(req => (
+                  <option key={req.id} value={req.id}>
+                    #{req.id} - {req.sales_person} ({req.model})
+                  </option>
+              ))}
+            </select>
+          </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-4">
           {error && (
@@ -180,7 +189,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
                 type="text"
                 name="customerName"
                 value={formData.customerName}
-                disabled={isOn || initialData}
+                disabled={!!selectedRequestId || !!initialData}
                 onChange={handleChange}
                 required
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -198,7 +207,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                disabled={isOn || initialData}
+                disabled={!!selectedRequestId || !!initialData}
                 required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter phone number"
@@ -215,7 +224,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
                 name="salesPerson"
                 value={formData.salesPerson}
                 onChange={handleChange}
-                disabled={isOn || initialData}
+                disabled={!!selectedRequestId || !!initialData}
                 required
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 placeholder="Enter salesperson name"
