@@ -21,9 +21,32 @@ function AllQuotation() {
         hasNextPage: false,
         hasPreviousPage: false
     });
+    const [statusModal, setStatusModal] = useState({
+        show: false,
+        status: null,
+        remark: null,
+        row: null,
+      });
 
     // Ref for the operations panel
     const operationsPanelRef = useRef(null);
+
+    const handleTestDrive = async(selectedRow) => {
+        // fetch status
+        const response = await axios.get(`/test-drive/status/${selectedRow.ALOT_ID}`);
+        const responseStatus = response.data;
+        
+        if (!responseStatus.status) { // if no record found
+            requestTestDrive(selectedRow);
+        } else {
+            setStatusModal({
+                show: true,
+                status: responseStatus.status,
+                remark: responseStatus.remark || 'No remarks available.',
+                row: selectedRow,
+            });
+        }
+      };
 
     const handleBooking = () => {
         if (!selectedRow) return;
@@ -31,63 +54,38 @@ function AllQuotation() {
         navigate(`/booking-form/${quoteID}`);
     };
 
-    const handleTestDrive = async () => {
-        if (!selectedRow) return;
-        console.log(selectedRow);
-        
+    const requestTestDrive = async (row) => {
 
         try {
-            const variant = selectedRow[6].split(" ")[0];
-            const model = await fetchDemoCar(variant);
-            console.log(selectedRow);
-            
-            if (model) {
-                const formData = {
-                    cxID: selectedRow[1],
-                    alotID: selectedRow[0],
-                    status: 0
-                }
+          const detailsResponse = await axios.post(`/test-drive/request`, {
+            cxID: row.CX_ID,
+            alotID: row.ALOT_ID,
+            variant: row.variant,
+            requested_by: row.CA_NAME,
+            cust_phone: row.CUSTOMER_PHONE,
+            cust_name: row.CX_NAME
+          });
 
-                const payload = new FormData();
-                for (const key in formData) {
-                    payload.append(key, formData[key]);
-                }
-
-                const detailsResponse = await axios.post(`/test-drive/out`, payload);
-
-                if (detailsResponse.status === 200) {
-                    setModalData({
-                        show: true,
-                        success: true,
-                        message: 'Test drive request sent successfully!',
-                        model: model.model
-                    });
-                } else {
-                    setModalData({
-                        show: true,
-                        success: false,
-                        message: 'Failed to send test drive request.',
-                        model: variant
-                    });
-                }
-            } else {
-                setModalData({
-                    show: true,
-                    success: false,
-                    message: 'No available demo car found for this variant.',
-                    model: variant
-                });
-            }
+          if (detailsResponse.status === 200) {
+            setModalData({
+              show: true,
+              success: true,
+              message: 'Test drive request sent successfully!',
+              model: row?.variant || '',
+            });
+          } else {
+            throw new Error('Failed to send test drive request');
+          }
         } catch (error) {
             console.error("Error in requesting test drive:", error);
-            setModalData({
-                show: true,
-                success: false,
-                message: 'An error occurred while processing your request.',
-                model: selectedRow[4].split(" ")[0]
-            });
+          setModalData({
+            show: true,
+            success: false,
+            message: 'An error occurred while processing your request.',
+            model: row?.variant || '',
+          });
         }
-    }
+      }
 
     const handleOpenPDF = () => {
         if (!selectedRow) return;
@@ -335,7 +333,7 @@ function AllQuotation() {
 
                     <div className="flex flex-col items-center justify-between mb-4">
                         <div className="mb-4 text-sm text-center">
-                            <span className="font-semibold">Selected:</span> {selectedRow[3]} - {selectedRow[4]}
+                            <span className="font-semibold">Selected:</span> {selectedRow.CX_ID} - {selectedRow.CX_NAME}
                         </div>
 
                         {/* 2x2 Button Grid */}
@@ -359,7 +357,7 @@ function AllQuotation() {
                                 Book
                             </button>
                             <button
-                                onClick={handleTestDrive}
+                                onClick={() => handleTestDrive(selectedRow)}
                                 className="bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg flex items-center justify-center"
                             >
                                 Test Drive
@@ -422,6 +420,43 @@ function AllQuotation() {
                             ))}
                         </tbody>
                     </table>
+                )}
+                {statusModal.show && (
+                    <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                        <h3 className="text-lg text-center font-semibold mb-2">Test Drive Already Requested</h3>
+                        <hr className='pb-3 text-gray-400'/>
+                        <p className="text-sm text-center text-gray-700 mb-2">
+                            <strong>Current Status:</strong> {
+                            statusModal.status === 1 ? 'Requested' : 
+                            statusModal.status === 2 ? 'Pending (Request Accepted)':
+                            statusModal.status === 3 ? 'Approved !!' :
+                            statusModal.status === 4 ? 'Request Rejected' :
+                            statusModal.status === 5 ? 'Test Drive Completed' :  'Unknown'
+                            }
+                        </p>
+                        <p className="text-sm text-center text-gray-700 mb-4">
+                        <strong>Remarks:</strong> {statusModal.remark || 'No remarks'}
+                        </p>
+                        <div className="flex flex-end justify-end gap-2 pt-2">
+                            <button
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            onClick={() => {
+                                requestTestDrive(statusModal.row);
+                                setStatusModal({ show: false, status: null, remark: null, row: null });
+                            }}
+                            >
+                            Request Again
+                            </button>
+                            <button
+                            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            onClick={() => setStatusModal({ show: false, status: null, remark: null, row: null })}
+                            >
+                            Cancel
+                            </button>
+                        </div>
+                        </div>
+                    </div>
                 )}
             </div>
 

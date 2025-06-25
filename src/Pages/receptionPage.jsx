@@ -50,7 +50,7 @@ function ReceptionPage() {
     const fetchDropdownData = async () => {
       try {
         // Fetch endpoints one by one
-        const caResponse = await axios.get('/leads/ca-list');
+        const caResponse = await axios.get("/leads/ca-list?query=onlyCA");
         
         setCaList(caResponse.data || []);
         setModelList(modelOptions);

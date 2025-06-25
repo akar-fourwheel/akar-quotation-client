@@ -1,9 +1,12 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext, useCallback, useRef } from "react";
 import ListGroup from "../Components/testDriveComponents/ListGroup";
 import AllRecords from "../Components/testDriveComponents/AllRecords";
 import axios from "axios";
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
+import { showError, showSuccess } from "../utils/toast";
+import RequestNotificationModal from "../Components/testDriveComponents/RequestNotificationModal";
+import TestDriveVehicleList from "../Components/testDriveComponents/TestDriveVehicleList";
 
 function TestDrivePage() {
   const [jsonData, setJsonData] = useState(null);
@@ -17,6 +20,10 @@ function TestDrivePage() {
   const audioRef = useRef(null);
   const previousRecordsRef = useRef([]);
   const listGroupRef = useRef(null);
+  const [vehiclesData, setVehiclesData] = useState();
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [actionStates, setActionStates] = useState({});
+  const [activeTab, setActiveTab] = useState('pending');
 
   // Initialize audio on component mount
   useEffect(() => {
@@ -25,11 +32,11 @@ function TestDrivePage() {
     audioRef.current.load();
   }, []);
 
-  const getData = () => {
-    axios.get("/test-drive/status")
+  const getData = useCallback(() => {
+    axios.get("/test-drive/pending-requests")
       .then((response) => {
         const jsonData = response.data;
-        setJsonData(jsonData.joined);
+        setPendingRequests(jsonData.rows);
         setStatusLoading(false);
       })
       .catch((error) => {
@@ -37,72 +44,85 @@ function TestDrivePage() {
         setError(error.message);
         setStatusLoading(false);
       });
+  
+    // if (role === roles.ADMIN || role === roles.MD) {
+    //   axios.get("/test-drive/records")
+    //     .then((response) => {
+    //       const currentRecords = response.data;
+    //       const pendingRecords = currentRecords.data.filter(record => record.status === 0);
+    //       setHasNewRecords(pendingRecords.length > 0);
+  
+    //       if (previousRecordsRef.current.length > 0) {
+    //         const newRecords = pendingRecords.filter(
+    //           record => !previousRecordsRef.current.some(
+    //             prev => prev.model === record.model && prev.sales_person === record.sales_person && prev.cx_name === record.cx_name
+    //           )
+    //         );
+    //         if (newRecords.length > 0 && audioRef.current) {
+    //           audioRef.current.play().catch(console.error);
+    //         }
+    //       }
+    //       previousRecordsRef.current = pendingRecords;
+    //       setPendingRequests(pendingRecords);
+    //       setRecords(currentRecords || []);
+    //       setRecordsLoading(false);
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error fetching records:', error);
+    //       setError(error.message);
+    //       setRecordsLoading(false);
+    //       setPendingRequests([]);
+    //     });
+    // }
+  }, [role]);
 
-    if (role === roles.ADMIN || role === roles.MD) {
-      axios.get("/test-drive/records")
-        .then((response) => {
-          const currentRecords = response.data;
-          
-          const pendingRecords = currentRecords.data.filter(record => record.status === 0);
-
-          setHasNewRecords(pendingRecords.length > 0);
-
-          if (previousRecordsRef.current.length > 0) {
-            const newRecords = pendingRecords.filter(
-              record => !previousRecordsRef.current.some(
-                prev => prev.model === record.model && prev.sales_person === record.sales_person && prev.cx_name === record.cx_name
-              )
-            );
-
-            if (newRecords.length > 0) {
-              // Play sound with error handling
-              try {
-                audioRef.current.play().catch(error => {
-                  console.error('Error playing notification sound:', error);
-                });
-              } catch (error) {
-                console.error('Error with audio playback:', error);
-              }
-            }
-            previousRecordsRef.current = pendingRecords;
-
-            setPendingRequests(pendingRecords);            
-            
-          } else {
-            // First run: set both
-            previousRecordsRef.current = pendingRecords;
-            setPendingRequests(pendingRecords);            
-          }
-          setRecords(currentRecords || []);
-          setRecordsLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error fetching records:', error);
-          setError(error.message);
-          setRecordsLoading(false);
-          setPendingRequests([]);
-        });
-    }
-  }
-    
   useEffect(() => {
     getData();
-    // Poll for new records every 10 seconds
-    const interval = setInterval(getData, 30000);    
+    const interval = setInterval(getData, 30000);
     return () => clearInterval(interval);
+  }, [getData]);
+  
+  useEffect(() => {
+    axios.get("/test-drive/get-demo-vehicles")  
+      .then((response) => {
+        setVehiclesData(response.data.rows);
+      })
+      .catch((error) => {
+        console.error('Error fetching demo vehicles:', error);
+        setError(error.message);
+      });
   }, []);
 
-  const handleNotificationClick = () => {
-    console.log(pendingRequests);
-    
+  const handleNotificationClick = () => {    
     // Reset audio to beginning
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
     }
-    // Trigger notification modal in ListGroup
-    if (listGroupRef.current) {
-      listGroupRef.current.showNotificationModal();
+    setShowNotificationModal(true);
+  };
+
+  const handleAccept = async(requestId) => {
+    try {
+      await axios.put(`/test-drive/accept`, { id: requestId })
+      .then((res) => setPendingRequests(pendingRequests.filter((req) => req.id != requestId)))
+      
+      showSuccess('Request Accepted!')
+    } catch (error) {
+      showError('Some issue in Accepting request !')
     }
+    setShowNotificationModal(false);
+  };
+
+  const handleReject = async(requestId, remark) => {
+    try {
+      await axios.put(`/test-drive/reject`, { id: requestId, remark })
+      .then((res) => setPendingRequests(pendingRequests.filter((req) => req.id != requestId)))
+      
+      showSuccess('Request Rejected!')
+    } catch (error) {
+      showError('Some issue in rejecting request !')
+    }
+    setShowNotificationModal(false);
   };
 
   return (
@@ -150,12 +170,10 @@ function TestDrivePage() {
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
               </div>
             ) : (
-              <ListGroup 
-                ref={listGroupRef}
-                data={jsonData?.data || []} 
+              <TestDriveVehicleList
+                data={vehiclesData || []}
+                pendingRequests={pendingRequests}
                 getData={getData}
-                pendingRecords={pendingRequests}
-                hasNewRecords={hasNewRecords}
               />
             )}
             {error && (
@@ -180,12 +198,23 @@ function TestDrivePage() {
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
               </div>
             ) : (
-              <AllRecords data={records.data.filter(record => record.in_km !== 0) || []} />
+              <AllRecords data={records?.data?.filter(record => record.in_km !== 0) || []} />
             )}
           </div>
         </div>
         )}
       </div>
+      <RequestNotificationModal
+        show={showNotificationModal}
+        onClose={() => setShowNotificationModal(false)}
+        pendingRequests={pendingRequests}
+        onAccept={handleAccept}
+        onReject={handleReject}
+        actionStates={actionStates}
+        setActionStates={setActionStates}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
     </div>
   );
 }
