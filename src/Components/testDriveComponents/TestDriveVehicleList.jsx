@@ -29,6 +29,12 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
     } } )
   }
 
+  const handleOutClose = () => {
+    setShowOut(false);
+    setSelectedVehicle(null);
+    getData();
+  };
+
   return (
     <div className="overflow-x-auto w-full">
       <table className="min-w-full text-sm text-left bg-white border border-gray-200 shadow rounded">
@@ -98,7 +104,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
         <>
           <AddDetails
             model={selectedVehicle.model}
-            setShow={setShowOut}
+            setShow={handleOutClose}
             show={showOut}
             getdata={getData}
             id={selectedVehicle.id}
@@ -113,6 +119,8 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
             show={showIn}
             getData={getData}
             id={selectedVehicle.id}
+            alotId={selectedVehicle.alot_id}
+            onStatusUpdate={handleStatusUpdate}
           />
         </>
       )}

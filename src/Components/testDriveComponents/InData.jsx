@@ -1,14 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
+import { showSuccess } from "../../utils/toast";
 
 const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ inKM: "", model: model, photo: null, alotId: alotId });
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-
-  console.log(alotId);
-  
 
   const handleClose = () => {
     setShow(false);
@@ -28,14 +26,13 @@ const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) =
     }
 
     try {
-      const response = await axios.put(`/test-drive/in/${model}`, { availability: "Available" });
+      const pushData = await axios.put(`/test-drive/in`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
-      
-        const pushData = await axios.put(`/test-drive/in`, payload, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-      if (!response.status === 200 && !pushData.status === 200) {
+      if (pushData.status == 200) {
+        showSuccess("Test drive completed.")
+      } else {
         throw new Error("Failed to update vehicle status");
       }
 
@@ -43,7 +40,6 @@ const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) =
       onStatusUpdate(model, "Available", "");
       handleClose();
     } catch (err) {
-      console.error("Error updating vehicle:", err);
       setError("Something went wrong while updating the vehicle.");
     } finally {
       setLoading(false);
