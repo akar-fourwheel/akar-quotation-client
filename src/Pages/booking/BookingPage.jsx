@@ -24,11 +24,10 @@ function BookingPage() {
             bookingId
           }
         }).then(res => {
-          console.log(res.data);
-          
+          alert(res.data.message);
+          window.location.reload(false);
         })
         
-        window.location.reload(false);
       }
       catch(e){
         console.log(e);
@@ -57,7 +56,6 @@ function BookingPage() {
           }
           catch(e){
               console.log("booking data could not be set");
-              
           }
       })
   },[])
@@ -75,7 +73,7 @@ function BookingPage() {
   >
     <option value="all">Show All</option>
     <option value="cancelled">Cancelled</option>
-    <option value="bookings">bookings</option>
+    <option value="bookings">Bookings</option>
   </select>
 </div>
 </div>
@@ -83,37 +81,37 @@ function BookingPage() {
 <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
   <thead>
     <tr className="bg-gray-100">
-      <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Booking_ID</th>
+      <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Booking ID</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Sales Advicer</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Customer Name</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Year</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Varient</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Color</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Chassis_No</th>
-      <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Get_info</th>
+      <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Get Info</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Cancel</th>
     </tr>
   </thead>
   <tbody>
   {quotaData.length!=0 ? (quotaData
   .filter((row) => {
-    if (filterOption === "cancelled") return row[7] === "cancelled";
-    if (filterOption === "bookings") return row[7] === null;
+    if (filterOption === "cancelled") return row.STAT === "cancelled";
+    if (filterOption === "bookings") return (row.STAT === "" || row.STAT === null);
     return true; // 'all'
   })
   .map((row) => (
-      <tr key={row} className={`border-b  ${ row[7] === "cancelled" ? "bg-red-400 hover:bg-red-200" : "hover:bg-gray-50"}`}>
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-900">{row[0]}</td>
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm font-medium text-gray-700">{row[1]}</td>
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-900">{row[2]}</td>
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row[3]}</td>
+      <tr key={row.Quotation_ID} className={`border-b  ${ row.STAT === "cancelled" ? "bg-red-400 hover:bg-red-200" : "hover:bg-gray-50"}`}>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-900">{row.Quotation_ID}</td>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm font-medium text-gray-700">{row.username}</td>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-900">{row.CX_NAME}</td>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row.Manufacturing_YR}</td>
         
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row[4]}</td>
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row[5]}</td>
-        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row[6]}</td>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row.Product_Line}</td>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row.VC_Color}</td>
+        <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row.Chasis_No}</td>
         <td>
         <button
-            onClick={()=> handleNavi(row[6])}
+            onClick={()=> handleNavi(row.Chasis_No)}
             className="px-4 py-2 bg-blue-500 mx-4 sm:w-30 text-white rounded-lg hover:bg-blue-600"
             aria-label="information"
           >
@@ -121,8 +119,8 @@ function BookingPage() {
           </button>
           </td>
           <td>
-        {!row[7] && <button
-            onClick={()=> handleCancel(row[0])}
+        {!row.STAT && <button
+            onClick={()=> handleCancel(row.Quotation_ID)}
             className="px-4 py-2 px-1 mx-4 bg-rose-600 sm:w-30 text-white rounded-lg hover:bg-rose-400"
             aria-label="Book"
           >

@@ -24,22 +24,24 @@ const BookingForm = () => {
   const handleBooking = async () => {
     try {
       await bookingCar();
-      await axios.patch('/teamLead/inc-target', {
-        id: localStorage.userId,
-      });
-    } catch (e) {
-      console.error(e);
-      console.log("Booking registration failed to update target.");
-    }
-  };
-  
-
-  const bookingCar = async() => {
+      //fix this when team-lead dashboard gets implemented
+      // await axios.patch('/teamLead/inc-target', {
+        //   id: localStorage.userId,
+        // });
+      } catch (e) {
+        console.error(e);
+        console.log("Booking registration failed to update target.");
+      }
+    };
+    
+    const bookingCar = async() => {
     try {      
       axios.post(`/booking-process`, {
         quoteID,
         customer:resData.CUSTOMER_NAME,
         contact:resData.CUSTOMER_PHONE,
+        ALOT_ID:resData.ALOT_ID,
+        cx_id:resData.customer_id,
         sales_adv:resData.CA_NAME,
         optiId,
         year: resData.year,
@@ -63,6 +65,7 @@ const BookingForm = () => {
               quoteID,
               sales_adv: resData.CA_NAME,
               customer:resData.CUSTOMER_NAME,
+              cx_id: resData.customer_id,
               contact:resData.CUSTOMER_PHONE,
               optiId,
               year:resData.year,
@@ -207,7 +210,7 @@ const BookingForm = () => {
         />
       </div>
 
-      <Field label="Remaining Amount" value={RemainingAmt} />
+      <Field label="Remaining Amount" value={RemainingAmt.toFixed(2)} />
     </div>
 
     {bookingError && (
