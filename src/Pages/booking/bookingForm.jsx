@@ -5,12 +5,11 @@ import { useNavigate } from "react-router";
 
 const BookingForm = () => {
   const quoteID = useParams().id;
-
   const navigate = useNavigate();
 
   const [bookingAmount, setBookingAmount] = useState(0);
   const [optiId,setOptiId] = useState('');
-  const [resData, setResData] = useState({});
+  const [resData, setResData] = useState(null);
   const [color, setColor] = useState("");
   const [colorList,setColorList] = useState([]);
   const [orderCat,setOrderCat] = useState(["individual","corporate"]);
@@ -19,35 +18,37 @@ const BookingForm = () => {
   const [errorColor,setErrorColor] = useState('')
   const [remark,setRemark] = useState(' ')
 
-  const finalAmt = parseFloat(resData[6]) || 0;
+  const finalAmt = parseFloat(resData?.GRAND_TOTAL??0);
   const RemainingAmt = finalAmt - parseFloat(bookingAmount || 0);
 
   const handleBooking = async () => {
     try {
       await bookingCar();
-      await axios.patch('/teamLead/inc-target', {
-        id: localStorage.userId,
-      });
-    } catch (e) {
-      console.error(e);
-      console.log("Booking registration failed to update target.");
-    }
-  };
-  
-
-  const bookingCar = async() => {
+      //fix this when team-lead dashboard gets implemented
+      // await axios.patch('/teamLead/inc-target', {
+        //   id: localStorage.userId,
+        // });
+      } catch (e) {
+        console.error(e);
+        console.log("Booking registration failed to update target.");
+      }
+    };
+    
+    const bookingCar = async() => {
     try {      
       axios.post(`/booking-process`, {
         quoteID,
-        customer:resData[0],
-        contact:resData[1],
-        sales_adv:resData[7],
+        customer:resData.CUSTOMER_NAME,
+        contact:resData.CUSTOMER_PHONE,
+        ALOT_ID:resData.ALOT_ID,
+        cx_id:resData.customer_id,
+        sales_adv:resData.CA_NAME,
         optiId,
-        year: resData[2],
+        year: resData.year,
         bookingAmount: bookingAmount,
         RemainingAmount: RemainingAmt,
         color,
-        variant: resData[3],
+        variant: resData.variant,
         orderC,
         remark
       })
@@ -62,13 +63,14 @@ const BookingForm = () => {
 
             axios.post('/booking-request',{
               quoteID,
-              sales_adv:resData[7],
-              customer:resData[0],
-              contact:resData[1],
+              sales_adv: resData.CA_NAME,
+              customer:resData.CUSTOMER_NAME,
+              cx_id: resData.customer_id,
+              contact:resData.CUSTOMER_PHONE,
               optiId,
-              year:resData[2],
-              variant:resData[3],
-              fuel:resData[8],
+              year:resData.year,
+              variant:resData.variant,
+              fuel:resData.fuel,
               color,
             })
             .then(res => {              
@@ -97,32 +99,39 @@ const BookingForm = () => {
 
   useEffect(() => {
     if (!quoteID) return;
-  
+    
     axios.get(`/booking-form`, {
       params: { quoteID },
-    }).then((res) => {      
-      setResData(res.data);
-      setColor(res.data[4]);
-  
-      if (!res.data[4] || res.data[4] === "N/A") {
+    }).then((res) => {
+      setResData(res.data[0]);
+      setColor(res.data[0].color);
+      
+      if (!res.data.color || res.data.color === "N/A") {
         axios.get(`/booking-color`, {
           params: {
-            year: res.data[2],
-            variant: res.data[3],
+            year: res.data[0].year,
+            variant: res.data[0].variant,
           },
-        }).then((res) => {
-          setColorList(res.data);
+        }).then((colorRes) => {
+          setColorList(colorRes.data);
         });
       }
     });
   }, [quoteID]);
 
   useEffect(() => {
-    const maxAmount = resData[6];
-    if (bookingAmount > maxAmount) {
-      setBookingAmount(maxAmount);
+    if (resData && bookingAmount > parseFloat(resData.GRAND_TOTAL)) {
+      setBookingAmount(resData.GRAND_TOTAL);
     }
-  }, [bookingAmount]);
+  }, [bookingAmount,resData]);
+
+// replace with loader
+  if(!resData) {
+    return(
+      <div className="text-center mt-10 text-gray-600">
+        LOADING BOOKING DATA......
+      </div>
+    )};
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4 sm:px-6 lg:px-8">
@@ -130,9 +139,9 @@ const BookingForm = () => {
     <h2 className="text-2xl font-semibold text-gray-800">Booking Details</h2>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-gray-700">
-      <Field label="Customer Name" value={resData[0]} />
-      <Field label="Contat Number" value={resData[1]} />
-      <Field label="Sales Executive" value={resData[7]} />
+      <Field label="Customer Name" value={resData.CUSTOMER_NAME} />
+      <Field label="Contat Number" value={resData.CUSTOMER_PHONE} />
+          <Field label="Sales Executive" value={resData.CA_NAME} />
       <div className="flex flex-col">
         <label className="text-gray-600 mb-1 font-medium">Opti ID</label>
         <input
@@ -142,11 +151,12 @@ const BookingForm = () => {
           onChange={(e) => setOptiId(e.target.value)}
         />
       </div>
-      <Field label="Model Year" value={resData[2]} />
-      <Field label="Variant" value={resData[3]} />
+      <Field label="Model Year" value={resData.year} />
+      <Field label="Variant" value={resData.variant} />
 
       <div className="flex flex-col">
         <label className="text-gray-600 mb-1 font-medium">Color</label>
+
         {color && color !== "N/A" ? (
           <select
             className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
@@ -187,8 +197,8 @@ const BookingForm = () => {
             </select>
        </div>
 
-      <Field label="Total Discount" value={resData[5]} />
-      <Field label="Final Amount" value={resData[6]} />
+      <Field label="Total Discount" value={resData.TOTAL_DISCOUNT} />
+      <Field label="Final Amount" value={resData.GRAND_TOTAL} />
 
       <div className="flex flex-col">
         <label className="text-gray-600 mb-1 font-medium">Booking Amount</label>
@@ -200,7 +210,7 @@ const BookingForm = () => {
         />
       </div>
 
-      <Field label="Remaining Amount" value={RemainingAmt} />
+      <Field label="Remaining Amount" value={RemainingAmt.toFixed(2)} />
     </div>
 
     {bookingError && (
