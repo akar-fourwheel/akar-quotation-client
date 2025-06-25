@@ -8,6 +8,7 @@ import CustomerDetailsForm from '../Components/quotation/CustomerDetailsForm';
 import VehicleSelector from '../Components/quotation/VehicleSelector';
 import { discounts, corpOfferOptions, rtoOptions, ewOptions, vasOptions, hpnOptions } from '../Components/quotation/staticQuotOptions';
 import { showSuccess, showError, showInfo } from '../utils/toast';
+import Loader from '../Components/Loader/Loader'
 
 const quotationPage = () => {
   const [getYear, setGetYear] = useState([]);
@@ -652,6 +653,7 @@ onChange={(e) => {
 
       <div className="overflow-x-auto mt-6">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 overflow-y-hidden">
+          {loading && <Loader/>}
           {Object.keys(finalData).map((key, i) => (
             <Fragment key={i}>
               {(i >= 19 && i <= 26) ?

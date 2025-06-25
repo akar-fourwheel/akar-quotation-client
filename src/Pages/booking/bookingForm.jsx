@@ -24,22 +24,24 @@ const BookingForm = () => {
   const handleBooking = async () => {
     try {
       await bookingCar();
-      await axios.patch('/teamLead/inc-target', {
-        id: localStorage.userId,
-      });
-    } catch (e) {
-      console.error(e);
-      console.log("Booking registration failed to update target.");
-    }
-  };
-  
-
-  const bookingCar = async() => {
+      //fix this when team-lead dashboard gets implemented
+      // await axios.patch('/teamLead/inc-target', {
+        //   id: localStorage.userId,
+        // });
+      } catch (e) {
+        console.error(e);
+        console.log("Booking registration failed to update target.");
+      }
+    };
+    
+    const bookingCar = async() => {
     try {      
       axios.post(`/booking-process`, {
         quoteID,
         customer:resData.CUSTOMER_NAME,
         contact:resData.CUSTOMER_PHONE,
+        ALOT_ID:resData.ALOT_ID,
+        cx_id:resData.customer_id,
         sales_adv:resData.CA_NAME,
         optiId,
         year: resData.year,
@@ -63,6 +65,7 @@ const BookingForm = () => {
               quoteID,
               sales_adv: resData.CA_NAME,
               customer:resData.CUSTOMER_NAME,
+              cx_id: resData.customer_id,
               contact:resData.CUSTOMER_PHONE,
               optiId,
               year:resData.year,
@@ -153,23 +156,29 @@ const BookingForm = () => {
 
       <div className="flex flex-col">
         <label className="text-gray-600 mb-1 font-medium">Color</label>
+
+        {color && color !== "N/A" ? (
           <select
-           className="p-2 border border-gray-300 rounded-lg"
-           value={color}
-           onChange={(e) => setColor(e.target.value)}
-         >
-          <option value="" disabled>Select a color</option>
-       
-           {colorList.length > 0
-             ? colorList.map((clr, index) => (
-                 <option key={index} value={clr}>
-                   {clr}
-                 </option>
-               ))
-             : (
-               <option value={color}>{color}</option>
-             )}
-         </select>
+            className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+            value={color}
+            disabled
+          >
+            <option value={color}>{color}</option>
+          </select>
+        ) : (
+          <select
+            className="p-2 border border-gray-300 rounded-lg"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+          >
+            <option value="">Select a color</option>
+            {colorList.map((clr, index) => (
+              <option key={index} value={clr}>
+                {clr}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div className="flex flex-col">
@@ -201,7 +210,7 @@ const BookingForm = () => {
         />
       </div>
 
-      <Field label="Remaining Amount" value={RemainingAmt} />
+      <Field label="Remaining Amount" value={RemainingAmt.toFixed(2)} />
     </div>
 
     {bookingError && (

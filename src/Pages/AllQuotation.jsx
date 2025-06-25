@@ -55,7 +55,6 @@ function AllQuotation() {
     };
 
     const requestTestDrive = async (row) => {
-
         try {
           const detailsResponse = await axios.post(`/test-drive/request`, {
             cxID: row.CX_ID,
@@ -78,14 +77,14 @@ function AllQuotation() {
           }
         } catch (error) {
             console.error("Error in requesting test drive:", error);
-          setModalData({
-            show: true,
-            success: false,
-            message: 'An error occurred while processing your request.',
-            model: row?.variant || '',
-          });
+            setModalData({
+              show: true,
+              success: false,
+              message: 'An error occurred while processing your request.',
+              model: row?.variant || '',
+            });
         }
-      }
+    }
 
     const handleOpenPDF = () => {
         if (!selectedRow) return;
@@ -165,7 +164,7 @@ function AllQuotation() {
     const fetchQuotations = async (page) => {        
         try {
             let response;
-            
+
             if (role === roles.ADMIN || role === roles.MD) {
                 if (salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
@@ -239,7 +238,6 @@ function AllQuotation() {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit',
             hour12: true
         });
     }
@@ -380,7 +378,7 @@ function AllQuotation() {
                             <option value="">All CAs</option>
                             {uniqueCas
                                 .map(([id, name]) => (
-                                    <option key={id} value={id}>
+                                    <option key={id} value={name}>
                                         {name}
                                     </option>
                                 ))}
@@ -392,12 +390,12 @@ function AllQuotation() {
                     <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
                         <thead>
                             <tr className="bg-gray-100">
-                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Created_on</th>
-                                <th className="px-2 py-2 text-left text-sm md:text-md font-medium text-gray-700">Unique_ID</th>
+                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Date & Time</th>
+                                <th className="px-2 py-2 text-left text-sm md:text-md font-medium text-gray-700">ID</th>
                                 {role !== roles.SALES && (
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Sales_Person</th>
+                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Sales Person</th>
                                 )}
-                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Customer_Name</th>
+                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Customer Name</th>
                                 <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Variant</th>
                             </tr>
                         </thead>
@@ -409,9 +407,9 @@ function AllQuotation() {
                                     onClick={() => handleRowClick(row)}
                                 >
                                     <td className="px-4 py-2 text-xs md:text-md text-gray-900">{setToIst(row.date)}</td>
-                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900">{row.ALOT_ID}</td>
+                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900">{row.quotation_id}</td>
                                     {role !== roles.SALES && (
-                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900">{row.CA_NAME}</td>
+                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900">{row.username}</td>
                                     )}
                                     <td className="px-4 py-2 text-sm text-gray-900">{row.CX_NAME}</td>
                                     <td className="px-4 py-2 text-sm text-gray-900">{row.variant}</td>
