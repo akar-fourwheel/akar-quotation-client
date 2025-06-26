@@ -552,9 +552,9 @@ const dataBasedOnYear = (e) => {
     
     const Qdata = buildQuotationData({
       name, phoneNo, email, address, selectedSalesPerson, cxId, cxAllot, inhouse, selectedHpn, hpn,
-      finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, mdmrDisc, sss,
+      finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, sss,
       totalDisc, tcs, rto, scrap, cod, selectedAcc, accTotal, ins, selectedInsurance, totalAddOns, ew,
-      selectedVas, totalESP
+      selectedVas, totalESP, mdmrDisc
     });
       
       try {
