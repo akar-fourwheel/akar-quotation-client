@@ -1,6 +1,6 @@
 export function buildQuotationData({
   name, phoneNo, email, address, selectedSalesPerson, cxId, cxAllot, inhouse, selectedHpn, hpn,
-  finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, sss,
+  finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, mdmrDisc, sss,
   totalDisc, tcs, rto, scrap, cod, selectedAcc, accTotal, ins, selectedInsurance, totalAddOns, ew,
   selectedVas, totalESP 
 }) {
@@ -39,6 +39,7 @@ export function buildQuotationData({
         MSMEDisc: ((corpOffer === "MSME") ? finalData.MSME : 0),
         gridDisc: (selectedDiscounts.some((opt) => opt.value === "GRID") ? finalData.GRID : 0),
         addDisc: addDisc,
+        mdmrDisc: mdmrDisc,
         SSS: sss,
         totalDisc: totalDisc,
         billingPrice: finalData.ESP - totalDisc,

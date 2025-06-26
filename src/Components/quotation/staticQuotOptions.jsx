@@ -41,6 +41,7 @@ export const hpnOptions = [
   { label: "IDBI Bank", value: "IDBI Bank" },
   { label: "IDFC First Bank", value: "IDFC First Bank" },
   { label: "IndusInd Bank", value: "IndusInd Bank" },
+  { label: "Indian Bank", value: "Indian Bank" },
   { label: "Kotak Mahindra Bank", value: "Kotak Mahindra Bank" },
   { label: "Kotak Mahindra Prime Limited", value: "Kotak Mahindra Prime Limited" },
   { label: "Punjab National Bank", value: "Punjab National Bank" },

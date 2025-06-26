@@ -1,8 +1,7 @@
-import React, { use, useEffect, useState } from 'react';
+import React, {useEffect, useState,Fragment,useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router";
 import Select from "react-select";
-import { Fragment } from 'react';
 import { buildQuotationData } from '../Components/quotation/BuildQuotationData';
 import CustomerDetailsForm from '../Components/quotation/CustomerDetailsForm';
 import VehicleSelector from '../Components/quotation/VehicleSelector';
@@ -10,7 +9,7 @@ import { discounts, corpOfferOptions, rtoOptions, ewOptions, vasOptions, hpnOpti
 import { showSuccess, showError, showInfo } from '../utils/toast';
 import Loader from '../Components/Loader/Loader'
 
-const quotationPage = () => {
+const QuotationPage = ()=>{
   const [getYear, setGetYear] = useState([]);
   const [year, setYear] = useState('');
   const [getModel, setGetModel] = useState([]);
@@ -63,6 +62,8 @@ const quotationPage = () => {
   const [customerList, setCustomerList] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  const [mdmrDisc, setMdmrDisc] = useState(0);
+  const isManagerRole = ['admin', 'audit'].includes(localStorage.getItem('role'));
   const [errors, setErrors] = useState({
     name: false,
     address: false,
@@ -268,7 +269,7 @@ const dataBasedOnYear = (e) => {
         setCurrModelList(data);
       } else {
         // For existing customers, filter to show only their specific model
-        setCurrModelList(data.filter((model) => model == selectedCustomer[6]));
+        setCurrModelList(data?.filter((model) => model == selectedCustomer[6]));
       }
     });
 };
@@ -317,6 +318,23 @@ const dataBasedOnYear = (e) => {
       });
   };
 
+  const discountOptions = useMemo(() => {
+    if (!finalData || Object.keys(finalData).length === 0) return [];
+
+    const opts = discounts
+      .filter((d) => Number(finalData[d.value] ?? 0) > 0)
+      .map((d) => ({ value: d.value, label: d.label || d.value.replace(/_/g, ' ') }));
+
+    if (finalData.MSME || finalData.SOLER) opts.push({ value: 'CORPORATE OFFER', label: 'Corporate Offer' });
+    if ((finalData.EXCHANGE ?? 0) + (finalData.ADDITIONAL_EXCHANGE ?? 0) > 0)
+      opts.push({ value: 'EXCHANGE', label: 'Exchange' });
+    if ((finalData.ICE_to_EV ?? 0) + (finalData.EV_to_EV ?? 0) > 0)
+      opts.push({ value: 'LOYALTY', label: 'Loyalty' });
+    if (isManagerRole) opts.push({ value: 'MDMR', label: 'MD/MR' });
+
+    return opts;
+  }, [finalData, isManagerRole]);  
+
   // Fetch data when the year or model or fuel is selected
 
   useEffect(() => {
@@ -336,10 +354,10 @@ const dataBasedOnYear = (e) => {
     const newTotal = selectedDiscounts.reduce((accumulator, item) => {
       if (item.value === "CORPORATE OFFER") return accumulator;
       return accumulator + (finalData[item.value] || 0);
-    }, 0) + addExc + loyalty + (finalData[corpOffer] || 0) + Number(addDisc) + Number(sss);
+    }, 0) + addExc + loyalty + (finalData[corpOffer] || 0) + Number(addDisc) + Number(sss) + Number(mdmrDisc);
 
     setTotalDisc(newTotal);
-  }, [selectedDiscounts, addExc, loyalty, corpOffer, addDisc, sss]);
+  }, [selectedDiscounts, addExc, loyalty, corpOffer, addDisc, sss, mdmrDisc]);
 
   useEffect(() => {
     const newInsuranceTotal = selectedInsurance.reduce((accumulator, item) => {
@@ -371,6 +389,10 @@ const dataBasedOnYear = (e) => {
   const handleDiscount = (selected) => {
     setSelectedDiscounts(selected);
 
+    if (!selected.some((opt) => opt.value === 'MDMR')) {
+      setMdmrDisc(0);
+    }
+    
     if (!selected.some((opt) => opt.value === "EXCHANGE")) { setLoyalty(0); setAddExc(0); }
     if (!selected.some((opt) => opt.value === "CORPORATE OFFER")) { setCorpOffer(""); }
   };
@@ -496,7 +518,6 @@ const dataBasedOnYear = (e) => {
       validationErrors.selectedSalesPerson = true;
       isValid = false;
     }
-    console.log(addDisc, maxAddDisc);
 
     // if (maxAddDisc && (addDisc > maxAddDisc)) {
     //   setShowWarning(true);
@@ -531,7 +552,7 @@ const dataBasedOnYear = (e) => {
     
     const Qdata = buildQuotationData({
       name, phoneNo, email, address, selectedSalesPerson, cxId, cxAllot, inhouse, selectedHpn, hpn,
-      finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, sss,
+      finalData, selectedColor, selectedDiscounts, addExc, loyalty, loyaltyType, corpOffer, addDisc, mdmrDisc, sss,
       totalDisc, tcs, rto, scrap, cod, selectedAcc, accTotal, ins, selectedInsurance, totalAddOns, ew,
       selectedVas, totalESP
     });
@@ -564,7 +585,7 @@ const dataBasedOnYear = (e) => {
     useEffect(() => {
       setPdfUrl('');
     }, [
-      getYear,year,getModel,model,getFuel,fuel,getVariant,variant,finalData,selectedInsurance,selectedDiscounts,addExc,loyalty,corpOffer,addDisc,sss,rto,totalDisc,ew,accessories,selectedAcc,
+      getYear, year, getModel, model, getFuel, fuel, getVariant, variant, finalData, selectedInsurance, selectedDiscounts, addExc, loyalty, corpOffer, addDisc, mdmrDisc, sss,rto,totalDisc,ew,accessories,selectedAcc,
       color,selectedColor,selectedVas,selectedHpn,totalAddOns,accTotal,loyaltyType,scrap,name,phoneNo,email,address,selectedSalesPerson]);
 
   return (
@@ -672,9 +693,14 @@ onChange={(e) => {
                   />
                   {insType === 'Dealer' && <>
                     <div>Insurance Amount:</div>
-                    <div className="w-full p-2 border border-gray-300 rounded-lg">
+                    {!isManagerRole ? <div className="w-full p-2 border border-gray-300 rounded-lg">
                       {ins}
-                    </div>
+                    </div> :
+                    <input className="w-full p-2 border border-gray-300 rounded-lg"
+                      type="number"
+                      value={ins}
+                      onChange={(e) => { setIns(e.target.value) }}
+                    />}
                     <div>Select Insurance Add-ons:</div>
                     <Select
                       options={Object.keys(finalData)
@@ -689,11 +715,11 @@ onChange={(e) => {
                       menuIsOpen={undefined}
                       maxMenuHeight={200}
                       classNamePrefix="react-select"
-                    />
+                    /> 
                   </>}
                   <div>Insurance Total:</div>
                   <div className="w-full p-2 border border-gray-300 rounded-lg">
-                    {totalAddOns + ins}
+                    {totalAddOns + Number(ins)}
                   </div>
                   <div>TCS:</div>
                   <div className="w-full p-2 border border-gray-300 rounded-lg">
@@ -749,7 +775,7 @@ onChange={(e) => {
                         />
                       </>}
                     <div>Select Discount Type:</div>
-                    <Select
+                    {/* <Select
                       options={[...discounts.filter(x => finalData[x.value] > 0),
                       (finalData['MSME'] || finalData['SOLER']) ?
                         { value: 'CORPORATE OFFER', label: 'Corporate Offer' } :
@@ -759,7 +785,10 @@ onChange={(e) => {
                         { value: 'None', label: 'None' },
                       (finalData['ICE_to_EV'] + finalData['EV_to_EV'] > 0) ?
                         { value: 'LOYALTY', label: 'Loyalty' } :
-                        { value: 'None', label: 'None' }].filter(x => x.value != "None")}
+                        { value: 'None', label: 'None' },
+                        isManagerRole
+                          ? { value: 'MDMR', label: 'MD/MR' }
+                          : { value: 'None', label: 'None' }].filter(x => x.value != "None")}
                       isMulti
                       value={selectedDiscounts}
                       onChange={handleDiscount}
@@ -769,7 +798,23 @@ onChange={(e) => {
                       menuIsOpen={undefined}
                       maxMenuHeight={200}
                       classNamePrefix="react-select"
+                    /> */}
+
+                    <Select
+                      options={discountOptions}
+                      isMulti
+                      value={selectedDiscounts}
+                      onChange={handleDiscount}
+                      className="w-full p-1 rounded-lg"
+                      isSearchable={false}
+                      closeMenuOnSelect={false}
+                      maxMenuHeight={200}
+                      menuIsOpen={undefined}
+                      classNamePrefix="react-select"
+                      placeholder={discountOptions.length ? 'Choose…' : 'No discounts available'}
+                      isDisabled={!discountOptions.length}
                     />
+
                     {(selectedDiscounts.some((opt) => opt.value === "EXCHANGE") && fuel == 'Electric') &&
                       <>
                         <div>Additional Exchange: </div>
@@ -797,6 +842,18 @@ onChange={(e) => {
                           className="w-full p-1 rounded-lg"
                         />
                       </>}
+                    {selectedDiscounts.some((o) => o.value === 'MDMR') && (
+                      <>
+                        <div>MD/MR Discount:</div>
+                        <input
+                          className="w-full p-2 border border-gray-300 rounded-lg"
+                          type="number"
+                          min="0"
+                          value={mdmrDisc}
+                          onChange={(e) => setMdmrDisc(e.target.value)}
+                        />
+                      </>
+                    )}
                     <div>Additional Discount:</div>
                     <div>
                       <input className="w-full p-2 border border-gray-300 rounded-lg"
@@ -973,4 +1030,4 @@ onChange={(e) => {
   );
 };
 
-export default quotationPage;
+export default QuotationPage;
