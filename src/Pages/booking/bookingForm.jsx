@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import { useNavigate } from "react-router";
+import { useParams, useNavigate } from "react-router";
 
 const BookingForm = () => {
   const quoteID = useParams().id;
@@ -91,6 +90,12 @@ const BookingForm = () => {
         }
         }
           
+      })
+      .catch (err => {                                 
+        const status = err.response?.status;         
+        setErrorColor(status === 409 ? "red" : "amber");
+              setBookingError("Sorry, could not request stock. There may already be a booking with the same id!");
+        console.error(err);
       });
     } catch (e) {
       console.error("Booking error", e);
