@@ -194,6 +194,10 @@ const handleCustomerSelect = (customer) => {
         customerId= response.data.insertedId;
         setCxId(customerId);
 
+        if(!response.data.success){
+          showError(response.data.message);
+          return;
+        }
       } catch (e) {
         console.log(e);
         showError("Failed to create new customer. Please try again.");
@@ -353,15 +357,15 @@ const dataBasedOnYear = (e) => {
   useEffect(() => {
     const newTotal = selectedDiscounts.reduce((accumulator, item) => {
       if (item.value === "CORPORATE OFFER") return accumulator;
-      return accumulator + (finalData[item.value] || 0);
-    }, 0) + addExc + loyalty + (finalData[corpOffer] || 0) + Number(addDisc) + Number(sss) + Number(mdmrDisc);
+      return accumulator + Number(finalData[item.value] || 0);
+    }, 0) + Number(addExc) + Number(loyalty) + Number(finalData[corpOffer] || 0) + Number(addDisc) + Number(sss) + Number(mdmrDisc);
 
     setTotalDisc(newTotal);
   }, [selectedDiscounts, addExc, loyalty, corpOffer, addDisc, sss, mdmrDisc]);
 
   useEffect(() => {
     const newInsuranceTotal = selectedInsurance.reduce((accumulator, item) => {
-      return accumulator + (finalData[item.value] || 0);
+      return accumulator + Number(finalData[item.value] || 0);
     }, 0);
 
     setTotalAddOns(newInsuranceTotal);
