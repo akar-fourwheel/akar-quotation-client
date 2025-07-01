@@ -45,7 +45,7 @@ function DealerContent({ responseData }) {
               <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">COLOR</th>
               <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">AGE</th>
               <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">QUANT.</th>
-              <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">BOOKING</th>
+              {/* <th className="border border-solid md:p-2 p-1 text-[12px] md:text-sm text-white">BOOKING</th> */}
             </tr>
           </thead>
           <tbody>
@@ -56,11 +56,11 @@ function DealerContent({ responseData }) {
                     {cell}
                   </td>
                 ))}
-                <td className="border border-solid p-2">
+                {/* <td className="border border-solid p-2">
                   <button className="w-full px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">
                     Book
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

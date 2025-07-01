@@ -60,7 +60,7 @@ function AllQuotation() {
             cxID: row.CX_ID,
             alotID: row.ALOT_ID,
             variant: row.variant,
-            requested_by: row.CA_NAME,
+            requested_by: row.username,
             cust_phone: row.CUSTOMER_PHONE,
             cust_name: row.CX_NAME
           });

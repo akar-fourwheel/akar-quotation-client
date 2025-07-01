@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { roles } from '../../Routes/roles';
 import { AuthContext } from '../../context/auth/AuthProvider';
+import { showSuccess, showError } from "../../utils/toast.js";
 
 function BookingPage() {
 
@@ -18,16 +19,18 @@ function BookingPage() {
 
     function handleCancel(bookingId){
       try{
-
         axios.get('/booking-cancel',{
           params:{
             bookingId
           }
         }).then(res => {
-          alert(res.data.message);
-          window.location.reload(false);
+          showSuccess(res.data.message);
+          setQuotaData((prev) =>
+            prev.map((b) =>
+              b.Quotation_ID === bookingId ? { ...b, STAT: "cancelled" } : b
+            )
+          );
         })
-        
       }
       catch(e){
         console.log(e);
@@ -35,7 +38,7 @@ function BookingPage() {
     }
 
   useEffect(() => {
-    if(role==roles.ADMIN || role===roles.MD)
+    if(role==roles.ADMIN || role===roles.MD || role === roles.AUDITOR)
     axios.get(`/admin/all-bookings`)
     .then((response)=> {
         try{

@@ -2,8 +2,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from 'react-router';
+
 
 const BookingSuccess = () => {
+    const navigate = useNavigate();
     const { chassis } = useParams();
     
     const [bookingData, setBookingData] = useState([]);
@@ -87,6 +90,34 @@ const BookingSuccess = () => {
         ? "Please contact support for more details."
         : "Thank you for booking. We'll be in touch soon!"}
     </div>
+    {/* <div className="mt-8">
+      <button
+        onClick={() => navigate('/')}
+        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        Home
+      </button>
+    </div> */}
+
+
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => navigate('/')}
+              className="flex-1 group relative py-2 px-4 rounded-md text-sm font-medium
+               text-white bg-gradient-to-r from-blue-500 to-indigo-500
+               hover:from-blue-600 hover:to-indigo-600">
+              Home
+            </button>
+
+            <button
+              onClick={() => navigate('/booking-list')}
+              className="flex-1 group relative py-2 px-4 rounded-md text-sm font-medium
+               text-indigo-600 bg-white border border-indigo-500
+               hover:bg-indigo-50">
+              Booking List
+            </button>
+          </div>
   </div>
 </div>
 

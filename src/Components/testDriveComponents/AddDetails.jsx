@@ -99,7 +99,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
           headers: { "Content-Type": "multipart/form-data" },
         });
         if(outResult?.status == 200){
-          showSuccess("test Drive  Booked!")
+          showSuccess("Test Drive Booked!")
           getdata();
           onStatusUpdate && onStatusUpdate(model, selectedRequestId === "workshop" ? "Workshop" : "Unavailable", formData.salesPerson);
         }
