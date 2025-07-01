@@ -74,7 +74,7 @@ const QuotationPage = ()=>{
   const [loading, setLoading] = useState(false);
   const  navigate = useNavigate();
 
-  const filteredCustomers = customerList.filter(customer => {
+  const filteredCustomers = customerList?.filter(customer => {
   if (!customerSearchQuery) return true;
   
   const query = customerSearchQuery.toLowerCase();
