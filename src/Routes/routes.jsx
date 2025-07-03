@@ -75,7 +75,7 @@ export const routes = createBrowserRouter([
                         Component: BookingForm
                     },
                     {
-                        path: '/booking-success/:chassis',
+                        path: '/booking-success/:id',
                         Component: bookingSuccess
                     },
                     {

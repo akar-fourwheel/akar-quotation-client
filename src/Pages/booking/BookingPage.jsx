@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router';
 import { roles } from '../../Routes/roles';
 import { AuthContext } from '../../context/auth/AuthProvider';
 import { showSuccess, showError } from "../../utils/toast.js";
+import CancelModal from "../../Components/modals/CancelModal.jsx";
+import BookingInfoModal from "../../Components/modals/BookingInfoModal";
 
 function BookingPage() {
 
@@ -12,9 +14,14 @@ function BookingPage() {
 
     const [quotaData,setQuotaData] = useState([]);
     const [filterOption, setFilterOption] = useState("all");
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [selectedBookingId, setSelectedBookingId] = useState(null);
 
-    function handleNavi(ChassisNo){
-      navigate(`/booking-success/${ChassisNo}`);
+    function handleNavi(id){
+      setSelectedBookingId(id);
+      setShowInfoModal(true);
     }
 
     function handleCancel(bookingId){
@@ -25,6 +32,7 @@ function BookingPage() {
           }
         }).then(res => {
           showSuccess(res.data.message);
+          setShowCancelModal(false);
           setQuotaData((prev) =>
             prev.map((b) =>
               b.Quotation_ID === bookingId ? { ...b, STAT: "cancelled" } : b
@@ -90,7 +98,7 @@ function BookingPage() {
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Year</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Varient</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Color</th>
-      <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Chassis_No</th>
+      <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Chassis No</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Get Info</th>
       <th className="sm:px-2 sm:py-3 px-1 py-2 text-left text-sm sm:text-sm font-medium text-gray-700">Cancel</th>
     </tr>
@@ -103,7 +111,7 @@ function BookingPage() {
     return true; // 'all'
   })
   .map((row) => (
-      <tr key={row.Quotation_ID} className={`border-b  ${ row.STAT === "cancelled" ? "bg-red-400 hover:bg-red-200" : "hover:bg-gray-50"}`}>
+      <tr key={row.id} className='border-b hover:bg-gray-50'>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-900">{row.Quotation_ID}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm font-medium text-gray-700">{row.username}</td>
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-900">{row.CX_NAME}</td>
@@ -114,7 +122,7 @@ function BookingPage() {
         <td className="sm:px-4 sm:py-3 px-1 py-2 text-xs w-50 sm:text-sm text-gray-700">{row.Chasis_No}</td>
         <td>
         <button
-            onClick={()=> handleNavi(row.Chasis_No)}
+            onClick={()=> handleNavi(row.id)}
             className="px-4 py-2 bg-blue-500 mx-4 sm:w-30 text-white rounded-lg hover:bg-blue-600"
             aria-label="information"
           >
@@ -122,13 +130,16 @@ function BookingPage() {
           </button>
           </td>
           <td>
-        {!row.STAT && <button
-            onClick={()=> handleCancel(row.Quotation_ID)}
+        {!row.STAT ? <button
+            onClick={() => {
+              setSelectedRow(row);
+              setShowCancelModal(true);
+            }}
             className="px-4 py-2 px-1 mx-4 bg-rose-600 sm:w-30 text-white rounded-lg hover:bg-rose-400"
             aria-label="Book"
           >
             Cancel
-          </button>
+          </button> : <span className='text-center'>Cancelled</span>
           }
           </td>
       </tr>
@@ -143,6 +154,19 @@ function BookingPage() {
 </table>
 
       </div>
+      {showCancelModal && selectedRow && (
+        <CancelModal
+          onClose={() => setShowCancelModal(false)}
+          onConfirm={handleCancel}
+          selectedRow={selectedRow}
+        />
+      )}
+      {showInfoModal && (
+        <BookingInfoModal
+          bookingId={selectedBookingId}
+          onClose={() => setShowInfoModal(false)}
+        />
+      )}
     </div>
   );
 }
