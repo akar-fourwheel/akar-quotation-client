@@ -88,12 +88,12 @@ function AllQuotation() {
 
     const handleOpenPDF = () => {
         if (!selectedRow) return;
-        window.open(selectedRow[5], '_blank');
+        window.open(selectedRow.file_url, '_blank');
     };
 
     const handleSendWhatsApp = () => {
         if (!selectedRow) return;
-        window.location.href = selectedRow[6];
+        window.location.href = selectedRow.whatsapp_link;
     };
 
     const closeModal = () => {

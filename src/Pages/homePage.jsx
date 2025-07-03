@@ -11,7 +11,8 @@ const HomePage = () => {
     <>
       <div
         className="relative min-h-screen w-full bg-cover bg-center h-100"
-        style={{ backgroundImage: `url('https://images.91wheels.com/news/wp-content/uploads/2022/04/Tata-Motors.jpg?w=1080&q=65')` }}
+        style={{
+          backgroundImage: `url('https://www.tatamotors.com/wp-content/uploads/2023/11/press-11feb23-highres.jpg')` }}
       >
         <div className="absolute inset-0 backdrop-blur bg-white/30 dark:bg-black/30"></div>
 
@@ -30,7 +31,7 @@ const HomePage = () => {
           <div className="backdrop-blur-sm bg-white/10 w-full max-w-5xl rounded-2xl shadow-xl p-6 sm:p-10 text-white">
             <div className="text-center mb-8">
               <img src="./logo.jpg" alt="Logo" className="h-28 mx-auto rounded-md shadow" />
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-center drop-shadow mt-4">Welcome to Akar Motors</h1>
+              <h1 className="text-4xl sm:text-5xl font-extrabold text-center drop-shadow mt-4 mb-15">Welcome to Akar Motors</h1>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
