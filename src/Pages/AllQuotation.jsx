@@ -42,7 +42,7 @@ function AllQuotation() {
             setStatusModal({
                 show: true,
                 status: responseStatus.status,
-                remark: responseStatus.remark || 'No remarks available.',
+                remark: responseStatus.remark || 'No remarks.',
                 row: selectedRow,
             });
         }
@@ -169,7 +169,7 @@ function AllQuotation() {
                 if (salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
                         params: {
-                            name: salesFilter,
+                            sales_person_id: salesFilter,
                             role,
                             page,
                             limit: 25
@@ -378,7 +378,7 @@ function AllQuotation() {
                             <option value="">All CAs</option>
                             {uniqueCas
                                 .map(([id, name]) => (
-                                    <option key={id} value={name}>
+                                    <option key={id} value={id}>
                                         {name}
                                     </option>
                                 ))}
@@ -426,11 +426,11 @@ function AllQuotation() {
                         <hr className='pb-3 text-gray-400'/>
                         <p className="text-sm text-center text-gray-700 mb-2">
                             <strong>Current Status:</strong> {
-                            statusModal.status === 1 ? 'Requested' : 
-                            statusModal.status === 2 ? 'Pending (Request Accepted)':
-                            statusModal.status === 3 ? 'Approved !!' :
-                            statusModal.status === 4 ? 'Request Rejected' :
-                            statusModal.status === 5 ? 'Test Drive Completed' :  'Unknown'
+                            statusModal.status === 'REQUESTED' ? 'Requested' : 
+                            statusModal.status === 'PENDING' ? 'Pending (Request Accepted)':
+                            statusModal.status === 'APPROVED' ? 'Approved !!' :
+                            statusModal.status === 'REJECTED' ? 'Request Rejected' :
+                            statusModal.status === 'COMPLETED' ? 'Test Drive Completed' :  'Unknown'
                             }
                         </p>
                         <p className="text-sm text-center text-gray-700 mb-4">

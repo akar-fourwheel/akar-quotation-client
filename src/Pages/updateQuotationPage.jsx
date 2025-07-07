@@ -99,7 +99,11 @@ const handleUpdateAll = async () => {
                     <span className={`mr-2 font-bold ${results[key].success ? 'text-green-500' : 'text-red-500'}`}>
                       {results[key].success ? '✓' : '✗'}
                     </span>
-                    <span className="leading-tight">{results[key].message}</span>
+                    <span className="leading-tight">
+                      {typeof results[key].message === 'string'
+                        ? results[key].message
+                        : JSON.stringify(results[key].message)}
+                    </span>
                   </div>
                 )}
               </div>
