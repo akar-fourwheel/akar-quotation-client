@@ -10,7 +10,7 @@ const DEFAULT_ROLE = localStorage.getItem("role") || "sales";
 export default function BookTestDrivePage() {
     const [form, setForm] = useState({
         cxID: '',
-        ca: DEFAULT_CA_ID,
+        sales_person_id: DEFAULT_CA_ID,
         requested_by: DEFAULT_CA_NAME,
         model: "",
         variant: "",
