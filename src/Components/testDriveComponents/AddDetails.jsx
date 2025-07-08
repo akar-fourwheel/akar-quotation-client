@@ -28,11 +28,11 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
       id: id, cxID: null, alotID: null
     };
 
-    if (selectedRequestId === "workshop") {
+    if (selectedRequestId === "WORKSHOP" || selectedRequestId === "BREAKDOWN") {
       setFormData({
         ...baseState,
-        customerName: "Workshop",
-        salesPerson: "Workshop",
+        customerName: selectedRequestId,
+        salesPerson: selectedRequestId,
         phoneNumber: "9999999999",
       });
       setSelectedRequest(null);
@@ -83,9 +83,15 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
     e.preventDefault();
     setLoading(true);
     setError(null);
+    const selectedStatus =
+      selectedRequestId === "WORKSHOP"
+        ? "WORKSHOP"
+        : selectedRequestId === "BREAKDOWN"
+        ? "BREAKDOWN"
+        : "UNAVAILABLE";
 
     try {
-      const isUpdateRequest = selectedRequestId && selectedRequestId !== "workshop";
+      const isUpdateRequest = selectedRequestId && selectedRequestId !== "WORKSHOP";
 
       if (isUpdateRequest) {
         const updatePayload = new FormData();
@@ -94,6 +100,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
         updatePayload.append('photo', formData.photo);
         updatePayload.append('alot_id', formData.alotID);
         updatePayload.append('outKM', formData.outKM);
+        updatePayload.append('status', selectedStatus);
 
         const outResult = await axios.put(`/test-drive/out/update`, updatePayload, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -101,9 +108,19 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
         if(outResult?.status == 200){
           showSuccess("Test Drive Booked!")
           getdata();
-          onStatusUpdate && onStatusUpdate(model, selectedRequestId === "workshop" ? "Workshop" : "Unavailable", formData.salesPerson);
+          onStatusUpdate && onStatusUpdate(
+            model,
+            selectedRequestId === "WORKSHOP"
+              ? "WORKSHOP"
+              : selectedRequestId === "BREAKDOWN"
+              ? "BREAKDOWN"
+              : "UNAVAILABLE",
+            formData.salesPerson
+          );
         }
       } else {
+        formData.status = selectedStatus;
+        
         const createPayload = new FormData();
         for (const key in formData) {
           createPayload.append(key, formData[key]);
@@ -113,7 +130,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
         });
       }
       getdata();
-      onStatusUpdate && onStatusUpdate(model, selectedRequestId === "workshop" ? "Workshop" : "Unavailable", formData.salesPerson);
+      onStatusUpdate && onStatusUpdate(model, selectedRequestId === "WORKSHOP" ? "WORKSHOP" : "UNAVAILABLE", formData.salesPerson);
       handleClose();
     } catch (err) {
       setError(err.message);
@@ -156,7 +173,8 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
               onChange={e => setSelectedRequestId(e.target.value)}
             >
               <option value="">-- Select an option --</option>
-              <option value="workshop">Workshop</option>
+              <option value="WORKSHOP">Workshop</option>
+              <option value="BREAKDOWN">Breakdown</option>
               {pendingRequests
                  .filter(req => {
                    if (!req.model) return false;
