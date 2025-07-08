@@ -32,10 +32,11 @@ function TestDrivePage() {
     audioRef.current.load();
   }, []);
 
-  const getData = useCallback(() => {
+  const fetchPendingRequests = useCallback(() => {
     axios.get("/test-drive/pending-requests")
       .then((response) => {
         const jsonData = response.data;
+        if (jsonData.rows.length > 0) setHasNewRecords(true);
         setPendingRequests(jsonData.rows);
         setStatusLoading(false);
       })
@@ -44,43 +45,48 @@ function TestDrivePage() {
         setError(error.message);
         setStatusLoading(false);
       });
+  }, []);
   
-    // if (role === roles.ADMIN || role === roles.MD) {
-    //   axios.get("/test-drive/records")
-    //     .then((response) => {
-    //       const currentRecords = response.data;
-    //       const pendingRecords = currentRecords.data.filter(record => record.status === 0);
-    //       setHasNewRecords(pendingRecords.length > 0);
+  const fetchAllRecords = useCallback(() => {
+    setRecordsLoading(true);
+    axios.get("/test-drive/records")
+      .then((response) => {
+        const currentRecords = response.data;
+        const pendingRecords = currentRecords.data.filter(record => record.status === 0);
+        setHasNewRecords(pendingRecords.length > 0);
   
-    //       if (previousRecordsRef.current.length > 0) {
-    //         const newRecords = pendingRecords.filter(
-    //           record => !previousRecordsRef.current.some(
-    //             prev => prev.model === record.model && prev.sales_person === record.sales_person && prev.cx_name === record.cx_name
-    //           )
-    //         );
-    //         if (newRecords.length > 0 && audioRef.current) {
-    //           audioRef.current.play().catch(console.error);
-    //         }
-    //       }
-    //       previousRecordsRef.current = pendingRecords;
-    //       setPendingRequests(pendingRecords);
-    //       setRecords(currentRecords || []);
-    //       setRecordsLoading(false);
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error fetching records:', error);
-    //       setError(error.message);
-    //       setRecordsLoading(false);
-    //       setPendingRequests([]);
-    //     });
-    // }
-  }, [role]);
+        if (previousRecordsRef.current.length > 0) {
+          const newRecords = pendingRecords.filter(
+            record => !previousRecordsRef.current.some(
+              prev => prev.model === record.model &&
+                      prev.sales_person === record.sales_person &&
+                      prev.cx_name === record.cx_name
+            )
+          );
+          if (newRecords.length > 0 && audioRef.current) {
+            audioRef.current.play().catch(console.error);
+          }
+        }
+  
+        previousRecordsRef.current = pendingRecords;
+        setPendingRequests(pendingRecords);
+        setRecords(currentRecords || []);
+        setRecordsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching records:', error);
+        setError(error.message);
+        setRecordsLoading(false);
+        setPendingRequests([]);
+      });
+  }, []);
 
   useEffect(() => {
-    getData();
-    const interval = setInterval(getData, 30000);
+    fetchPendingRequests();
+    const interval = setInterval(fetchPendingRequests, 30000);
+  
     return () => clearInterval(interval);
-  }, [getData]);
+  }, [fetchPendingRequests]);
   
   useEffect(() => {
     axios.get("/test-drive/get-demo-vehicles")  
@@ -92,6 +98,12 @@ function TestDrivePage() {
         setError(error.message);
       });
   }, []);
+
+  useEffect(() => {
+    if (role === roles.ADMIN || role === roles.MD) {
+      fetchAllRecords();
+    }
+  }, [role, fetchAllRecords]);  
 
   const handleNotificationClick = () => {    
     // Reset audio to beginning
@@ -173,7 +185,7 @@ function TestDrivePage() {
               <TestDriveVehicleList
                 data={vehiclesData || []}
                 pendingRequests={pendingRequests}
-                getData={getData}
+                getData={fetchPendingRequests}
               />
             )}
             {error && (
@@ -186,11 +198,18 @@ function TestDrivePage() {
         </div>
         {(role === roles.ADMIN || role === roles.MD) && ( 
         <div className="bg-white shadow-lg rounded-lg mt-10">
-          <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4">
-            <h3 className="text-center text-xl font-semibold flex items-center justify-center gap-2">
+          <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4 flex justify-between items-center">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
               <i className="fas fa-history"></i>
               All Records
             </h3>
+            <button
+              onClick={fetchAllRecords}
+              className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-all"
+              title="Refresh all records"
+            >
+              <i className="fas fa-sync-alt mr-1"></i> Refresh
+            </button>
           </div>
           <div className="p-6">
             {recordsLoading ? (

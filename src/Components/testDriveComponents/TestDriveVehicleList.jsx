@@ -24,9 +24,10 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
   };
 
   const handleStatusUpdate = (model, status, salesPerson) => {
-    data.map((dt)=>{ if(dt.parent_product == model){
-      dt.status = status; dt.username = salesPerson
-    } } )
+    // data.map((dt)=>{ if(dt.parent_product == model){
+    //   dt.status = status; dt.username = salesPerson
+    // } } )
+    return;
   }
 
   const handleOutClose = () => {
@@ -66,7 +67,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
                 }`}>
                   {row.status}
                 </span>
-                {row.username != null && <small className=" ml-4 bg-gray-200 rounded-full px-3 py-1">{`${row.username.charAt(0).toUpperCase() + row.username.slice(1)}`}</small>}
+                {row.sales_person != null && <small className=" ml-4 bg-gray-200 rounded-full px-3 py-1">{`${row.sales_person.charAt(0).toUpperCase() + row.sales_person.slice(1)}`}</small>}
               </td>
               <td className="px-4 py-2 text-center">
                 <div className="flex flex-col sm:flex-row justify-center gap-2">
