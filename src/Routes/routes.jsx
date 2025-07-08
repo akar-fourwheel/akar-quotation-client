@@ -22,6 +22,7 @@ import QuotationUpdateDashboard from "../Pages/updateQuotationPage";
 import StockUpdateDashboard from "../Pages/updateStockPage";
 import ReceptionPage from "../Pages/receptionPage";
 import bookTestDrive from "../Pages/bookTestDrive";
+import TestDriveHistoryPage from "../Pages/TestDriveHistoryPage";
 
 export const routes = createBrowserRouter([
     {
@@ -90,13 +91,17 @@ export const routes = createBrowserRouter([
                         path: '/update-quotation',
                         Component : QuotationUpdateDashboard
                     },
-                    { 
+                    {
                         path: '/update-stock',
                         Component : StockUpdateDashboard
                     },
                     {
                         path:'/book-test-drive',
                         Component:bookTestDrive
+                    },
+                    {
+                        path: '/test-drive-history',
+                        Component: TestDriveHistoryPage
                     }
                 ]
             }

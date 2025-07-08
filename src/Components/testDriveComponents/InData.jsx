@@ -4,13 +4,13 @@ import { showSuccess } from "../../utils/toast";
 
 const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ inKM: "", model: model, photo: null, alotId: alotId });
+  const [formData, setFormData] = useState({ inKM: "", model: model, photo: null, id: id });
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleClose = () => {
     setShow(false);
-    setFormData({ inKM: "", model: "", photo: null, alotId: alotId, id: id });
+    setFormData({ inKM: "", model: "", photo: null, id: id });
     setPreviewUrl(null);
     setError(null);
   };
@@ -26,7 +26,7 @@ const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) =
     }
 
     try {
-      const pushData = await axios.put(`/test-drive/in`, payload, {
+      const pushData = await axios.put(`/test-drive/in/update`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
