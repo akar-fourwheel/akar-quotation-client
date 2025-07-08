@@ -91,46 +91,27 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
         : "UNAVAILABLE";
 
     try {
-      const isUpdateRequest = selectedRequestId && selectedRequestId !== "WORKSHOP";
+      const updatePayload = new FormData();
+      updatePayload.append('id', id);
+      updatePayload.append('requestId', formData.reqId);
+      updatePayload.append('photo', formData.photo);
+      updatePayload.append('alot_id', formData.alotID);
+      updatePayload.append('outKM', formData.outKM);
+      updatePayload.append('status', selectedStatus);
 
-      if (isUpdateRequest) {
-        const updatePayload = new FormData();
-        updatePayload.append('id', id); // demo_vehicle_id from props
-        updatePayload.append('requestId', formData.reqId);
-        updatePayload.append('photo', formData.photo);
-        updatePayload.append('alot_id', formData.alotID);
-        updatePayload.append('outKM', formData.outKM);
-        updatePayload.append('status', selectedStatus);
+      const outResult = await axios.put(`/test-drive/out/update`, updatePayload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-        const outResult = await axios.put(`/test-drive/out/update`, updatePayload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        if(outResult?.status == 200){
-          showSuccess("Test Drive Booked!")
-          getdata();
-          onStatusUpdate && onStatusUpdate(
-            model,
-            selectedRequestId === "WORKSHOP"
-              ? "WORKSHOP"
-              : selectedRequestId === "BREAKDOWN"
-              ? "BREAKDOWN"
-              : "UNAVAILABLE",
-            formData.salesPerson
-          );
-        }
-      } else {
-        formData.status = selectedStatus;
-        
-        const createPayload = new FormData();
-        for (const key in formData) {
-          createPayload.append(key, formData[key]);
-        }
-        await axios.post(`/test-drive/out`, createPayload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+      if(outResult?.status == 200){
+        showSuccess("Test Drive Booked!")
+        getdata();
+        onStatusUpdate && onStatusUpdate(
+          model,
+          selectedStatus,
+          formData.salesPerson
+        );
       }
-      getdata();
-      onStatusUpdate && onStatusUpdate(model, selectedRequestId === "WORKSHOP" ? "WORKSHOP" : "UNAVAILABLE", formData.salesPerson);
       handleClose();
     } catch (err) {
       setError(err.message);

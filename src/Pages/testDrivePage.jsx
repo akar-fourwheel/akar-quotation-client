@@ -1,6 +1,5 @@
 import { useEffect, useState, useContext, useCallback, useRef } from "react";
 import ListGroup from "../Components/testDriveComponents/ListGroup";
-import AllRecords from "../Components/testDriveComponents/AllRecords";
 import axios from "axios";
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
@@ -10,10 +9,8 @@ import TestDriveVehicleList from "../Components/testDriveComponents/TestDriveVeh
 
 function TestDrivePage() {
   const [jsonData, setJsonData] = useState(null);
-  const [records, setRecords] = useState(null);
   const [error, setError] = useState(null);
   const [statusLoading, setStatusLoading] = useState(true);
-  const [recordsLoading, setRecordsLoading] = useState(true);
   const [hasNewRecords, setHasNewRecords] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
   const { role } = useContext(AuthContext);
@@ -47,40 +44,6 @@ function TestDrivePage() {
       });
   }, []);
   
-  const fetchAllRecords = useCallback(() => {
-    setRecordsLoading(true);
-    axios.get("/test-drive/records")
-      .then((response) => {
-        const currentRecords = response.data;
-        const pendingRecords = currentRecords.data.filter(record => record.status === 0);
-        setHasNewRecords(pendingRecords.length > 0);
-  
-        if (previousRecordsRef.current.length > 0) {
-          const newRecords = pendingRecords.filter(
-            record => !previousRecordsRef.current.some(
-              prev => prev.model === record.model &&
-                      prev.sales_person === record.sales_person &&
-                      prev.cx_name === record.cx_name
-            )
-          );
-          if (newRecords.length > 0 && audioRef.current) {
-            audioRef.current.play().catch(console.error);
-          }
-        }
-  
-        previousRecordsRef.current = pendingRecords;
-        setPendingRequests(pendingRecords);
-        setRecords(currentRecords || []);
-        setRecordsLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching records:', error);
-        setError(error.message);
-        setRecordsLoading(false);
-        setPendingRequests([]);
-      });
-  }, []);
-
   useEffect(() => {
     fetchPendingRequests();
     const interval = setInterval(fetchPendingRequests, 30000);
@@ -98,12 +61,6 @@ function TestDrivePage() {
         setError(error.message);
       });
   }, []);
-
-  useEffect(() => {
-    if (role === roles.ADMIN || role === roles.MD) {
-      fetchAllRecords();
-    }
-  }, [role, fetchAllRecords]);  
 
   const handleNotificationClick = () => {    
     // Reset audio to beginning
@@ -196,32 +153,6 @@ function TestDrivePage() {
             )}
           </div>
         </div>
-        {(role === roles.ADMIN || role === roles.MD) && ( 
-        <div className="bg-white shadow-lg rounded-lg mt-10">
-          <div className="bg-gray-200 text-gray-800 rounded-t-lg px-6 py-4 flex justify-between items-center">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <i className="fas fa-history"></i>
-              All Records
-            </h3>
-            <button
-              onClick={fetchAllRecords}
-              className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-all"
-              title="Refresh all records"
-            >
-              <i className="fas fa-sync-alt mr-1"></i> Refresh
-            </button>
-          </div>
-          <div className="p-6">
-            {recordsLoading ? (
-              <div className="flex justify-center items-center py-10">
-                <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
-              </div>
-            ) : (
-              <AllRecords data={records?.data?.filter(record => record.in_km !== 0) || []} />
-            )}
-          </div>
-        </div>
-        )}
       </div>
       <RequestNotificationModal
         show={showNotificationModal}
