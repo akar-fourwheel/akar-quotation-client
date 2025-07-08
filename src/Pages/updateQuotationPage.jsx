@@ -12,7 +12,7 @@ const QuotationUpdateDashboard = () => {
     { key: 'hpn', label: 'HPN Data', endpoint: 'update/update-hpn' },
     { key: 'color', label: 'Color Data', endpoint: 'update/update-color' },
     { key: 'vas', label: 'VAS Data', endpoint: 'update/update-vas' },
-    { key: 'scheme', label: 'Scheme Data', endpoint: 'update/update-scheme' },
+    // { key: 'scheme', label: 'Scheme Data', endpoint: 'update/update-scheme' },
   ];
 
 const handleApiCall = async (endpoint, key) => {
