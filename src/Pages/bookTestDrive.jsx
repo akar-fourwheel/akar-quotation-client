@@ -2,22 +2,32 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { modelOptions } from "../Components/quotation/staticQuotOptions";
+import { TruckIcon } from "@heroicons/react/24/outline";
 
-/* ------------------------------------------------------------------
-   Get the logged-in CA’s details from localStorage (or anywhere you store
-   session info).  Adjust the keys if yours differ.
-   ------------------------------------------------------------------ */
 const DEFAULT_CA_ID = localStorage.getItem("userId") || "0";
 const DEFAULT_CA_NAME = localStorage.getItem("username") || "Unknown CA";
 const DEFAULT_ROLE = localStorage.getItem("role") || "sales";
 
+const variantOptions = {
+    "Sedan": ["Base", "Mid", "Top", "Premium"],
+    "SUV": ["Base", "Mid", "Top", "Premium", "Limited"],
+    "Hatchback": ["Base", "Mid", "Top"],
+    "Coupe": ["Base", "Sport", "Premium"],
+    "Convertible": ["Base", "Sport", "Limited"],
+    "Truck": ["Base", "Mid", "Top", "Heavy Duty"],
+    "Van": ["Base", "Mid", "Top", "Commercial"],
+    "Wagon": ["Base", "Mid", "Top"],
+    "Hybrid": ["Base", "Mid", "Top", "Eco"],
+    "Electric": ["Base", "Mid", "Top", "Long Range"]
+};
+
 export default function BookTestDrivePage() {
-    /* ------------- state ------------- */
     const [form, setForm] = useState({
         customerId: "",
-        ca: DEFAULT_CA_ID,    // we still keep the id for backend use
-        caName: DEFAULT_CA_NAME,  // used in POST URL
+        ca: DEFAULT_CA_ID,
+        caName: DEFAULT_CA_NAME,
         model: "",
+        variant: "",
         scheduleTime: "",
     });
 
@@ -27,7 +37,6 @@ export default function BookTestDrivePage() {
     const [submitting, setSubmitting] = useState(false);
     const [msg, setMsg] = useState({ text: "", ok: true });
 
-    /* ------------- helper: fetch customers for this CA ------------- */
     const fetchCustomers = async () => {
         try {
             const response = await axios.get('/customer-info', {
@@ -41,30 +50,34 @@ export default function BookTestDrivePage() {
             console.error('Error fetching customers:', error);
             setMsg({ text: "Failed to fetch customers", ok: false });
         } finally {
-            setLoading(false);  // 👈 IMPORTANT: this was missing
+            setLoading(false);
         }
     };
-    
 
     useEffect(() => {
         fetchCustomers();
     }, []);
 
-    /* ------------- generic change handler ------------- */
-    const handleChange = ({ target }) =>
-        setForm((p) => ({ ...p, [target.name]: target.value }));
+    const handleChange = ({ target }) => {
+        const newForm = { ...form, [target.name]: target.value };
 
-    /* ------------- validation ------------- */
+        if (target.name === "model") {
+            newForm.variant = "";
+        }
+
+        setForm(newForm);
+    };
+
     const validate = () => {
         const e = {};
-        if (!form.customerId) e.customerId = "Select customer";
-        if (!form.model) e.model = "Select model";
-        if (!form.scheduleTime) e.scheduleTime = "Pick date & time";
+        if (!form.customerId) e.customerId = "Please select a customer";
+        if (!form.model) e.model = "Please select a model";
+        if (!form.variant) e.variant = "Please select a variant";
+        if (!form.scheduleTime) e.scheduleTime = "Please select date & time";
         setErrors(e);
         return !Object.keys(e).length;
     };
 
-    /* ------------- submit ------------- */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMsg({ text: "", ok: true });
@@ -76,9 +89,8 @@ export default function BookTestDrivePage() {
                 `/book-test-drive/${encodeURIComponent(form.caName)}`,
                 form
             );
-            setMsg({ text: "Test-drive booked!", ok: true });
-            // reset user-editable fields
-            setForm({ ...form, customerId: "", model: "", scheduleTime: "" });
+            setMsg({ text: "Test-drive booked successfully!", ok: true });
+            setForm({ ...form, customerId: "", model: "", variant: "", scheduleTime: "" });
         } catch (err) {
             setMsg({ text: err.response?.data?.message || "Server error", ok: false });
         } finally {
@@ -86,58 +98,83 @@ export default function BookTestDrivePage() {
         }
     };
 
-    /* ------------- UI ------------- */
+    const getAvailableVariants = () => {
+        return variantOptions[form.model] || [];
+    };
+
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-            <div className="w-full max-w-xl">
-                <div className="bg-white shadow-lg rounded-lg">
-                    {/* header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg px-6 py-4">
-                        <h2 className="text-center text-2xl font-bold flex items-center gap-2">
-                            <i className="fas fa-car-side" /> Schedule Test-Drive
-                        </h2>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+            <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                        Schedule Test Drive
+                    </h1>
+                </div>
+
+                <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+                        <div className="flex items-center justify-center gap-3">
+                            <h2 className="text-2xl font-bold text-white">Test Drive Booking</h2>
+                        </div>
                     </div>
 
-                    {/* body */}
-                    <div className="p-6 sm:p-8">
+                    <div className="p-8">
                         {loading ? (
-                            <p className="text-center py-10">Loading customers…</p>
+                            <div className="flex items-center justify-center py-16">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                                <span className="ml-3 text-gray-600">Loading customers...</span>
+                            </div>
                         ) : (
-                            <form onSubmit={handleSubmit} noValidate>
-                                {/* banner */}
+                            <form onSubmit={handleSubmit} noValidate className="space-y-6">
                                 {msg.text && (
                                     <div
-                                        className={`p-4 mb-6 rounded text-center font-medium ${msg.ok
-                                                ? "bg-green-100 text-green-800"
-                                                : "bg-red-100 text-red-800"
+                                        className={`p-4 rounded-lg text-center font-medium transition-all duration-300 ${msg.ok
+                                                ? "bg-green-50 text-green-800 border border-green-200"
+                                                : "bg-red-50 text-red-800 border border-red-200"
                                             }`}
                                     >
-                                        {msg.text}
+                                        <div className="flex items-center justify-center gap-2">
+                                            {msg.ok ? (
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            )}
+                                            {msg.text}
+                                        </div>
                                     </div>
                                 )}
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* CA name (read-only) */}
-                                    <div>
-                                        <label className="block text-sm font-bold mb-1">CA</label>
-                                        <input
-                                            type="text"
-                                            value={form.caName}
-                                            readOnly
-                                            className="border p-2 w-full bg-gray-100 text-gray-700 cursor-not-allowed"
-                                        />
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div className="lg:col-span-2">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Customer Advisor
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={form.caName}
+                                                readOnly
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 cursor-not-allowed focus:outline-none"
+                                            />
+                                        </div>
                                     </div>
 
-                                    {/* Customer dropdown */}
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-bold mb-1">Customer *</label>
+                                    <div className="lg:col-span-2">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Customer <span className="text-red-500">*</span>
+                                        </label>
                                         <select
                                             name="customerId"
                                             value={form.customerId}
                                             onChange={handleChange}
-                                            className={`border p-2 w-full ${errors.customerId && "border-red-500"}`}
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.customerId ? "border-red-500" : "border-gray-300"
+                                                }`}
                                         >
-                                            <option value="">Select customer</option>
+                                            <option value="">Select a customer</option>
                                             {customerList.map((c) => (
                                                 <option key={c[0]} value={c[0]}>
                                                     {c[1]}
@@ -145,61 +182,113 @@ export default function BookTestDrivePage() {
                                             ))}
                                         </select>
                                         {errors.customerId && (
-                                            <p className="text-xs text-red-500">{errors.customerId}</p>
+                                            <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {errors.customerId}
+                                            </p>
                                         )}
                                     </div>
 
-                                    {/* Model dropdown */}
                                     <div>
-                                        <label className="block text-sm font-bold mb-1">Model *</label>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Model <span className="text-red-500">*</span>
+                                        </label>
                                         <select
                                             name="model"
                                             value={form.model}
                                             onChange={handleChange}
-                                            className={`border p-2 w-full ${errors.model && "border-red-500"}`}
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.model ? "border-red-500" : "border-gray-300"
+                                                }`}
                                         >
-                                            <option value="">Select model</option>
+                                            <option value="">Select a model</option>
                                             {modelOptions.map((m) => (
                                                 <option key={m} value={m}>
                                                     {m}
                                                 </option>
                                             ))}
                                         </select>
-                                        {errors.model && <p className="text-xs text-red-500">{errors.model}</p>}
+                                        {errors.model && (
+                                            <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {errors.model}
+                                            </p>
+                                        )}
                                     </div>
 
-                                    {/* Schedule datetime */}
                                     <div>
-                                        <label className="block text-sm font-bold mb-1">
-                                            Schedule Date & Time *
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Variant <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            name="variant"
+                                            value={form.variant}
+                                            onChange={handleChange}
+                                            disabled={!form.model}
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.variant ? "border-red-500" : "border-gray-300"
+                                                } ${!form.model ? "bg-gray-50 cursor-not-allowed" : ""}`}
+                                        >
+                                            <option value="">
+                                                {form.model ? "Select a variant" : "Select model first"}
+                                            </option>
+                                            {getAvailableVariants().map((v) => (
+                                                <option key={v} value={v}>
+                                                    {v}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.variant && (
+                                            <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {errors.variant}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="lg:col-span-2">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Schedule Date & Time <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="datetime-local"
                                             name="scheduleTime"
                                             value={form.scheduleTime}
                                             onChange={handleChange}
-                                            className={`border p-2 w-full ${errors.scheduleTime && "border-red-500"}`}
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.scheduleTime ? "border-red-500" : "border-gray-300"
+                                                }`}
                                         />
                                         {errors.scheduleTime && (
-                                            <p className="text-xs text-red-500">{errors.scheduleTime}</p>
+                                            <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {errors.scheduleTime}
+                                            </p>
                                         )}
                                     </div>
                                 </div>
 
-                                {/* submit */}
-                                <div className="mt-8 flex justify-end">
+                                <div className="pt-6 flex justify-end">
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded disabled:bg-blue-300 flex items-center"
-                                    >
+                                            className="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-4 px-6 rounded-lg transform shadow-lg"
+                                        >
                                         {submitting ? (
-                                            <>
-                                                <span className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent rounded-full" />
-                                                Saving…
-                                            </>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                <span>Booking Test Drive...</span>
+                                            </div>
                                         ) : (
-                                            "Book Test-Drive"
+                                            <div className="flex items-center justify-center gap-2">
+                                                <TruckIcon className="h-7 w-7 text-white mt-0.5"/>
+                                                <span>Book Test Drive</span>
+                                            </div>
                                         )}
                                     </button>
                                 </div>
