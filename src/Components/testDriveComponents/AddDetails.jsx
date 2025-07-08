@@ -42,10 +42,10 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
         setFormData({
           ...baseState,
           reqId:req.id,
-          cxID: req.CX_ID || req.cx_id,
+          cxID: req.cx_id || req.cx_id,
           alotID: req.ALOT_ID || req.alot_id,
-          customerName: req.cx_name || req.customerName,
-          phoneNumber: req.cx_phone || req.phoneNumber,
+          customerName: req.CX_NAME || req.customerName,
+          phoneNumber: req.CX_PHONE || req.phoneNumber,
           salesPerson: req.sales_person || req.salesPerson,
           outKM: "",
           model: req.model || model,

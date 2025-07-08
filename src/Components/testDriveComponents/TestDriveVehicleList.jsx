@@ -24,7 +24,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
   };
 
   const handleStatusUpdate = (model, status, salesPerson) => {
-    data.map((dt)=>{ if(dt.model == model){
+    data.map((dt)=>{ if(dt.parent_product == model){
       dt.status = status; dt.username = salesPerson
     } } )
   }
@@ -58,7 +58,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
               </td>
               <td className="px-4 py-2 whitespace-nowrap text-sm">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium text-white text-center ${
-                  row.status === "Available"
+                  row.status === "AVAILABLE"
                     ? "bg-green-500"
                     : row.status === "Workshop"
                     ? "bg-yellow-500"
@@ -73,9 +73,9 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
                   <button
                     type="button"
                     onClick={() => handleOutClick(row)}
-                    disabled={row.status !== "Available"}
+                    disabled={row.status !== "AVAILABLE"}
                     className={`px-3 py-1 text-sm font-medium rounded-md items-center gap-1 cursor-pointer ${
-                      row.status === "Available"
+                      row.status === "AVAILABLE"
                         ? "bg-blue-600 hover:bg-blue-700 text-white"
                         : "bg-gray-300 text-gray-600 cursor-not-allowed"
                     }`}
@@ -85,9 +85,9 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
                   <button
                     type="button"
                     onClick={() => handleInClick(row)}
-                    disabled={row.status === "Available"}
+                    disabled={row.status === "AVAILABLE"}
                     className={`px-3 py-1 text-sm font-medium rounded-md items-center gap-1 ${
-                      row.status !== "Available"
+                      row.status !== "AVAILABLE"
                         ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                         : "bg-gray-300 text-gray-600 cursor-not-allowed"
                     }`}
@@ -103,7 +103,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
       {selectedVehicle && (
         <>
           <AddDetails
-            model={selectedVehicle.model}
+            model={selectedVehicle.parent_product}
             setShow={handleOutClose}
             show={showOut}
             getdata={getData}
@@ -113,7 +113,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
             onStatusUpdate={handleStatusUpdate}
           />
           <InData
-            model={selectedVehicle.model}
+            model={selectedVehicle.parent_product}
             avail={selectedVehicle.status}
             setShow={setShowIn}
             show={showIn}

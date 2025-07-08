@@ -15,9 +15,9 @@ const RequestNotificationModal = ({
 
   const filteredRequests = pendingRequests.filter(req => {
     if (activeTab === 'pending') {
-      return req.status == 1 || !req.status;
+      return req.status == "REQUESTED" || !req.status;
     } else {
-      return req.status == 2;
+      return req.status == "PENDING";
     }
   });
 
@@ -53,7 +53,7 @@ const RequestNotificationModal = ({
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Pending ({pendingRequests.filter(req => req.status == 1 || !req.status).length})
+                Pending ({pendingRequests.filter(req => req.status == "REQUESTED" || !req.status).length})
               </span>
             </button>
             <button
@@ -68,7 +68,7 @@ const RequestNotificationModal = ({
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Accepted ({pendingRequests.filter(req => req.status == 2).length})
+                Accepted ({pendingRequests.filter(req => req.status == "PENDING").length})
                 <small className="text-gray-600 text-xs">Vehicle Not Allocated</small>
               </span>
             </button>
@@ -123,6 +123,9 @@ const RequestNotificationModal = ({
                       </div>
                       {req.sales_person && (
                         <p className="text-sm text-gray-600 mt-1">Sales Executive: {req.sales_person}</p>
+                      )}
+                      {req.CX_NAME && (
+                        <p className="text-sm text-gray-600 mt-1">Customer: {req.CX_NAME}</p>
                       )}
                     </div>
                     <div className="text-xs text-gray-500">

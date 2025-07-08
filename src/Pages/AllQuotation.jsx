@@ -28,6 +28,9 @@ function AllQuotation() {
         row: null,
       });
 
+    const [scheduledDateTime, setScheduledDateTime] = useState('');
+    const [testDriveSelected, setTestDriveSelected] = useState(false);
+
     // Ref for the operations panel
     const operationsPanelRef = useRef(null);
 
@@ -35,6 +38,7 @@ function AllQuotation() {
         // fetch status
         const response = await axios.get(`/test-drive/status/${selectedRow.ALOT_ID}`);
         const responseStatus = response.data;
+        setTestDriveSelected(false);
         
         if (!responseStatus.status) { // if no record found
             requestTestDrive(selectedRow);
@@ -42,7 +46,7 @@ function AllQuotation() {
             setStatusModal({
                 show: true,
                 status: responseStatus.status,
-                remark: responseStatus.remark || 'No remarks available.',
+                remark: responseStatus.remark || 'No remarks.',
                 row: selectedRow,
             });
         }
@@ -61,10 +65,12 @@ function AllQuotation() {
             alotID: row.ALOT_ID,
             variant: row.variant,
             requested_by: row.username,
+            sales_person_id: row.user_id,
             cust_phone: row.CUSTOMER_PHONE,
-            cust_name: row.CX_NAME
+            cust_name: row.CX_NAME,
+            scheduledDateTime: scheduledDateTime
           });
-
+          setTestDriveSelected(false);
           if (detailsResponse.status === 200) {
             setModalData({
               show: true,
@@ -76,6 +82,7 @@ function AllQuotation() {
             throw new Error('Failed to send test drive request');
           }
         } catch (error) {
+            setTestDriveSelected(false);
             console.error("Error in requesting test drive:", error);
             setModalData({
               show: true,
@@ -124,24 +131,24 @@ function AllQuotation() {
         };
     }, [selectedRow]);
 
-    const fetchDemoCar = async (model) => {
-        try {
-            const response = await axios.get('/test-drive/status');
-            const jsonData = response.data
-            const matchedCar = jsonData.joined.data.find(
-                car => car.status === 'Available' && car.model === model
-            );
+    // const fetchDemoCar = async (model) => {
+    //     try {
+    //         const response = await axios.get('/test-drive/status');
+    //         const jsonData = response.data
+    //         const matchedCar = jsonData.joined.data.find(
+    //             car => car.status === 'Available' && car.model === model
+    //         );
 
-            if (matchedCar) {
-                return ({ 'model': matchedCar.model, 'id': matchedCar.id });
-            } else {
-                return
-            }
-        }
-        catch (e) {
-            console.log("Error fetching Demo Vehicle data:", e);
-        }
-    }
+    //         if (matchedCar) {
+    //             return ({ 'model': matchedCar.model, 'id': matchedCar.id });
+    //         } else {
+    //             return
+    //         }
+    //     }
+    //     catch (e) {
+    //         console.log("Error fetching Demo Vehicle data:", e);
+    //     }
+    // }
 
     const fetchCas = async () => {
         try {
@@ -169,7 +176,7 @@ function AllQuotation() {
                 if (salesFilter !== '') {
                     response = await axios.get(`/my-quotation`, {
                         params: {
-                            name: salesFilter,
+                            sales_person_id: salesFilter,
                             role,
                             page,
                             limit: 25
@@ -354,13 +361,33 @@ function AllQuotation() {
                             >
                                 Book
                             </button>
-                            <button
-                                onClick={() => handleTestDrive(selectedRow)}
-                                className="bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg flex items-center justify-center"
-                            >
+                            {!testDriveSelected ? (
+                                <button
+                                    onClick={() => setTestDriveSelected(true)}
+                                    className="bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg flex items-center justify-center"
+                                >
                                 Test Drive
                             </button>
+                            ) : 
+                            (
+                                <div className="col-span-2">
+                                <label className="text-xs font-medium text-gray-600 mb-1 block">Schedule Test Drive</label>
+                                <input
+                                  type="datetime-local"
+                                  value={scheduledDateTime}
+                                  onChange={(e) => setScheduledDateTime(e.target.value)}
+                                  className="w-full border rounded px-2 py-1 text-sm mb-2"
+                                />
+                                <button
+                                  onClick={() => handleTestDrive(selectedRow)}
+                                  className="w-full bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg px-4 py-2"
+                                >
+                                  Request Test Drive
+                                </button>
+                              </div>
+                        )}
                         </div>
+                        
                     </div>
 
                 </div>
@@ -378,7 +405,7 @@ function AllQuotation() {
                             <option value="">All CAs</option>
                             {uniqueCas
                                 .map(([id, name]) => (
-                                    <option key={id} value={name}>
+                                    <option key={id} value={id}>
                                         {name}
                                     </option>
                                 ))}
@@ -426,11 +453,11 @@ function AllQuotation() {
                         <hr className='pb-3 text-gray-400'/>
                         <p className="text-sm text-center text-gray-700 mb-2">
                             <strong>Current Status:</strong> {
-                            statusModal.status === 1 ? 'Requested' : 
-                            statusModal.status === 2 ? 'Pending (Request Accepted)':
-                            statusModal.status === 3 ? 'Approved !!' :
-                            statusModal.status === 4 ? 'Request Rejected' :
-                            statusModal.status === 5 ? 'Test Drive Completed' :  'Unknown'
+                            statusModal.status === 'REQUESTED' ? 'Requested' : 
+                            statusModal.status === 'PENDING' ? 'Pending (Request Accepted)':
+                            statusModal.status === 'APPROVED' ? 'Approved !!' :
+                            statusModal.status === 'REJECTED' ? 'Request Rejected' :
+                            statusModal.status === 'COMPLETED' ? 'Test Drive Completed' :  'Unknown'
                             }
                         </p>
                         <p className="text-sm text-center text-gray-700 mb-4">
