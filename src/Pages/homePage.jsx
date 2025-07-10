@@ -3,7 +3,6 @@ import { BellIcon,CubeIcon,PercentBadgeIcon,PencilSquareIcon,DocumentTextIcon,Cu
 import { roles } from "../Routes/roles";
 import NotificationOverlay from "../Components/homePage/NotificationOverlay";
 import { useEffect, useState } from "react";
-
 const HomePage = () => {
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -12,7 +11,7 @@ const HomePage = () => {
       <div
         className="relative min-h-screen w-full bg-cover bg-center h-100"
         style={{
-          backgroundImage: `url('https://www.tatamotors.com/wp-content/uploads/2023/11/press-11feb23-highres.jpg')` }}
+          backgroundImage: `url('/bgImage.jpg')` }}
       >
         <div className="absolute inset-0 backdrop-blur bg-white/30 dark:bg-black/30"></div>
 

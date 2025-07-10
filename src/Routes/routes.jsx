@@ -23,6 +23,7 @@ import StockUpdateDashboard from "../Pages/updateStockPage";
 import ReceptionPage from "../Pages/receptionPage";
 import bookTestDrive from "../Pages/bookTestDrive";
 import TestDriveHistoryPage from "../Pages/TestDriveHistoryPage";
+import customerList from "../Pages/customerList";
 
 export const routes = createBrowserRouter([
     {
@@ -130,7 +131,11 @@ export const routes = createBrowserRouter([
                     {
                         path: '/reception',
                         Component: ReceptionPage
-                    }
+                    },
+                    {
+                        path: '/customer-list',
+                        Component: customerList
+                    },
                 ]
             },
         ]
