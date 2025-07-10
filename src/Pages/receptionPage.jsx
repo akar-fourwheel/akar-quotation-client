@@ -26,6 +26,7 @@ function ReceptionPage() {
     address: '',
     ca: '',
     model: '',
+    remark:'',
     leadType: getLeadType(), 
     exeName: localStorage.getItem('userId')
   });
@@ -209,11 +210,6 @@ function ReceptionPage() {
                     <label htmlFor="address" className="block text-gray-700 text-sm font-bold">Address <span className="text-red-500">*</span></label>
                     <textarea id="address" name="address" rows="3" value={formData.address} onChange={handleChange} className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.address ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter customer's full address" required></textarea>
                     {errors.address && <p className="text-red-500 text-xs italic mt-1">{errors.address}</p>}
-                  </div>
-                  
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Remarks </label>
-                    <input type="text" id="remark" name="remark" value={formData.remark} onChange={handleChange} className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`} placeholder="Kindly fill customer remark" />
                   </div>
                 </div>
 
