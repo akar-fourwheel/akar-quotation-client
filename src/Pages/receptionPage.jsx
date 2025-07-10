@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { modelOptions } from '../Components/quotation/staticQuotOptions';
 
-// Define gender options outside the component for better practice
 const genderOptions = [
   { label: 'Male', value: 'M' },
   { label: 'Female', value: 'F' },
@@ -10,18 +9,15 @@ const genderOptions = [
 ];
 
 function ReceptionPage() {
-  // Get user role from localStorage
   const userRole = localStorage.getItem('role');
   
-  // Determine leadType based on user role
   const getLeadType = () => {
     if (userRole === 'cre') {
       return 'digital';
     }
-    return 'reception'; // Default for 'reception' role or any other role
+    return 'reception'; 
   };
 
-  // State for form fields
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -30,26 +26,22 @@ function ReceptionPage() {
     address: '',
     ca: '',
     model: '',
-    leadType: getLeadType(), // Set leadType based on user role
+    leadType: getLeadType(), 
     exeName: localStorage.getItem('userId')
   });
   
-  // State for dropdown options
   const [caList, setCaList] = useState([]);
   const [modelList, setModelList] = useState([]);
   
-  // State for various statuses
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // For initial data fetch
-  const [fetchError, setFetchError] = useState(null); // For fetch errors
+  const [isLoading, setIsLoading] = useState(true); 
+  const [fetchError, setFetchError] = useState(null); 
   const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
 
-  // Fetch CA and Model lists on component mount
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        // Fetch endpoints one by one
         const caResponse = await axios.get("/leads/ca-list?query=onlyCA");
         
         setCaList(caResponse.data || []);
@@ -131,7 +123,6 @@ function ReceptionPage() {
     }
   };
 
-  // Get page title based on user role
   const getPageTitle = () => {
     if (userRole === 'cre') {
       return 'Digital Lead Entry';
@@ -190,7 +181,6 @@ function ReceptionPage() {
                     {errors.gender && <p className="text-red-500 text-xs italic mt-1">{errors.gender}</p>}
                   </div>
                   
-                  {/* CA Dropdown */}
                   <div>
                     <label htmlFor="ca" className="block text-gray-700 text-sm font-bold mb-2">CA <span className="text-red-500">*</span></label>
                     <select id="ca" name="ca" value={formData.ca} onChange={handleChange} className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.ca ? 'border-red-500' : 'border-gray-300'}`} required>
@@ -200,7 +190,6 @@ function ReceptionPage() {
                     {errors.ca && <p className="text-red-500 text-xs italic mt-1">{errors.ca}</p>}
                   </div>
 
-                  {/* Model Dropdown */}
                   <div>
                     <label htmlFor="model" className="block text-gray-700 text-sm font-bold mb-2">Model <span className="text-red-500">*</span></label>
                     <select id="model" name="model" value={formData.model} onChange={handleChange} className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.model ? 'border-red-500' : 'border-gray-300'}`} required>
