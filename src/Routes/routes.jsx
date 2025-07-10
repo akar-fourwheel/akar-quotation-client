@@ -39,7 +39,7 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.ADMIN]} />,
+        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.ADMIN, roles.RECEPTION]} />,
         children: [
             {
                 element: <Layout />,
@@ -103,6 +103,10 @@ export const routes = createBrowserRouter([
                     {
                         path: '/test-drive-history',
                         Component: TestDriveHistoryPage
+                    },
+                    {
+                        path: '/customer-list',
+                        Component: customerList
                     }
                 ]
             }
@@ -131,11 +135,7 @@ export const routes = createBrowserRouter([
                     {
                         path: '/reception',
                         Component: ReceptionPage
-                    },
-                    {
-                        path: '/customer-list',
-                        Component: customerList
-                    },
+                    }
                 ]
             },
         ]
