@@ -52,6 +52,9 @@ const ReceptionDashboard = () => {
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Address
                                 </th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Remark
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -71,6 +74,9 @@ const ReceptionDashboard = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{cust.username}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 max-w-xs truncate">
                                         <span title={cust.address}>{cust.address}</span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        {cust.remark || <span className="italic text-gray-400">null</span>}
                                     </td>
                                 </tr>
                             ))}

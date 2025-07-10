@@ -26,6 +26,7 @@ function ReceptionPage() {
     address: '',
     ca: '',
     model: '',
+    remark:'',
     leadType: getLeadType(), 
     exeName: localStorage.getItem('userId')
   });
