@@ -162,6 +162,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
                    const pattern = new RegExp(`\\b${model}\\b`, 'i');
                    return pattern.test(req.model);
                  })
+                 .filter(req=> req.status == "PENDING" )
                  .map(req => (
                   <option key={req.id} value={req.id}>
                     #{req.id} - {req.sales_person} ({req.model})
