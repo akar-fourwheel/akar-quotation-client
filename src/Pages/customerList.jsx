@@ -47,6 +47,9 @@ const ReceptionDashboard = () => {
                                     Email
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    CA Name
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Address
                                 </th>
                             </tr>
@@ -65,6 +68,7 @@ const ReceptionDashboard = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {cust.email || <span className="italic text-gray-400">N/A</span>}
                                     </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{cust.username}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 max-w-xs truncate">
                                         <span title={cust.address}>{cust.address}</span>
                                     </td>
