@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
 import { useContext } from 'react';
 import { showSuccess } from '../utils/toast';
+import useDebounce from '../hooks/useDebounce';
 
 const ReceptionDashboard = () => {
     const { role } = useContext(AuthContext);
@@ -21,10 +22,46 @@ const ReceptionDashboard = () => {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [id, setId] = useState('');
-    const fetchCustomers = async (page = 1) => {
+    
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchType, setSearchType] = useState('customer'); // 'customer' or 'ca'
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    const didMountRef = useRef(false);
+
+    useEffect(() => {
+        if (!didMountRef.current) {
+            if (!searchTerm) {
+                fetchCustomers(1);
+            }
+            didMountRef.current = true;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!didMountRef.current) return;
+        // Only fetch if debounced term matches current term
+        if (debouncedSearchTerm !== searchTerm) return;
+        // If search term is empty, fetch all customers
+        if (!debouncedSearchTerm) {
+            fetchCustomers(1);
+            setCurrentPage(1);
+            return;
+        }
+        fetchCustomers(1, debouncedSearchTerm, searchType);
+        setCurrentPage(1);
+    }, [debouncedSearchTerm, searchType]);
+
+    const fetchCustomers = async (page = 1, searchTerm = '', searchType = 'customer') => {
         setLoading(true);
         try {
-            const response = await axios.get(`/customer-list?page=${page}&limit=10`);
+            let url = `/customer-list?page=${page}&limit=10`;
+            
+            if (searchTerm.trim()) {
+                url += `&search=${encodeURIComponent(searchTerm)}&searchType=${searchType}`;
+            }
+            
+            const response = await axios.get(url);
             setCustomers(response.data.customers || []);
             setPagination(response.data.pagination || {});
             setCurrentPage(page);
@@ -36,9 +73,21 @@ const ReceptionDashboard = () => {
         }
     };
 
-    useEffect(() => {
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleSearchTypeChange = (e) => {
+        setSearchType(e.target.value);
+        setSearchTerm(''); // Reset search term when changing type
+        setCurrentPage(1);
+    };
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        setSearchType('customer');
         fetchCustomers(1);
-    }, []);
+    };
 
     const openRemarkModal = (remark, id) => {
         setSelectedRemark(remark);
@@ -53,7 +102,7 @@ const ReceptionDashboard = () => {
             if(response.status === 200){
                 showSuccess("Remark updated successfully");
                 closeModal();
-                fetchCustomers(currentPage);
+                fetchCustomers(currentPage, debouncedSearchTerm, searchType);
             }
         } catch (err) {
             console.error("Failed to update remark:", err);
@@ -69,7 +118,7 @@ const ReceptionDashboard = () => {
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagination.totalPages) {
-            fetchCustomers(newPage);
+            fetchCustomers(newPage, debouncedSearchTerm, searchType);
         }
     };
 
@@ -165,53 +214,111 @@ const ReceptionDashboard = () => {
                 Customer List
             </h1>
 
+            {/* Search Section */}
+            <div className="mb-6 bg-white p-4 rounded-lg shadow">
+                <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="flex-1">
+                        <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+                            Search
+                        </label>
+                        <input
+                            type="text"
+                            id="search"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            placeholder={
+                                searchType === 'customer' 
+                                    ? "Search by customer name or phone..." 
+                                    : "Search by CA name..."
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+                    <div className="min-w-[180px]">
+                        <label htmlFor="searchType" className="block text-sm font-medium text-gray-700 mb-2">
+                            Search Type
+                        </label>
+                        <select
+                            id="searchType"
+                            value={searchType}
+                            onChange={handleSearchTypeChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="customer">Customer Name/Phone</option>
+                            <option value="ca">CA Name</option>
+                        </select>
+                    </div>
+                    {(searchTerm || debouncedSearchTerm) && (
+                        <button
+                            onClick={clearSearch}
+                            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                        >
+                            Clear
+                        </button>
+                    )}
+                </div>
+                {searchTerm && searchTerm !== debouncedSearchTerm && (
+                    <div className="mt-2 text-sm text-gray-500">
+                        Searching...
+                    </div>
+                )}
+            </div>
+
             {loading ? (
                 <div className="text-center text-gray-600">Loading...</div>
             ) : (
                 <div className="overflow-hidden shadow rounded-lg bg-white">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    {["CX ID", "Name", "Phone", "Gender", "Email", "CA Name", "Address", "Remark"].map((heading) => (
-                                        <th key={heading} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            {heading}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {customers.map((cust, index) => (
-                                    <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-4 py-3 whitespace-nowrap">{cust.id}</td>
-                                        <td className="px-4 py-3">{cust.name}</td>
-                                        <td className="px-4 py-3">{cust.phone}</td>
-                                        <td className="px-4 py-3">
-                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${cust.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'}`}>
-                                                {cust.gender === 'F' ? 'Female' : 'Male'}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3">{cust.email || <span className="italic text-gray-400">N/A</span>}</td>
-                                        <td className="px-4 py-3">{cust.username}</td>
-                                        <td className="px-4 py-3 max-w-[10rem] truncate" title={cust.address}>{cust.address}</td>
-                                        <td className="px-4 py-3">
-                                            {cust.remark ? (
-                                                <button
-                                                    onClick={() => openRemarkModal(cust.remark, cust.id)}
-                                                    className="text-blue-600 hover:underline"
-                                                >
-                                                    {role === roles.SALES ? 'Edit' : 'View'}
-                                                </button>
-                                            ) : (
-                                                role === roles.SALES ? <button onClick={() => openRemarkModal('', cust.id)} className="text-blue-600 hover:underline">Add Remark</button> : <span className="italic text-gray-400">No Remark</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    {renderPagination()}
+                    {customers.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                            {debouncedSearchTerm ? 'No customers found matching your search.' : 'No customers found.'}
+                        </div>
+                    ) : (
+                        <>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead className="bg-gray-100">
+                                        <tr>
+                                            {["CX ID", "Name", "Phone", "Gender", "Email", "CA Name", "Address", "Remark"].map((heading) => (
+                                                <th key={heading} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    {heading}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {customers.map((cust, index) => (
+                                            <tr key={index} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-4 py-3 whitespace-nowrap">{cust.id}</td>
+                                                <td className="px-4 py-3">{cust.name}</td>
+                                                <td className="px-4 py-3">{cust.phone}</td>
+                                                <td className="px-4 py-3">
+                                                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${cust.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'}`}>
+                                                        {cust.gender === 'F' ? 'Female' : 'Male'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3">{cust.email || <span className="italic text-gray-400">N/A</span>}</td>
+                                                <td className="px-4 py-3">{cust.username}</td>
+                                                <td className="px-4 py-3 max-w-[10rem] truncate" title={cust.address}>{cust.address}</td>
+                                                <td className="px-4 py-3">
+                                                    {cust.remark ? (
+                                                        <button
+                                                            onClick={() => openRemarkModal(cust.remark, cust.id)}
+                                                            className="text-blue-600 hover:underline"
+                                                        >
+                                                            {role === roles.SALES ? 'Edit' : 'View'}
+                                                        </button>
+                                                    ) : (
+                                                        role === roles.SALES ? <button onClick={() => openRemarkModal('', cust.id)} className="text-blue-600 hover:underline">Add Remark</button> : <span className="italic text-gray-400">No Remark</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {renderPagination()}
+                        </>
+                    )}
                 </div>
             )}
 

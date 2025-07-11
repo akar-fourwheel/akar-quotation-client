@@ -24,9 +24,9 @@ function ReceptionPage() {
     gender: '',
     email: '',
     address: '',
+    exchange: '',
     ca: '',
     model: '',
-    remark:'',
     leadType: getLeadType(), 
     exeName: localStorage.getItem('userId')
   });
@@ -39,6 +39,8 @@ function ReceptionPage() {
   const [isLoading, setIsLoading] = useState(true); 
   const [fetchError, setFetchError] = useState(null); 
   const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
+  const [showExchange, setShowExchange] = useState(true);
+
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -72,6 +74,7 @@ function ReceptionPage() {
     
     if (!formData.name.trim()) newErrors.name = 'Customer name is required.';
     if (!formData.address.trim()) newErrors.address = 'Address is required.';
+    if (showExchange && !formData.exchange.trim()) newErrors.exchange = 'Exchange is required.';
     if (!formData.gender) newErrors.gender = 'Please select a gender.';
     if (!formData.ca) newErrors.ca = 'Please select a CA.'; // Validation for CA
     if (!formData.model) newErrors.model = 'Please select a model.'; // Validation for Model
@@ -106,9 +109,9 @@ function ReceptionPage() {
             gender: '', 
             email: '', 
             address: '', 
+            exchange: '',
             ca: '', 
             model: '',
-            remark:'',
             leadType: getLeadType(), // Reset leadType based on user role
             exeName: localStorage.getItem('userId')
           });
@@ -210,6 +213,54 @@ function ReceptionPage() {
                     <label htmlFor="address" className="block text-gray-700 text-sm font-bold">Address <span className="text-red-500">*</span></label>
                     <textarea id="address" name="address" rows="3" value={formData.address} onChange={handleChange} className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.address ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter customer's full address" required></textarea>
                     {errors.address && <p className="text-red-500 text-xs italic mt-1">{errors.address}</p>}
+                  </div>
+
+                  <div className="md:col-span-2 mb-4">
+                    <div className="mb-2">
+                      <label className="inline-flex items-center cursor-default">
+                        <input
+                          type="checkbox"
+                          id="toggleExchange"
+                          checked={showExchange}
+                          onChange={() => {
+                            setShowExchange((prev) => {
+                              const newState = !prev;
+                              setFormData((data) => ({
+                                ...data,
+                                exchange: newState ? '' : null,
+                              }));
+                              return newState;
+                            });
+                          }}
+                          className="sr-only peer"
+                        />
+                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <span className="ml-3 text-sm font-bold text-gray-700">Customer has Exchange</span>
+                      </label>
+                    </div>
+
+                    {showExchange && (
+                      <>
+                        <label htmlFor="exchange" className="block text-gray-700 text-sm font-bold mt-4">
+                          Exchange <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          id="exchange"
+                          name="exchange"
+                          value={formData.exchange}
+                          onChange={handleChange}
+                          className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.exchange ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Enter exchange"
+                          required
+                        />
+                        {errors.exchange && (
+                          <p className="text-red-500 text-xs italic mt-1">{errors.exchange}</p>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
 
