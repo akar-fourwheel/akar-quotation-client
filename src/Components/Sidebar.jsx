@@ -30,10 +30,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   ];
 
   const testDriveItems = [
-    { to: '/test-drive', label: 'Dashboard' },
-    { to: '/book-test-drive', label: 'Book Drive' },
     { to: '/test-drive-history', label: 'History' },
   ];
+  if (role === roles.GUARD || role === roles.ADMIN) {
+    testDriveItems.unshift({ to: '/test-drive', label: 'Dashboard' });
+  }
+  if(role === roles.SALES) {
+    testDriveItems.push({ to: '/book-test-drive', label: 'Book Drive' });
+  }
 
   const isActivePath = (path) => location.pathname === path;
 
@@ -103,25 +107,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 Home
               </Link>
 
-            <Link
-              to="/customer-list"
-              onClick={toggleSidebar}
-              className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
-                  ${isActivePath('/customer-list')
-                    ? 'bg-gray-700 text-gray-900 dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                  }
-              `}
-              >
-              <ListIcon className={`
-                  h-5 w-5 mr-3 transition-colors
-                  ${isActivePath('/customer-list')
-                              ? 'bg-gray-700 text-gray-900 dark:text-white'
-                              : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
-                            }
-                `} />
-                Customer List
-              </Link>
             </>
             )}
 
@@ -151,55 +136,73 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   {item.label}
                 </Link>
               ))}
-
-              <div className="space-y-1">
-                <button
-                  onClick={() => toggleMenu('testDrive')}
-                  className={`
-                    w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg
-                    transition-all duration-200 group
-                    ${expandedMenu === 'testDrive'
-                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                    }
-                  `}
-                >
-                  <div className="flex items-center">
-                    <CarIcon className="h-5 w-5 mr-3 text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300" />
-                    Test Drive
-                  </div>
-                  <ChevronDownIcon className={`
-                    h-4 w-4 transition-transform duration-200
-                    ${expandedMenu === 'testDrive' ? 'rotate-180' : ''}
-                  `} />
-                </button>
-
-                <div className={`
-                  overflow-hidden transition-all duration-200 ease-in-out
-                  ${expandedMenu === 'testDrive' ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}
-                `}>
-                  <div className="ml-8 space-y-1 py-1">
-                    {testDriveItems.map((item, index) => (
-                      <Link
-                        key={index}
-                        to={item.to}
-                        onClick={toggleSidebar}
-                        className={`
-                          block px-3 py-2 text-sm rounded-lg transition-colors
-                          ${isActivePath(item.to)
-                          ? 'bg-gray-700 text-gray-900 dark:text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                          }
-                        `}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </>
           )}
+          {(role === roles.ADMIN || role === roles.MD || role === roles.SALES || role === roles.RECEPTION) &&  <Link
+              to="/customer-list"
+              onClick={toggleSidebar}
+              className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
+                  ${isActivePath('/customer-list')
+                    ? 'bg-gray-700 text-gray-900 dark:text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  }
+              `}
+              >
+              <ListIcon className={`
+                  h-5 w-5 mr-3 transition-colors
+                  ${isActivePath('/customer-list')
+                              ? 'bg-gray-700 text-gray-900 dark:text-white'
+                              : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                            }
+                `} />
+            Customer List
+          </Link>}
+          {role !== roles.RECEPTION && <div className="space-y-1">
+            <button
+              onClick={() => toggleMenu('testDrive')}
+              className={`
+                w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg
+                transition-all duration-200 group
+                ${expandedMenu === 'testDrive'
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                }
+              `}
+            >
+              <div className="flex items-center">
+                <CarIcon className="h-5 w-5 mr-3 text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300" />
+                Test Drive
+              </div>
+              <ChevronDownIcon className={`
+                h-4 w-4 transition-transform duration-200
+                ${expandedMenu === 'testDrive' ? 'rotate-180' : ''}
+              `} />
+            </button>
+
+            <div className={`
+              overflow-hidden transition-all duration-200 ease-in-out
+              ${expandedMenu === 'testDrive' ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}
+            `}>
+              <div className="ml-8 space-y-1 py-1">
+                {testDriveItems.map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.to}
+                    onClick={toggleSidebar}
+                    className={`
+                      block px-3 py-2 text-sm rounded-lg transition-colors
+                      ${isActivePath(item.to)
+                      ? 'bg-gray-700 text-gray-900 dark:text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                      }
+                    `}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>}
         </nav>
 
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">

@@ -1,32 +1,162 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { roles } from '../Routes/roles';
+import { AuthContext } from '../context/auth/AuthProvider';
+import { useContext } from 'react';
+import { showSuccess } from '../utils/toast';
 
 const ReceptionDashboard = () => {
+    const { role } = useContext(AuthContext);
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedRemark, setSelectedRemark] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: 10
+    });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [id, setId] = useState('');
+    const fetchCustomers = async (page = 1) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`/customer-list?page=${page}&limit=10`);
+            setCustomers(response.data.customers || []);
+            setPagination(response.data.pagination || {});
+            setCurrentPage(page);
+        } catch (err) {
+            console.error("Failed to fetch customers:", err);
+            setCustomers([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        axios.get("/reception/customer-list")
-            .then(res => {
-                setCustomers(res.data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Failed to fetch customers:", err);
-                setLoading(false);
-            });
+        fetchCustomers(1);
     }, []);
 
-    const openRemarkModal = (remark) => {
+    const openRemarkModal = (remark, id) => {
         setSelectedRemark(remark);
+        setId(id);
         setShowModal(true);
+    };
+
+    const handleSaveRemark = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post(`/update-remark`, { id: id, remark: selectedRemark });
+            if(response.status === 200){
+                showSuccess("Remark updated successfully");
+                closeModal();
+                fetchCustomers(currentPage);
+            }
+        } catch (err) {
+            console.error("Failed to update remark:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const closeModal = () => {
         setShowModal(false);
         setSelectedRemark('');
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            fetchCustomers(newPage);
+        }
+    };
+
+    const renderPagination = () => {
+        if (pagination.totalPages <= 1) return null;
+
+        const pages = [];
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+
+        return (
+            <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
+                <div className="flex justify-between flex-1 sm:hidden">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={!pagination.hasPrevPage}
+                        className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={!pagination.hasNextPage}
+                        className="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Next
+                    </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm text-gray-700">
+                            Showing <span className="font-medium">{(currentPage - 1) * pagination.limit + 1}</span> to{' '}
+                            <span className="font-medium">
+                                {Math.min(currentPage * pagination.limit, pagination.totalCount)}
+                            </span>{' '}
+                            of <span className="font-medium">{pagination.totalCount}</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={!pagination.hasPrevPage}
+                                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span className="sr-only">Previous</span>
+                                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                            {pages.map((page) => (
+                                <button
+                                    key={page}
+                                    onClick={() => handlePageChange(page)}
+                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                        page === currentPage
+                                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    {page}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={!pagination.hasNextPage}
+                                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span className="sr-only">Next</span>
+                                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -38,47 +168,50 @@ const ReceptionDashboard = () => {
             {loading ? (
                 <div className="text-center text-gray-600">Loading...</div>
             ) : (
-                <div className="overflow-x-auto shadow rounded-lg bg-white">
-                    <table className="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                {["CX ID", "Name", "Phone", "Gender", "Email", "CA Name", "Address", "Remark"].map((heading) => (
-                                    <th key={heading} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        {heading}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {customers.map((cust, index) => (
-                                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-3 whitespace-nowrap">{cust.id}</td>
-                                    <td className="px-4 py-3">{cust.name}</td>
-                                    <td className="px-4 py-3">{cust.phone}</td>
-                                    <td className="px-4 py-3">
-                                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${cust.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'}`}>
-                                            {cust.gender === 'F' ? 'Female' : 'Male'}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3">{cust.email || <span className="italic text-gray-400">N/A</span>}</td>
-                                    <td className="px-4 py-3">{cust.username}</td>
-                                    <td className="px-4 py-3 max-w-[10rem] truncate" title={cust.address}>{cust.address}</td>
-                                    <td className="px-4 py-3">
-                                        {cust.remark ? (
-                                            <button
-                                                onClick={() => openRemarkModal(cust.remark)}
-                                                className="text-blue-600 hover:underline"
-                                            >
-                                                View
-                                            </button>
-                                        ) : (
-                                            <span className="italic text-gray-400">No Remark</span>
-                                        )}
-                                    </td>
+                <div className="overflow-hidden shadow rounded-lg bg-white">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead className="bg-gray-100">
+                                <tr>
+                                    {["CX ID", "Name", "Phone", "Gender", "Email", "CA Name", "Address", "Remark"].map((heading) => (
+                                        <th key={heading} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            {heading}
+                                        </th>
+                                    ))}
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {customers.map((cust, index) => (
+                                    <tr key={index} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-4 py-3 whitespace-nowrap">{cust.id}</td>
+                                        <td className="px-4 py-3">{cust.name}</td>
+                                        <td className="px-4 py-3">{cust.phone}</td>
+                                        <td className="px-4 py-3">
+                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${cust.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'}`}>
+                                                {cust.gender === 'F' ? 'Female' : 'Male'}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3">{cust.email || <span className="italic text-gray-400">N/A</span>}</td>
+                                        <td className="px-4 py-3">{cust.username}</td>
+                                        <td className="px-4 py-3 max-w-[10rem] truncate" title={cust.address}>{cust.address}</td>
+                                        <td className="px-4 py-3">
+                                            {cust.remark ? (
+                                                <button
+                                                    onClick={() => openRemarkModal(cust.remark, cust.id)}
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    {role === roles.SALES ? 'Edit' : 'View'}
+                                                </button>
+                                            ) : (
+                                                role === roles.SALES ? <button onClick={() => openRemarkModal('', cust.id)} className="text-blue-600 hover:underline">Add Remark</button> : <span className="italic text-gray-400">No Remark</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {renderPagination()}
                 </div>
             )}
 
@@ -91,9 +224,12 @@ const ReceptionDashboard = () => {
                             <button onClick={closeModal} className="text-gray-500 hover:text-gray-800 text-xl">&times;</button>
                         </div>
                         <div className="p-4 text-gray-700">
-                            <p>{selectedRemark}</p>
+                            {role === roles.SALES ? <textarea className="w-full p-2 border border-gray-300 rounded-md" value={selectedRemark} onChange={(e) => setSelectedRemark(e.target.value)} /> : <p>{selectedRemark}</p>}
                         </div>
-                        <div className="p-4 border-t border-gray-200 text-right">
+                        <div className="p-4 border-t border-gray-200 text-right flex justify-end gap-2">
+                            {role === roles.SALES ? <button onClick={handleSaveRemark} disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                {loading ? 'Saving...' : 'Save'}
+                            </button> : null}
                             <button onClick={closeModal} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                 Close
                             </button>
