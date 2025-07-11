@@ -3,27 +3,71 @@ import axios from "axios";
 import AllRecords from "../Components/testDriveComponents/AllRecords";
 
 const TestDriveHistoryPage = () => {
-  const [records, setRecords] = useState(null);
+  const [records, setRecords] = useState([]);
   const [recordsLoading, setRecordsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchAllRecords = useCallback(() => {
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    recordsPerPage: 10,
+    totalRecords: 0,
+    totalPages: 1
+  });
+
+  const [selectedStatus, setSelectedStatus] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchBy, setSearchBy] = useState('model');
+  const [showWorkshopRecords, setShowWorkshopRecords] = useState(false);
+  const [showBreakdownRecords, setShowBreakdownRecords] = useState(false);
+
+  const fetchAllRecords = useCallback((
+    page = pagination.currentPage,
+    limit = pagination.recordsPerPage
+  ) => {
     setRecordsLoading(true);
-    axios.get("/test-drive/records")
-      .then((response) => {
-        setRecords(response.data || []);
+    const queryParams = new URLSearchParams({
+      page,
+      limit,
+      status: selectedStatus,
+      searchBy,
+      searchTerm,
+      workshop: showWorkshopRecords ? 'true' : 'false',
+      breakdown: showBreakdownRecords ? 'true' : 'false'
+    }).toString();
+
+    axios.get(`/test-drive/records?${queryParams}`)
+      .then(response => {
+        setRecords(response.data.data || []);
+        setPagination({
+          currentPage: response.data.page,
+          recordsPerPage: response.data.limit,
+          totalRecords: response.data.totalCount,
+          totalPages: response.data.totalPages
+        });
         setRecordsLoading(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Error fetching records:', error);
         setError(error.message);
         setRecordsLoading(false);
       });
-  }, []);
+  }, [pagination.currentPage, pagination.recordsPerPage, selectedStatus, searchBy, searchTerm, showWorkshopRecords, showBreakdownRecords]);
 
   useEffect(() => {
     fetchAllRecords();
-  }, [fetchAllRecords]);
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    fetchAllRecords(newPage, pagination.recordsPerPage);
+  };
+
+  const handleRecordsPerPageChange = (newPerPage) => {
+    fetchAllRecords(1, newPerPage);
+  };
+
+  const handleFilterChange = () => {
+    fetchAllRecords(1, pagination.recordsPerPage);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 relative">
@@ -35,7 +79,7 @@ const TestDriveHistoryPage = () => {
               All Test Drive Histories
             </h3>
             <button
-              onClick={fetchAllRecords}
+              onClick={() => fetchAllRecords()}
               className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-all"
               title="Refresh all records"
             >
@@ -48,7 +92,23 @@ const TestDriveHistoryPage = () => {
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
               </div>
             ) : (
-              <AllRecords data={records?.data?.filter(record => record.in_km !== 0) || []} />
+              <AllRecords
+                data={records}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onRecordsPerPageChange={handleRecordsPerPageChange}
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                searchBy={searchBy}
+                setSearchBy={setSearchBy}
+                showWorkshopRecords={showWorkshopRecords}
+                setShowWorkshopRecords={setShowWorkshopRecords}
+                showBreakdownRecords={showBreakdownRecords}
+                setShowBreakdownRecords={setShowBreakdownRecords}
+                onFilterChange={handleFilterChange}
+              />
             )}
             {error && (
               <div className="mt-4 bg-red-100 text-red-700 px-4 py-3 rounded shadow">
@@ -63,4 +123,4 @@ const TestDriveHistoryPage = () => {
   );
 };
 
-export default TestDriveHistoryPage; 
+export default TestDriveHistoryPage;
