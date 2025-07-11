@@ -1,4 +1,5 @@
 import React from "react";
+import { CalendarIcon } from "@heroicons/react/24/outline";
 
 const RequestNotificationModal = ({
   show,
@@ -128,8 +129,20 @@ const RequestNotificationModal = ({
                         <p className="text-sm text-gray-600 mt-1">Customer: {req.CX_NAME}</p>
                       )}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {req.date && new Date(req.date).toLocaleDateString()}
+                    <div className=" flex text-xs text-gray-500">
+                      <CalendarIcon className="h-4 w-4 mr-1"/>
+                      <span className="font-bold">
+                        {new Date(req.scheduled_at)
+                          .toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })
+                          .replace(/\//g, '-')}
+                      </span>
                     </div>
                   </div>
 
