@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/auth/AuthProvider';
 import { showSuccess, showError } from "../../utils/toast.js";
 import CancelModal from "../../Components/modals/CancelModal.jsx";
 import BookingInfoModal from "../../Components/modals/BookingInfoModal";
+import VnaListModal from "../../Components/modals/VnaListModal.jsx";
 
 function BookingPage() {
 
@@ -18,6 +19,7 @@ function BookingPage() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [showVnaModal, setShowVnaModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleViewInfo = (id) => {
@@ -36,7 +38,7 @@ function BookingPage() {
       setQuotaData((prev) =>
         prev.map((booking) =>
           booking.Quotation_ID === bookingId
-            ? { ...booking, STAT: "cancelled" }
+            ? { ...booking, STAT: "CANCELLED" }
             : booking
         )
       );
@@ -75,16 +77,24 @@ function BookingPage() {
   }, [role, username]);
 
   const filteredData = quotaData.filter((row) => {
-    if (filterOption === "cancelled") return row.STAT === "cancelled";
-    if (filterOption === "active") return !row.STAT || row.STAT === "";
+    if (filterOption === "cancelled") return row.STAT === "CANCELLED";
+    if (filterOption === "active") return !row.STAT || row.STAT === "CONFIRMED";
+    if (filterOption === "inprogress") return row.STAT === "INPROGRESS";
     return true;
   });
 
   const getStatusBadge = (status) => {
-    if (status === "cancelled") {
+    if (status === "CANCELLED") {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
           Cancelled
+        </span>
+      );
+    }
+    if (status === "INPROGRESS") {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          In Progress
         </span>
       );
     }
@@ -107,7 +117,20 @@ function BookingPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-center text-gray-900">Booking Management</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">Booking Management</h1>
+            {(role === roles.ADMIN || role === roles.MD) && (
+              <button
+                onClick={() => setShowVnaModal(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                View VNA List
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="mb-6">
@@ -115,7 +138,8 @@ function BookingPage() {
             {[
               { value: "all", label: "All Bookings" },
               { value: "active", label: "Active" },
-              { value: "cancelled", label: "Cancelled" }
+              { value: "cancelled", label: "Cancelled" },
+              { value: "inprogress", label: "In Progress" }
             ].map((option) => (
               <button
                 key={option.value}
@@ -232,6 +256,12 @@ function BookingPage() {
           <BookingInfoModal
             bookingId={selectedBookingId}
             onClose={() => setShowInfoModal(false)}
+          />
+        )}
+
+        {showVnaModal && (
+          <VnaListModal
+            onClose={() => setShowVnaModal(false)}
           />
         )}
       </div>
