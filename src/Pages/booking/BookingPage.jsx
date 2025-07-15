@@ -223,7 +223,7 @@ function BookingPage() {
                           >
                             View Details
                           </button>
-                          {!row.STAT && (
+                          { (row.STAT === "CONFIRMED" || row.STAT === "INPROGRESS") && (
                             <button
                               onClick={() => {
                                 setSelectedRow(row);
