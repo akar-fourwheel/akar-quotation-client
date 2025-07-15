@@ -7,7 +7,7 @@ import { AuthContext } from '../context/auth/AuthProvider';
 function AllQuotation() {
     const navigate = useNavigate();
     const [quotaData, setQuotaData] = useState([]);
-    const { role, username } = useContext(AuthContext);
+    const { role, username, userId } = useContext(AuthContext);
     const [currentPage, setCurrentPage] = useState(1);
     const [salesFilter, setSalesFilter] = useState('');
     const [uniqueCas, setUniqueCas] = useState([]);
@@ -191,7 +191,7 @@ function AllQuotation() {
             } else if (role === roles.SALES) {
                 response = await axios.get(`/my-quotation`, {
                     params: {
-                        name: username,
+                        sales_person_id: userId,
                         role,
                         page,
                         limit: 25
@@ -200,7 +200,7 @@ function AllQuotation() {
             } else if (role == roles.TEAML) {
                 response = await axios.get("/teamLead/quotations", {
                     params: {
-                        name: username,
+                        name: userId,
                         role,
                         page,
                         limit: 25,

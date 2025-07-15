@@ -105,7 +105,7 @@ const CustomerDetailsForm = ({
                     {customer[5] && <span className="text-gray-400 truncate hidden lg:inline">{customer[5]}</span>}
                   </div>
                   <div className="ml-2 text-gray-600 text-xs shrink-0">
-                    {customer[6]} {/* Car model */}
+                    {customer[10]} {/* Car model */}
                   </div>
                 </div>
               ))}
