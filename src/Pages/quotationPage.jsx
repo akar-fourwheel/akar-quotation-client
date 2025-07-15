@@ -81,7 +81,7 @@ const QuotationPage = ()=>{
   const name = (customer[1] || '').toLowerCase();
   const phone = (customer[2] || '').toLowerCase();
   const email = (customer[4] || '').toLowerCase();
-  const model = (customer[6] || '').toLowerCase();
+  const model = (customer[10] || '').toLowerCase();
   
   return name.includes(query) || 
          phone.includes(query) || 
@@ -113,7 +113,7 @@ const handleCustomerSelect = (customer) => {
   setGender(customer[3] || ''); // gender
   setEmail(customer[4] || ''); // email
   setAddress(customer[5] || ''); // address
-  setcxAllot(customer[7] || ''); // allotment ID, assuming it's at index 7
+  setcxAllot(customer[11] || ''); // allotment ID, assuming it's at index 7
   // Index 6 is car model which we don't set in the form
 
   // Re-fetch the years to ensure dropdown is populated
@@ -168,7 +168,14 @@ const handleCustomerSelect = (customer) => {
           name: localStorage.userId
         }
       });
-      setCustomerList(response.data);
+      const customerData = response.data
+      if (customerData.success)
+      {
+        setCustomerList(customerData.data);
+      }
+      else {
+        setCustomerList([])
+      }
     } catch (error) {
       console.error('Error fetching customers:', error);
     }
@@ -273,7 +280,7 @@ const dataBasedOnYear = (e) => {
         setCurrModelList(data);
       } else {
         // For existing customers, filter to show only their specific model
-        setCurrModelList(data?.filter((model) => model == selectedCustomer[6]));
+        setCurrModelList(data?.filter((model) => model == selectedCustomer[10]));
       }
     });
 };
@@ -543,7 +550,7 @@ const dataBasedOnYear = (e) => {
     setCurrModelList(getModel);
     }
     else {
-      setCurrModelList(getModel.filter((model) => model == selectedCustomer[6])); // Assuming car model is at index 6
+      setCurrModelList(getModel.filter((model) => model == selectedCustomer[10])); // Assuming car model is at index 10
     }
   }
 

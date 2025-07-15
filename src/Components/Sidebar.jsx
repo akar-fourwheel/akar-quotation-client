@@ -104,9 +104,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                               : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
                             }
                 `} />
-                Home
+                New Customer
               </Link>
-
+              <Link
+                to="/reception/edit"
+                onClick={toggleSidebar}
+                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
+                  ${isActivePath('/reception/edit')
+                    ? 'bg-gray-700 text-gray-900 dark:text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  }
+                `}
+              >
+                <EditIcon className={`
+                  h-5 w-5 mr-3 transition-colors
+                  ${isActivePath('/reception/edit')
+                    ? 'bg-gray-700 text-gray-900 dark:text-white'
+                    : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                  }
+                `} />
+                
+                Update CA/Model
+              </Link>
             </>
             )}
 
@@ -303,5 +322,18 @@ const ChevronDownIcon = (props) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
   </svg>
 );
+
+const EditIcon = (props) => (
+  <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3zM5 19h14"
+    />
+  </svg>
+);
+
+
 
 export default Sidebar;
