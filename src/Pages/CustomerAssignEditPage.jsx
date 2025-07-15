@@ -50,6 +50,13 @@ export default function CustomerAssignEditPage() {
         fetchDropdowns();
     }, []);
 
+    const showStatus = (message, type) => {
+        setStatus({ message, type });
+        setTimeout(() => {
+            setStatus({ message: '', type: '' });
+        }, 7000);
+    };
+
     const fetchDropdowns = async () => {
         try {
             const caRes = await axios.get('/leads/ca-list?query=onlyCA');
@@ -64,15 +71,19 @@ export default function CustomerAssignEditPage() {
             setStatus({ message: 'Please enter a phone number', type: 'error' });
             return;
         }
-
+        if (searchPhone.length !== 10) {
+            setStatus({ message: 'Please enter a valid phone', type: 'error' });
+            return;
+        }
         setLoading(true);
         setCustomer(null);
         setStatus({ message: '', type: '' });
 
         try {
-            const res = await axios.get(`/customer-list?search=${searchPhone}&searchType=customer`);
-            if (res.data.customers.length > 0) {
-                setCustomer(res.data.customers[0]);
+            const res = await axios.get(`/check-customer?phone=${searchPhone}`);
+            const jsonData = res.data.data;
+            if (res.data.success) {
+                setCustomer(jsonData[0]);
                 setStatus({ message: 'Customer found successfully!', type: 'success' });
             } else {
                 setStatus({ message: 'Customer not found', type: 'error' });
@@ -91,17 +102,25 @@ export default function CustomerAssignEditPage() {
         
         setLoading(true);
         try {
-            await axios.post('/create-allot', {
+            const res = await axios.post('/create-allot', {
                 cx_id: customer.id,
                 lead_type: 'reception',
                 exe_name: userId,
                 ca_name: formData.ca_name,
                 model: formData.model
             });
-            setStatus({ message: 'New allotment created successfully!', type: 'success' });
-            setCustomer(null);
-            setFormData({ ca_name: '', model: '' });
-            setSearchPhone('');
+            
+            if(res.data.success){
+                showStatus('New allotment created successfully!', 'success' || res.data.message);
+                setCustomer(null);
+                setFormData({ ca_name: '', model: '' });
+                setSearchPhone('');  
+            }else{
+                showStatus(res.data.message || ('Same allotment already exists.', 'error'));
+                setCustomer(null);
+                setFormData({ ca_name: '', model: '' });
+                setSearchPhone(''); 
+            }           
         } catch (err) {
             setStatus({ message: 'Failed to create allotment.', type: 'error' });
         } finally {
@@ -197,7 +216,7 @@ export default function CustomerAssignEditPage() {
                                     <div className="backdrop-blur-sm bg-white/30 rounded-lg p-4 border border-white/20">
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Current CA</label>
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-blue-800 border border-blue-200/50 backdrop-blur-sm">
-                                            {customer.username}
+                                            {customer.ca_username}
                                         </span>
                                     </div>
                                 </div>
