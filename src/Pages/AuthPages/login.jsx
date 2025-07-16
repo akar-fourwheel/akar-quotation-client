@@ -67,7 +67,7 @@ const Login = () => {
             <p className="text-slate-600 text-sm">Sign in to access your dashboard</p>
           </div>
 
-          <div className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="relative">
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 User ID
@@ -136,8 +136,7 @@ const Login = () => {
             )}
 
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               disabled={isLoading}
               className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-4 focus:ring-blue-500/50 ${isLoading
                   ? 'bg-gradient-to-r from-slate-400 to-slate-500 cursor-not-allowed scale-95'
@@ -160,7 +159,7 @@ const Login = () => {
                 )}
               </div>
             </button>
-          </div>
+          </form>
 
           <div className="mt-8 text-center">
             <p className="text-xs text-slate-500">
