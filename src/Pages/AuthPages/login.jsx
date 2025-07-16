@@ -12,6 +12,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState('');
+  const [showPassword,setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -105,7 +106,7 @@ const Login = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   className={`w-full px-4 py-3 bg-slate-50/50 border-2 rounded-xl text-slate-900 placeholder-slate-400 transition-all duration-300 focus:outline-none focus:bg-white ${focusedField === 'password' || credentials.password
@@ -119,9 +120,37 @@ const Login = () => {
                   onBlur={() => setFocusedField('')}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                  </svg>
+                  <div onClick={() => setShowPassword(!showPassword)} className="cursor-pointer">
+                    {showPassword ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        className="h-5 w-5 text-slate-400"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 3l18 18M17.94 17.94A10.95 
+                           10.95 0 0112 19c-5 0-9.27-3.11-11-7
+                           1.1-2.51 3.02-4.61 5.5-5.73m3-1.12A10.95 
+                           10.95 0 0112 5c5 0 9.27 3.11 
+                           11 7-.57 1.3-1.36 2.48-2.33 3.5M15 
+                           12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 
+          7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
+          4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
