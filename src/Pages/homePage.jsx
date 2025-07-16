@@ -8,25 +8,37 @@ const HomePage = () => {
 
   return (
     <>
+      <style>{`
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE 10+ */
+      scrollbar-width: none; /* Firefox */
+    }
+  `}</style>
       <div
-        className="relative min-h-screen w-full bg-cover bg-center h-100"
+        className="relative min-h-screen w-full bg-cover bg-center h-100 overflow-y-auto no-scrollbar"
         style={{
-          backgroundImage: `url('/bgImage.jpg')` }}
+          backgroundImage: `url('/bgImage.jpg')`,
+          scrollbarWidth:'none',
+          msOverflowStyle:'none'
+        }}
       >
-        <div className="absolute inset-0 backdrop-blur bg-white/30 dark:bg-black/30"></div>
+        <div className="absolute inset-0 backdrop-blur bg-black/30"></div>
 
-        <div className="fixed top-30 right-20 z-5">
+        <div className="fixed top-30 right-11 md:right-15 z-5">
           <button
             onClick={() => setShowOverlay(true)}
             className="relative p-2 rounded-full bg-white hover:bg-gray-100 shadow transition"
           >
-            <BellIcon className="h-8 w-8 text-gray-800" />
+            <BellIcon className="h-6 w-6 text-gray-800" />
             {/* <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white"></span> */}
           </button>
         </div>
         {showOverlay && <NotificationOverlay onClose={() => setShowOverlay(false)} />}
 
-        <div className="relative z-3 flex items-center justify-center h-full px-4 pt-40 sm:pt-0 overflow-y-auto pt-16 pb-32">
+        <div className="relative z-3 flex items-center justify-center h-full px-4 pt-40 sm:pt-0 overflow-y-auto no-scrollbar pt-16 pb-32">
           <div className="backdrop-blur-sm bg-white/10 w-full max-w-5xl rounded-2xl shadow-xl p-6 sm:p-10 text-white">
             <div className="text-center mb-8">
               <img src="./logo.jpg" alt="Logo" className="h-28 mx-auto rounded-md shadow" />
