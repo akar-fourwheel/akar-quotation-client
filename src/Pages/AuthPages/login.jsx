@@ -11,6 +11,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [focusedField, setFocusedField] = useState('');
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,14 +31,12 @@ const Login = () => {
 
     try {
       await login(credentials);
-      // Redirect to the page they tried to visit or role-specific page
+      // Redirect to role-specific page
       let from = location.state?.from?.pathname || '/';
 
       if (localStorage.role === roles.GUARD) {
         from = '/guard/test-drive';
-      } else if (localStorage.role === roles.RECEPTION) {
-        from = '/reception';
-      } else if (localStorage.role === roles.CRE) {
+      } else if (localStorage.role === roles.RECEPTION || localStorage.role === roles.CRE) {
         from = '/reception';
       }
 
@@ -50,83 +49,128 @@ const Login = () => {
   };
 
   return (
-<div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div className="max-w-md w-full space-y-8">
-    <div className="flex flex-col items-center">
-      {/* Logo Image */}
-      <img
-        className="h-40 w-auto"
-        src="/logo.jpg"
-        alt="Logo"
-      />
-      <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Sign in to your account
-      </h2>
-    </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="userId" className="sr-only">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-slate-400/20 to-slate-600/20 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative w-full max-w-md">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-8 transform transition-all duration-300 hover:shadow-3xl">
+          <div className="text-center mb-8">
+            <div className="relative inline-block">
+              <div className="w-[6rem] h-[6rem] flex items-center justify-center mb-4 transform transition-transform duration-300 hover:scale-105">
+                <img src="/logoLogin.png" alt="akarLogo" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+            <p className="text-slate-600 text-sm">Sign in to access your dashboard</p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="relative">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 User ID
               </label>
-              <input
-                id="userId"
-                name="userId"
-                type="text"
-                autoComplete="userId"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="User ID"
-                value={credentials.userId}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="userId"
+                  name="userId"
+                  type="text"
+                  autoComplete="userId"
+                  required
+                  className={`w-full px-4 py-3 bg-slate-50/50 border-2 rounded-xl text-slate-900 placeholder-slate-400 transition-all duration-300 focus:outline-none focus:bg-white ${focusedField === 'userId' || credentials.userId
+                      ? 'border-blue-500'
+                      : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  placeholder="Enter your user ID"
+                  value={credentials.userId}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField('userId')}
+                  onBlur={() => setFocusedField('')}
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
+
+            <div className="relative">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={credentials.password}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                isLoading
-                  ? 'bg-indigo-400 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-              }`}
-            >
-              {isLoading ? (
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className={`w-full px-4 py-3 bg-slate-50/50 border-2 rounded-xl text-slate-900 placeholder-slate-400 transition-all duration-300 focus:outline-none focus:bg-white ${focusedField === 'password' || credentials.password
+                      ? 'border-blue-500'
+                      : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  placeholder="Enter your password"
+                  value={credentials.password}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField('password')}
+                  onBlur={() => setFocusedField('')}
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                   </svg>
-                </span>
-              ) : null}
-              {isLoading ? 'Signing in...' : 'Sign in'}
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3 animate-in slide-in-from-top-5 duration-300">
+                <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span className="text-red-700 text-sm font-medium">{error}</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-4 focus:ring-blue-500/50 ${isLoading
+                  ? 'bg-gradient-to-r from-slate-400 to-slate-500 cursor-not-allowed scale-95'
+                  : 'bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black hover:scale-105 hover:shadow-xl active:scale-95'
+                }`}
+            >
+              <div className="flex items-center justify-center space-x-2">
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                  </>
+                )}
+              </div>
             </button>
           </div>
-        </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-xs text-slate-500">
+              Secure dealership management system
+            </p>
+          </div>
+        </div>
+
+        <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-6 -left-6 w-8 h-8 bg-gradient-to-br from-slate-400 to-purple-600 rounded-full opacity-30 animate-bounce"></div>
       </div>
     </div>
   );
