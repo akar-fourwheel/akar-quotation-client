@@ -52,39 +52,43 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       <div className={`
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-900 
-        border-r border-gray-200 dark:border-gray-700
+        fixed inset-y-0 left-0 z-40 w-72 bg-gray-900 
+        border-r border-gray-700
         transform transition-transform duration-300 ease-in-out
         flex flex-col shadow-xl
       `}>
 
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="relative">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center ring-2 ring-white dark:ring-gray-800">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center ring-2 ring-gray-800">
                 <span className="text-sm font-semibold text-white">
                   {user?.username?.charAt(0).toUpperCase()}
                 </span>
               </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+              <p className="text-sm font-semibold text-white">
                 {user?.username}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 ID: {user?.userId}
               </p>
             </div>
           </div>
           <button
             onClick={toggleSidebar}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
           >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto" 
+        style={{
+          scrollbarWidth:'none',
+          msOverflowStyle:'none'
+        }}>
           {role === roles.RECEPTION && (
             <>
               <Link
@@ -92,16 +96,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 onClick={toggleSidebar}
                 className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
                   ${isActivePath('/reception')
-                              ? 'bg-gray-700 text-gray-900 dark:text-white'
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                              ? 'bg-gray-700 text-white'
+                              : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                             }
                 `}
                         >
                           <HomeIcon className={`
                   h-5 w-5 mr-3 transition-colors
                   ${isActivePath('/reception')
-                              ? 'bg-gray-700 text-gray-900 dark:text-white'
-                              : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                              ? 'bg-gray-700 text-white'
+                              : 'text-gray-400 group-hover:text-gray-300'
                             }
                 `} />
                 New Customer
@@ -111,16 +115,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 onClick={toggleSidebar}
                 className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
                   ${isActivePath('/reception/edit')
-                    ? 'bg-gray-700 text-gray-900 dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }
                 `}
               >
                 <EditIcon className={`
                   h-5 w-5 mr-3 transition-colors
                   ${isActivePath('/reception/edit')
-                    ? 'bg-gray-700 text-gray-900 dark:text-white'
-                    : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-400 group-hover:text-gray-300'
                   }
                 `} />
                 
@@ -140,16 +144,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     flex items-center px-3 py-2.5 text-sm font-medium rounded-lg
                     transition-all duration-200 group
                     ${isActivePath(item.to)
-                      ? 'bg-gray-700 text-gray-900 dark:text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                      ? 'bg-gray-700 text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                     }
                   `}
                 >
                   <item.icon className={`
                     h-5 w-5 mr-3 transition-colors
                     ${isActivePath(item.to)
-                    ? 'bg-gray-700 text-gray-900 dark:text-white'
-                      : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-400 group-hover:text-gray-300'
                     }
                   `} />
                   {item.label}
@@ -162,16 +166,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               onClick={toggleSidebar}
               className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
                   ${isActivePath('/customer-list')
-                    ? 'bg-gray-700 text-gray-900 dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }
               `}
               >
               <ListIcon className={`
                   h-5 w-5 mr-3 transition-colors
                   ${isActivePath('/customer-list')
-                              ? 'bg-gray-700 text-gray-900 dark:text-white'
-                              : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
+                              ? 'bg-gray-700 text-white'
+                              : 'text-gray-400 group-hover:text-gray-300'
                             }
                 `} />
             Customer List
@@ -183,13 +187,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg
                 transition-all duration-200 group
                 ${expandedMenu === 'testDrive'
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-gray-800 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }
               `}
             >
               <div className="flex items-center">
-                <CarIcon className="h-5 w-5 mr-3 text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300" />
+                <CarIcon className="h-5 w-5 mr-3 text-gray-400 group-hover:text-gray-300" />
                 Test Drive
               </div>
               <ChevronDownIcon className={`
@@ -211,8 +215,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     className={`
                       block px-3 py-2 text-sm rounded-lg transition-colors
                       ${isActivePath(item.to)
-                      ? 'bg-gray-700 text-gray-900 dark:text-white'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                      ? 'bg-gray-700 text-white'
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                       }
                     `}
                   >
@@ -224,11 +228,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </div>}
         </nav>
 
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+        <div className="p-4 border-t border-gray-700 space-y-3">
           {(user.role === roles.ADMIN || user.role === roles.MD) && (
             <button
               onClick={() => navigate("/signup")}
-              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-200"
+              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-800 transition-all duration-200"
             >
               <UserPlusIcon className="h-4 w-4 mr-2" />
               Add User
@@ -237,7 +241,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200"
+            className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-all duration-200"
           >
             <LogoutIcon className="h-4 w-4 mr-2" />
             Sign Out

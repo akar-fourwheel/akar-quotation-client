@@ -46,7 +46,6 @@ const Signup = () => {
       // Remove confirmPassword before sending to API
       const { confirmPassword, ...userData } = formData;
       await signup(userData);
-      navigate('/'); // Redirect to home after successful signup
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {
