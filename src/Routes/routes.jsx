@@ -23,7 +23,7 @@ import StockUpdateDashboard from "../Pages/updateStockPage";
 import ReceptionPage from "../Pages/receptionPage";
 import bookTestDrive from "../Pages/bookTestDrive";
 import TestDriveHistoryPage from "../Pages/TestDriveHistoryPage";
-import customerList from "../Pages/customerList";
+import CustomerList from "../Pages/customerList";
 import CustomerAssignEditPage from '../Pages/CustomerAssignEditPage'
 
 export const routes = createBrowserRouter([
@@ -40,7 +40,7 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.ADMIN, roles.RECEPTION]} />,
+        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
@@ -104,10 +104,6 @@ export const routes = createBrowserRouter([
                     {
                         path: '/test-drive-history',
                         Component: TestDriveHistoryPage
-                    },
-                    {
-                        path: '/customer-list',
-                        Component: customerList
                     }
                 ]
             }
@@ -144,6 +140,22 @@ export const routes = createBrowserRouter([
 
                 ]
             },
+        ]
+    },
+    {
+        element: (
+            <ProtectedRoute roles={[roles.RECEPTION, roles.CRE, roles.MD, roles.ADMIN, roles.SALES, roles.TEAML, roles.AUDITOR]} />
+        ),
+        children: [
+            {
+                element: <Layout />,
+                children: [
+                    {
+                        path: '/customer-list',
+                        element: <CustomerList />
+                    }
+                ]
+            }
         ]
     },
 ])

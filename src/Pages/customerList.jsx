@@ -5,7 +5,7 @@ import { AuthContext } from '../context/auth/AuthProvider';
 import { showSuccess } from '../utils/toast';
 import useDebounce from '../hooks/useDebounce';
 
-const ReceptionDashboard = () => {
+const CustomerList = () => {
     const { role } = useContext(AuthContext);
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -335,4 +335,4 @@ const ReceptionDashboard = () => {
     );
 };
 
-export default ReceptionDashboard;
+export default CustomerList;
