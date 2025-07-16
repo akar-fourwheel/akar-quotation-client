@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useContext, useRef } from 'react';
 import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
-import { useContext } from 'react';
 import { showSuccess } from '../utils/toast';
 import useDebounce from '../hooks/useDebounce';
 
@@ -31,25 +30,14 @@ const ReceptionDashboard = () => {
 
     useEffect(() => {
         if (!didMountRef.current) {
-            if (!searchTerm) {
-                fetchCustomers(1);
-            }
             didMountRef.current = true;
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!didMountRef.current) return;
-        // Only fetch if debounced term matches current term
-        if (debouncedSearchTerm !== searchTerm) return;
-        // If search term is empty, fetch all customers
-        if (!debouncedSearchTerm) {
             fetchCustomers(1);
-            setCurrentPage(1);
-            return;
+        } else if (debouncedSearchTerm.trim() !== '') {
+            fetchCustomers(1, debouncedSearchTerm, searchType);
+        } else if (searchType !== 'customer' && searchTerm.trim() === '') {
+            // handles if changing searchType with empty term
+            fetchCustomers(1, '', searchType);
         }
-        fetchCustomers(1, debouncedSearchTerm, searchType);
-        setCurrentPage(1);
     }, [debouncedSearchTerm, searchType]);
 
     const fetchCustomers = async (page = 1, searchTerm = '', searchType = 'customer') => {
@@ -80,7 +68,6 @@ const ReceptionDashboard = () => {
     const handleSearchTypeChange = (e) => {
         setSearchType(e.target.value);
         setSearchTerm(''); // Reset search term when changing type
-        setCurrentPage(1);
     };
 
     const clearSearch = () => {
