@@ -15,7 +15,7 @@ const HomePage = () => {
       >
         <div className="absolute inset-0 backdrop-blur bg-white/30 dark:bg-black/30"></div>
 
-        <div className="fixed top-30 right-20 z-50">
+        <div className="fixed top-30 right-20 z-5">
           <button
             onClick={() => setShowOverlay(true)}
             className="relative p-2 rounded-full bg-white hover:bg-gray-100 shadow transition"
@@ -26,7 +26,7 @@ const HomePage = () => {
         </div>
         {showOverlay && <NotificationOverlay onClose={() => setShowOverlay(false)} />}
 
-        <div className="relative z-10 flex items-center justify-center h-full px-4 pt-40 sm:pt-0 overflow-y-auto pt-16 pb-32">
+        <div className="relative z-3 flex items-center justify-center h-full px-4 pt-40 sm:pt-0 overflow-y-auto pt-16 pb-32">
           <div className="backdrop-blur-sm bg-white/10 w-full max-w-5xl rounded-2xl shadow-xl p-6 sm:p-10 text-white">
             <div className="text-center mb-8">
               <img src="./logo.jpg" alt="Logo" className="h-28 mx-auto rounded-md shadow" />
