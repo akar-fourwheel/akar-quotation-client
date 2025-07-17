@@ -21,7 +21,12 @@ const CustomerDetailsForm = ({
   customerSearchQuery,
   setCustomerSearchQuery,
   filteredCustomers,
-  handleCustomerSelect
+  handleCustomerSelect,
+  setFinalData,
+  setModel,
+  setYear,
+  setFuel,
+  setVariant
 }) => (
   <>
     {/* Toggle for New/Listed Customer */}
@@ -33,7 +38,12 @@ const CustomerDetailsForm = ({
             checked={newCx}
             onChange={(e) => {
               setNewCx(e.target.checked);
-              // Clear form when switching to new customer
+              // Always clear vehicle selection fields
+              setFinalData && setFinalData({});
+              setModel && setModel('');
+              setYear && setYear('');
+              setFuel && setFuel('');
+              setVariant && setVariant('');
               if (e.target.checked) {
                 setNewAllot && setNewAllot(true);
                 setSelectedCustomer && setSelectedCustomer(null);

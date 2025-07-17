@@ -716,6 +716,11 @@ onChange={(e) => {
       setCustomerSearchQuery={setCustomerSearchQuery}
       filteredCustomers={filteredCustomers}
       handleCustomerSelect={handleCustomerSelect}
+      setFinalData={setFinalData}
+      setModel={setModel}
+      setYear={setYear}
+      setFuel={setFuel}
+      setVariant={setVariant}
     />
 
         <input
