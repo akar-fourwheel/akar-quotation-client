@@ -105,7 +105,6 @@ const handleCustomerSelect = (customer) => {
   
   // Reset discounts and other dependent fields
   restState(0, '', 0);
-  
   // Fill form data (excluding car model which is at index 6)
   setCxId(customer[0]); // customer ID
   setName(customer[1] || ''); // customer name
@@ -113,7 +112,7 @@ const handleCustomerSelect = (customer) => {
   setGender(customer[3] || ''); // gender
   setEmail(customer[4] || ''); // email
   setAddress(customer[5] || ''); // address
-  setcxAllot(customer[11] || ''); // allotment ID, assuming it's at index 7
+  setcxAllot(customer[11] || ''); // allotment ID, assuming it's at index 11
   // Index 6 is car model which we don't set in the form
 
   // Re-fetch the years to ensure dropdown is populated
@@ -181,82 +180,139 @@ const handleCustomerSelect = (customer) => {
     }
   };
 
-  // Handle form submit
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    let customerId=null;
-    
-    if (newCx === true) {
+  const validateVehicleSelection = () => {
+    let valid = true;
+    let errors = {};
+    if (!year) { errors.year = true; valid = false; }
+    if (!model) { errors.model = true; valid = false; }
+    if (!fuel) { errors.fuel = true; valid = false; }
+    if (!variant) { errors.variant = true; valid = false; }
+    setErrors(prev => ({ ...prev, ...errors }));
+    return valid;
+  };
 
+  const createNewAllotment = async (cxIxd) => {
+    const cxAll = {
+      cx_id: cxIxd,
+      lead_type: 'outside',
+      exe_name: 'self',
+      ca_name: localStorage.userId,
+      model,
+    };
+    try {
+      const response = await axios.post(`/create-allot`, cxAll);
+      if (response.data.success) {
+        setcxAllot(response.data.insertedId);
+        return { success: true, insertedId: response.data.insertedId };
+      }
+      else if (response.data.message == "Same allotment already exists. Change model/CA") {
+        setcxAllot(response.data.existingAllotId);
+        return { success: true, insertedId: response.data.existingAllotId };
+      }
+      else {
+        showError(response.data.message || 'Failed to create allotment.');
+        return { success: false, message: response.data.message };
+      }
+    } catch (e) {
+      console.log(e);
+      showError('Failed to create allotment. Please try again.');
+      return { success: false, message: 'Failed to create allotment.' };
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
+    if (!validateForm()) {
+      showError('Please check customer details.');
+      setLoading(false);
+      return;
+    }
+
+    if (!validateVehicleSelection()) {
+      showError('Please select all vehicle details.');
+      setLoading(false);
+      return;
+    }
+
+    let customerId = null;
+    let allotmentResult = { success: true };
+
+    if (newCx === true) {
       const cxData = {
         name: name.toUpperCase(),
         gender,
         mobile: phoneNo,
         email: email || null,
         address: address
-      }
-
+      };
       try {
-        const response = await axios.post(`/create-cx`, cxData)
-        customerId= response.data.insertedId;
-        setCxId(customerId);
-
-        if(!response.data.success){
-          showError(response.data.message);
+        if (customerList.some(c => c[2] === phoneNo)) {
+          showError('Mobile number is already registered.');
+          setLoading(false);
           return;
         }
+
+        const response = await axios.post(`/create-cx`, cxData);
+        if (!response.data.success) {
+          showError(response.data.message || 'Failed to create new customer.');
+          setLoading(false);
+          return;
+        }
+        customerId = response.data.insertedId;
+        setCxId(customerId);
       } catch (e) {
         console.log(e);
-        showError("Failed to create new customer. Please try again.");
+        showError('Failed to create new customer. Please try again.');
+        setLoading(false);
+        return;
       }
     }
 
     if (customerId || newAllot) {
-      if(customerId) createNewAllotment(customerId);
-      else createNewAllotment(cxId);
+      const idToAllot = customerId || cxId;
+      allotmentResult = await createNewAllotment(idToAllot);
+      if (!allotmentResult.success) {
+        setLoading(false);
+        return;
+      }
     }
 
-    axios.get(`/quotation-data`, {
-      params: {
-        year: year,
-        model: model,
-        fuel: fuel,
-        variant: variant
-      },
-    })
-      .then((response) => {
-        const data = response.data[0]
-        const data1 = response.data[1]
-        const data2 = response.data[2]
-        setColor(data2);
-        setAccessories(data1)
-        setFinalData(data);
-        restState(data.Insurance, data.YEAR, data.AddDiscLim);
-        showSuccess("Quotation data fetched!");
-      })
-      .catch((error) => {
-        console.error('Error fetching quotation data:', error);
-        showError("Failed to load vehicle data. Please check your selection.");
+    if (newCx && newAllot) {
+      setNewCx(false);
+      fetchCustomers();
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/quotation-data`, {
+        params: {
+          year: year,
+          model: model,
+          fuel: fuel,
+          variant: variant
+        },
       });
+      const data = response.data[0];
+      const data1 = response.data[1];
+      const data2 = response.data[2];
+      setColor(data2);
+      setAccessories(data1);
+      setFinalData(data);
+      restState(data.Insurance, data.YEAR, data.AddDiscLim);
+      showSuccess('Quotation data fetched!');
+    } catch (error) {
+      console.error('Error fetching quotation data:', error);
+      showError('Failed to load vehicle data. Please check your selection.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const createNewAllotment = async(cxIxd) => {
-      const cxAll = {
-        cx_id: cxIxd,
-        lead_type: 'outside',
-        exe_name: 'self',
-        ca_name : localStorage.userId,
-        model,
-      }
-        try {
-          const response = await axios.post(`/create-allot`, cxAll)
-          setcxAllot(response.data.insertedId);
-        } catch (e) {
-          console.log(e);
-        }
-  }
-
-const dataBasedOnYear = (e) => {
+  const dataBasedOnYear = (e) => {
   const selectedYear = e.target.value;
   setYear(selectedYear);
   
@@ -506,25 +562,30 @@ const dataBasedOnYear = (e) => {
       phoneNo: false,
       email: false,
       selectedSalesPerson: false,
-      addDisc: false
+      addDisc: false,
+      gender: false
     };
 
     if (!name.trim() || !/^[A-Za-z\s]+$/.test(name)) {
       validationErrors.name = true;
       isValid = false;
     }
-    if (!address.trim()) {
-      validationErrors.address = true;
+    if (gender == null || gender == undefined || gender == 'null') {
+      validationErrors.gender = true;
       isValid = false;
     }
+    // if (!address.trim()) {
+    //   validationErrors.address = true;
+    //   isValid = false;
+    // }
     if (!phoneNo.trim() || !/^[6789]\d{9}$/.test(phoneNo)) {
       validationErrors.phoneNo = true;
       isValid = false;
     }
-    if (email && email.trim() && !/\S+@\S+\.\S+/.test(email)) {
-      validationErrors.email = true;
-      isValid = false;
-    }
+    // if (email && email.trim() && !/\S+@\S+\.\S+/.test(email)) {
+    //   validationErrors.email = true;
+    //   isValid = false;
+    // }
     if (!selectedSalesPerson) {
       validationErrors.selectedSalesPerson = true;
       isValid = false;
@@ -665,6 +726,7 @@ onChange={(e) => {
 
   <form onSubmit={handleSubmit} className="space-y-4">
     <VehicleSelector 
+      year={year}
       getYear={getYear}
       dataBasedOnYear={dataBasedOnYear}
       currModelList= {currModelList}

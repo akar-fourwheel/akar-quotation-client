@@ -83,7 +83,7 @@ const CustomerDetailsForm = ({
                   className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 truncate transition-colors ${
                     selectedCustomer &&
                     selectedCustomer[0] === customer[0] &&
-                    selectedCustomer[6] === customer[6]
+                    selectedCustomer[11] === customer[11]
                       ? 'bg-gray-100 border-l-2 border-blue-500'
                       : ''
                   }`}
