@@ -21,7 +21,12 @@ const CustomerDetailsForm = ({
   customerSearchQuery,
   setCustomerSearchQuery,
   filteredCustomers,
-  handleCustomerSelect
+  handleCustomerSelect,
+  setFinalData,
+  setModel,
+  setYear,
+  setFuel,
+  setVariant
 }) => (
   <>
     {/* Toggle for New/Listed Customer */}
@@ -33,7 +38,12 @@ const CustomerDetailsForm = ({
             checked={newCx}
             onChange={(e) => {
               setNewCx(e.target.checked);
-              // Clear form when switching to new customer
+              // Always clear vehicle selection fields
+              setFinalData && setFinalData({});
+              setModel && setModel('');
+              setYear && setYear('');
+              setFuel && setFuel('');
+              setVariant && setVariant('');
               if (e.target.checked) {
                 setNewAllot && setNewAllot(true);
                 setSelectedCustomer && setSelectedCustomer(null);
@@ -83,7 +93,7 @@ const CustomerDetailsForm = ({
                   className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 truncate transition-colors ${
                     selectedCustomer &&
                     selectedCustomer[0] === customer[0] &&
-                    selectedCustomer[6] === customer[6]
+                    selectedCustomer[11] === customer[11]
                       ? 'bg-gray-100 border-l-2 border-blue-500'
                       : ''
                   }`}

@@ -1,6 +1,7 @@
 import React from "react";
 
 const VehicleSelector = ({
+  year,
   getYear, dataBasedOnYear,
   currModelList, dataBasedOnYearAndModel,
   getFuel, dataBasedOnYearModelAndFuel,
@@ -11,6 +12,7 @@ const VehicleSelector = ({
       <label className="block text-lg">Year:</label>
       <select
         name="selectedYear"
+        value={year}
         onChange={dataBasedOnYear}
         className="w-full p-2 border border-gray-300 rounded-lg"
       >
