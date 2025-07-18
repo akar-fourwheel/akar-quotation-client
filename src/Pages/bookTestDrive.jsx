@@ -181,7 +181,7 @@ export default function BookTestDrivePage() {
                                             className={`w-full px-4 py-3 border rounded-lg ${errors.cxID ? "border-red-500" : "border-gray-300"} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
                                         >
                                             <option value="">Select a customer</option>
-                                            {customerList.map((c, idx) => (
+                                            {customerList.length > 0 && customerList.map((c, idx) => (
                                                 <option key={`${c[0]}-${idx}`} value={c[0]}>
                                                     {c[1]}
                                                 </option>

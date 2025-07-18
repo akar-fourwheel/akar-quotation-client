@@ -162,7 +162,7 @@ function AllQuotation() {
                     }
                 })
             }
-            setUniqueCas(cas.data);
+            setUniqueCas(cas.data || []);
         } catch (e) {
             console.log("Error fetching CA data:", e);
         }
@@ -219,7 +219,7 @@ function AllQuotation() {
 
     useEffect(() => {
         fetchQuotations(currentPage);
-        fetchCas();
+        (role === roles.ADMIN || role === roles.MD) && fetchCas();
     }, [currentPage, role, salesFilter, modalData]);
 
     const handlePageChange = (pageNumber) => {
