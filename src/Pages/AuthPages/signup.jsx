@@ -17,26 +17,26 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const [showCredentialModal, setShowCredentialModal] = useState(false);
+  const [status,setStatus] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setStatus({message:'',type:''});
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setStatus({message:'Passwords do not match' , type:'error'});
       return;
     }
 
     // Validate required fields
     if (!formData.userId || !formData.username || !formData.role || !formData.password) {
-      setError('Please fill in all required fields');
+      setStatus({message:'Please fill in all required fields' , type:'error'});
       return;
     }
     
@@ -45,9 +45,12 @@ const Signup = () => {
     try {
       // Remove confirmPassword before sending to API
       const { confirmPassword, ...userData } = formData;
-      await signup(userData);
+      const response = await signup(userData);
+
+      const msg = response?.data?.message || 'User account created successfully';
+      setStatus({message:msg , type:'success'});
     } catch (err) {
-      setError(err.message || 'Signup failed. Please try again.');
+      setStatus({message:err.response?.data?.message || 'Signup failed. Please try again.', type:'error'});
     } finally {
       setIsLoading(false);
     }
@@ -81,13 +84,48 @@ const Signup = () => {
       .catch(e => console.log(e));
   }, []);
 
+  useEffect(() => {
+    if (status.message) {
+      const timer = setTimeout(() => {
+      setStatus({ message: '', type: '' });
+    }, 4000);
+
+    if(status.type === 'success'){
+      setFormData({
+        userId: '',
+        username: '',
+        role: '',
+        password: '',
+        confirmPassword: '',
+      });
+      setSelectedUser(null);
+    }
+      
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
           {/* Header */}
           <div className="px-4 sm:px-6 pt-6 pb-4 text-center bg-blue-600 text-white">
-            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
+            <div className="flex justify-start">
+              <button onClick={()=>navigate("/")} className="flex items-center gap-1 hover:bg-white/10 rounded-xl pr-4 py-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-5 h-5 pt-1"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+              Back</button>
+            </div>
+            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-white/10 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
               <img
                 className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover"
                 src="/logo.jpg"
@@ -98,6 +136,25 @@ const Signup = () => {
               Create Account
             </h1>
           </div>
+
+          {/*Message status*/}
+          {status.message && (
+            <div className={`border rounded-lg p-4 mb-2 transition-all duration-300 ${status.type === 'success'
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-red-50 border-red-200 text-red-800'
+              }`}>
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  {status.type === 'success' ? (
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5l-3-3 1.414-1.414L9 10.172l4.586-4.586L15 7l-6 6z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0-8a1 1 0 00-1 1v4a1 1 0 102 0V7a1 1 0 00-1-1z" clipRule="evenodd" />
+                  )}
+                </svg>
+                <p className="text-sm font-medium">{status.message}</p>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <div className="px-4 sm:px-6 py-6">
@@ -269,24 +326,6 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Error Message */}
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 transform transition-all duration-300 ease-in-out">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">
-                        {error}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Action Buttons */}
               <div className="space-y-3">
                 <button
@@ -322,7 +361,7 @@ const Signup = () => {
                     if (selectedUser) {
                       setShowCredentialModal(true);
                     } else {
-                      setError('Please select a user first');
+                      setStatus('Please select a user first');
                     }
                   }}
                   className="w-full flex justify-center py-2.5 sm:py-3 px-4 border border-blue-300 rounded-lg text-sm font-semibold text-blue-700 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
