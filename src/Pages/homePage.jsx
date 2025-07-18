@@ -127,7 +127,7 @@ const HomePage = () => {
               </div>
             </div>
           </div>   
-          <footer className="relative z-10 text-center font-sans text-grey-300 text-md opacity-90 py-4 mt-24 sm:mt-16 rounded-b-xl">        
+          <footer className="relative z-10 text-center font-sans text-gray-300 text-md opacity-90 py-4 mt-24 sm:mt-16 rounded-b-xl">        
             Akar Autologix - Driven by Excellence
           </footer>
         </div>
