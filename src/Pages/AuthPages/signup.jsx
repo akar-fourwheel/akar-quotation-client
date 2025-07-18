@@ -22,35 +22,34 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const [showCredentialModal, setShowCredentialModal] = useState(false);
-  const [status,setStatus] = useState('');
+  const [status, setStatus] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({message:'',type:''});
+    setStatus({ message : '', type : '' });
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setStatus({message:'Passwords do not match' , type:'error'});
+      setStatus({message : 'Passwords do not match', type : 'error'});
       return;
     }
 
     // Validate required fields
     if (!formData.userId || !formData.username || !formData.role || !formData.password) {
-      setStatus({message:'Please fill in all required fields' , type:'error'});
+      setStatus({ message : 'Please fill in all required fields', type : 'error'});
       return;
     }
     
     setIsLoading(true);
 
     try {
-      // Remove confirmPassword before sending to API
       const { confirmPassword, ...userData } = formData;
       const response = await signup(userData);
 
       const msg = response?.data?.message || 'User account created successfully';
-      setStatus({message:msg , type:'success'});
+      setStatus({ message : msg , type : 'success' });
     } catch (err) {
-      setStatus({message:err.response?.data?.message || 'Signup failed. Please try again.', type:'error'});
+      setStatus({ message : err.response?.data?.message || 'Signup failed. Please try again.', type : 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +89,7 @@ const Signup = () => {
       setStatus({ message: '', type: '' });
     }, 4000);
 
-    if(status.type === 'success'){
+    if(status.type === 'success') {
       setFormData({
         userId: '',
         username: '',
@@ -112,7 +111,7 @@ const Signup = () => {
           {/* Header */}
           <div className="px-4 sm:px-6 pt-6 pb-4 text-center bg-blue-600 text-white">
             <div className="flex justify-start">
-              <button onClick={()=>navigate("/")} className="flex items-center gap-1 hover:bg-white/10 rounded-xl pr-4 py-2">
+              <button onClick={() => navigate("/")} className="flex items-center gap-1 hover:bg-white/10 rounded-xl pr-4 py-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -158,7 +157,7 @@ const Signup = () => {
 
           {/* Form */}
           <div className="px-4 sm:px-6 py-6">
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-4" onSubmit = {handleSubmit}>
               {/* User Selection */}
               <div className="space-y-4">
                 <div>
