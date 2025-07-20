@@ -683,7 +683,7 @@ const handleCustomerSelect = (customer) => {
 
   return (
     <div className="m-auto w-full max-w-4xl p-4">
-  <h2 className="text-2xl font-semibold text-center mb-6">Test form for Quotation</h2>
+  <h2 className="text-2xl font-semibold text-center mb-6">Quotation Form</h2>
 
   {/* <div className="mb-6 flex items-center space-x-3">
   <label className="flex items-center cursor-pointer">
