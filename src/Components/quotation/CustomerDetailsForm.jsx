@@ -88,34 +88,34 @@ const CustomerDetailsForm = ({
             <div className="divide-y divide-gray-100">
               {filteredCustomers.map((customer, index) => (
                 <div
-                  key={`${customer[0]}-${customer[6]}-${index}`}
+                  key={`${customer.id}-${customer.model}-${index}`}
                   onClick={() => handleCustomerSelect(customer)}
                   className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 truncate transition-colors ${
                     selectedCustomer &&
-                    selectedCustomer[0] === customer[0] &&
-                    selectedCustomer[11] === customer[11]
+                    selectedCustomer.id === customer.id &&
+                    selectedCustomer.allotment_id === customer.allotment_id
                       ? 'bg-gray-100 border-l-2 border-blue-500'
                       : ''
                   }`}
                 >
                   <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
-                    <span className="font-medium text-gray-800 truncate">{customer[1]}</span>
-                    <span className="text-gray-500 text-xs shrink-0">ID: {customer[0]}</span>
-                    {customer[2] && <span className="text-gray-500 truncate hidden md:inline">{customer[2]}</span>}
-                    {customer[3] && (
+                    <span className="font-medium text-gray-800 truncate">{customer.name}</span>
+                    <span className="text-gray-500 text-xs shrink-0">ID: {customer.id}</span>
+                    {customer.phone && <span className="text-gray-500 truncate hidden md:inline">{customer.phone}</span>}
+                    {customer.gender && (
                       <span className="text-gray-500 text-xs hidden md:inline">
-                        {customer[3] === 'M'
+                        {customer.gender === 'M'
                           ? 'M'
-                          : customer[3] === 'F'
+                          : customer.gender === 'F'
                           ? 'F'
                           : 'O'}
                       </span>
                     )}
-                    {customer[4] && <span className="text-gray-500 truncate hidden lg:inline">{customer[4]}</span>}
-                    {customer[5] && <span className="text-gray-400 truncate hidden lg:inline">{customer[5]}</span>}
+                    {customer.email && <span className="text-gray-500 truncate hidden lg:inline">{customer.email}</span>}
+                    {customer.address && <span className="text-gray-400 truncate hidden lg:inline">{customer.address}</span>}
                   </div>
                   <div className="ml-2 text-gray-600 text-xs shrink-0">
-                    {customer[10]} {/* Car model */}
+                    {customer.model} {/* Car model */}
                   </div>
                 </div>
               ))}
@@ -133,8 +133,8 @@ const CustomerDetailsForm = ({
           <div className="bg-green-50 border border-green-200 rounded-lg text-sm p-3">
             <div className="flex items-center justify-between">
               <span className="text-gray-800">
-                <span className="font-medium text-green-700">Selected Customer : {selectedCustomer[1]}</span> — {selectedCustomer[6]}
-                {selectedCustomer[2] && ` | ${selectedCustomer[2]}`}
+                <span className="font-medium text-green-700">Selected Customer : {selectedCustomer.name}</span> — {selectedCustomer.model}
+                {selectedCustomer.phone && ` | ${selectedCustomer.phone}`}
               </span>
               <button
                 type="button"
