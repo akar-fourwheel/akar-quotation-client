@@ -78,10 +78,10 @@ const QuotationPage = ()=>{
   if (!customerSearchQuery) return true;
   
   const query = customerSearchQuery.toLowerCase();
-  const name = (customer[1] || '').toLowerCase();
-  const phone = (customer[2] || '').toLowerCase();
-  const email = (customer[4] || '').toLowerCase();
-  const model = (customer[10] || '').toLowerCase();
+  const name = (customer.name || '').toLowerCase();
+  const phone = (customer.phone || '').toLowerCase();
+  const email = (customer.email || '').toLowerCase();
+  const model = (customer.model || '').toLowerCase();
   
   return name.includes(query) || 
          phone.includes(query) || 
@@ -91,9 +91,8 @@ const QuotationPage = ()=>{
 
 const handleCustomerSelect = (customer) => {
   setSelectedCustomer(customer);
-  setNewAllot(false); // Reset new allotment state when a customer is selected
+  setNewAllot(false);
   
-  // Reset all form fields
   setYear('');
   setModel('');
   setFuel('');
@@ -103,23 +102,23 @@ const handleCustomerSelect = (customer) => {
   setGetVariant([]);
   setFinalData({});
   
-  // Reset discounts and other dependent fields
   restState(0, '', 0);
-  // Fill form data (excluding car model which is at index 6)
-  setCxId(customer[0]); // customer ID
-  setName(customer[1] || ''); // customer name
-  setPhoneNo(customer[2] || ''); // phone number
-  setGender(customer[3] || ''); // gender
-  setEmail(customer[4] || ''); // email
-  setAddress(customer[5] || ''); // address
-  setcxAllot(customer[11] || ''); // allotment ID, assuming it's at index 11
-  // Index 6 is car model which we don't set in the form
 
-  // Re-fetch the years to ensure dropdown is populated
+  setCxId(customer.id);
+  setName(customer.name || '');
+  setPhoneNo(customer.phone || '');
+  setGender(customer.gender || '');
+  setEmail(customer.email || '');
+  setAddress(customer.address || '');
+  setcxAllot(customer.allotment_id || '');
+
   axios.get(`/quotation`)
     .then((response) => {
-      const fetchedYears = response.data.flat();
-      setGetYear(fetchedYears);
+      if (response.data.success) {
+        setGetYear(response.data.data);
+      } else {
+        setGetYear([]);
+      }
     })
     .catch((error) => {
       console.error('Error fetching years:', error);
@@ -177,6 +176,7 @@ const handleCustomerSelect = (customer) => {
       }
     } catch (error) {
       console.error('Error fetching customers:', error);
+      setCustomerList([]);
     }
   };
 
@@ -296,14 +296,17 @@ const handleCustomerSelect = (customer) => {
           variant: variant
         },
       });
-      const data = response.data[0];
-      const data1 = response.data[1];
-      const data2 = response.data[2];
-      setColor(data2);
-      setAccessories(data1);
-      setFinalData(data);
-      restState(data.Insurance, data.YEAR, data.AddDiscLim);
-      showSuccess('Quotation data fetched!');
+      
+      if (response.data.success) {
+        const { vehicleData, accessories, colors } = response.data.data;
+        setColor(colors);
+        setAccessories(accessories);
+        setFinalData(vehicleData);
+        restState(vehicleData.Insurance, vehicleData.YEAR, vehicleData.AddDiscLim);
+        showSuccess('Quotation data fetched!');
+      } else {
+        showError(response.data.message || 'Failed to load vehicle data.');
+      }
     } catch (error) {
       console.error('Error fetching quotation data:', error);
       showError('Failed to load vehicle data. Please check your selection.');
@@ -319,34 +322,40 @@ const handleCustomerSelect = (customer) => {
   setCurrModelList([]);
   setModel('');
   setFuel('')
-  setGetFuel([]); // Clear fuel options when the year is changed
+  setGetFuel([]);
   setVariant('');
   setGetVariant([]);
 
-  // Fetch models based on selected year
   axios
     .get(`/quotation-data`, {
       params: { year: selectedYear },
     })
     .then((response) => {
-      const data = response.data.flat();
-      setGetModel(data); // Assuming models are returned based on year
-      // If it's a new customer OR adding new car (newAllot is true), show all models
-      if (newCx || newAllot) {
-        setCurrModelList(data);
+      if (response.data.success) {
+        const data = response.data.data;
+        setGetModel(data);
+        if (newCx || newAllot) {
+          setCurrModelList(data);
+        } else {
+          setCurrModelList(data?.filter((model) => model == selectedCustomer?.model));
+        }
       } else {
-        // For existing customers, filter to show only their specific model
-        setCurrModelList(data?.filter((model) => model == selectedCustomer[10]));
+        setGetModel([]);
+        setCurrModelList([]);
       }
+    })
+    .catch((error) => {
+      console.error('Error fetching models:', error);
+      setGetModel([]);
+      setCurrModelList([]);
     });
 };
 
-  // Fetch fuel based on year and model
   const dataBasedOnYearAndModel = (e) => {
     const selectedModel = e.target.value;
     setModel(selectedModel);
     setFuel('')
-    setGetFuel([]); // Clear fuel options when the year is changed
+    setGetFuel([]);
     setVariant('');
     setGetVariant([]);
 
@@ -358,17 +367,22 @@ const handleCustomerSelect = (customer) => {
         },
       })
       .then((response) => {
-        if (response.data == "data not found") return;
-        const data = response.data.flat();
-        setGetFuel(data); // Assuming fuel types are returned based on year and model
+        if (response.data.success) {
+          const data = response.data.data;
+          setGetFuel(data);
+        } else {
+          setGetFuel([]);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching fuels:', error);
+        setGetFuel([]);
       });
   };
 
-  // Fetch variant based on year, model and fuel
   const dataBasedOnYearModelAndFuel = (e) => {
     const selectedFuel = e.target.value;
     setFuel(selectedFuel);
-
 
     axios
       .get(`/quotation-data`, {
@@ -379,9 +393,16 @@ const handleCustomerSelect = (customer) => {
         },
       })
       .then((response) => {
-        if (response.data === "data not found") return;
-        const data = response.data.flat();
-        setGetVariant(data); // Correctly updating variants
+        if (response.data.success) {
+          const data = response.data.data;
+          setGetVariant(data);
+        } else {
+          setGetVariant([]);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching variants:', error);
+        setGetVariant([]);
       });
   };
 
@@ -402,18 +423,19 @@ const handleCustomerSelect = (customer) => {
     return opts;
   }, [finalData, isManagerRole]);  
 
-  // Fetch data when the year or model or fuel is selected
-
   useEffect(() => {
-    // Fetch years initially
     axios
       .get(`/quotation`)
       .then((response) => {
-        const fetchedYears = response.data.flat();
-        setGetYear(fetchedYears);
+        if (response.data.success) {
+          setGetYear(response.data.data);
+        } else {
+          setGetYear([]);
+        }
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        setGetYear([]);
       });
   }, []);
 
@@ -442,7 +464,6 @@ const handleCustomerSelect = (customer) => {
   setAccTotal(newAccTotal);
 }, [selectedAcc]);
 
-  // Fetch customers when component mounts and when toggle changes
   useEffect(() => {
     if (!newCx) {
       fetchCustomers();
@@ -611,7 +632,7 @@ const handleCustomerSelect = (customer) => {
     setCurrModelList(getModel);
     }
     else {
-      setCurrModelList(getModel.filter((model) => model == selectedCustomer[10])); // Assuming car model is at index 10
+      setCurrModelList(getModel.filter((model) => model == selectedCustomer?.model));
     }
   }
 

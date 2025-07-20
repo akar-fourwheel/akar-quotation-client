@@ -37,8 +37,11 @@ const PriceList = () => {
         axios
             .get(`/quotation`)
             .then((response) => {
-                const fetchedYears = response.data.flat();
-                setGetYear(fetchedYears);
+                if (response.data.success) {
+                    setGetYear(response.data.data);
+                  } else {
+                    setGetYear([]);
+                  }
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -56,7 +59,11 @@ const PriceList = () => {
         axios.get(`/quotation-data`, {
             params: { year: selectedYear },
         }).then((response) => {
-            setGetModel(response.data.flat());
+            if (response.data.success) {
+                setGetModel(response.data.data);
+              } else {
+                setGetModel([]);
+              }
         });
     };
 
@@ -70,7 +77,11 @@ const PriceList = () => {
             params: { year, model: selectedModel },
         }).then((response) => {
             if (response.data !== "data not found") {
-                setGetFuel(response.data.flat());
+                if (response.data.success) {
+                    setGetFuel(response.data.data);
+                  } else {
+                    setGetFuel([]);
+                  }
             }
         });
     };

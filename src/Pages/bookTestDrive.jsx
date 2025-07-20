@@ -182,8 +182,8 @@ export default function BookTestDrivePage() {
                                         >
                                             <option value="">Select a customer</option>
                                             {customerList.length > 0 && customerList.map((c, idx) => (
-                                                <option key={`${c[0]}-${idx}`} value={c[0]}>
-                                                    {c[1]}
+                                                <option key={`${c.id}-${idx}`} value={c.id}>
+                                                    {c.name}
                                                 </option>
                                             ))}
                                         </select>
