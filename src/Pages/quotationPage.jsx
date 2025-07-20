@@ -71,7 +71,7 @@ const QuotationPage = ()=>{
     email: false,
     selectedSalesPerson: false,
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const  navigate = useNavigate();
 
   const filteredCustomers = customerList?.filter(customer => {
