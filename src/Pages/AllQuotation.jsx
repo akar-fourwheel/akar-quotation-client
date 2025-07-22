@@ -3,15 +3,16 @@ import { Link, useNavigate } from 'react-router';
 import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
+import useDebounce from '../hooks/useDebounce'; 
 
 function AllQuotation() {
     const navigate = useNavigate();
     const [quotaData, setQuotaData] = useState([]);
     const { role, username, userId } = useContext(AuthContext);
     const [currentPage, setCurrentPage] = useState(1);
-    const [salesFilter, setSalesFilter] = useState('');
     const [uniqueCas, setUniqueCas] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
+    const [expandedRow, setExpandedRow] = useState(null);
     const [modalData, setModalData] = useState({ show: false, success: false, message: '', model: '' });
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -26,10 +27,16 @@ function AllQuotation() {
         status: null,
         remark: null,
         row: null,
-      });
+    });
+
+    //filter section
+    const [searchTerm, setSearchTerm] = useState('');
+    const [salesFilter, setSalesFilter] = useState(''); 
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     const [scheduledDateTime, setScheduledDateTime] = useState('');
     const [testDriveSelected, setTestDriveSelected] = useState(false);
+    
 
     // Ref for the operations panel
     const operationsPanelRef = useRef(null);
@@ -107,12 +114,10 @@ function AllQuotation() {
         setModalData({ ...modalData, show: false });
     };
 
-    // Function to close the operations panel
     const closeOperationsPanel = () => {
         setSelectedRow(null);
     };
 
-    // Handle clicks outside the operations panel
     useEffect(() => {
         function handleClickOutside(event) {
             if (operationsPanelRef.current && !operationsPanelRef.current.contains(event.target)) {
@@ -120,35 +125,14 @@ function AllQuotation() {
             }
         }
 
-        // Add event listener when the panel is open
         if (selectedRow) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
-        // Clean up the event listener
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [selectedRow]);
-
-    // const fetchDemoCar = async (model) => {
-    //     try {
-    //         const response = await axios.get('/test-drive/status');
-    //         const jsonData = response.data
-    //         const matchedCar = jsonData.joined.data.find(
-    //             car => car.status === 'Available' && car.model === model
-    //         );
-
-    //         if (matchedCar) {
-    //             return ({ 'model': matchedCar.model, 'id': matchedCar.id });
-    //         } else {
-    //             return
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.log("Error fetching Demo Vehicle data:", e);
-    //     }
-    // }
 
     const fetchCas = async () => {
         try {
@@ -170,47 +154,22 @@ function AllQuotation() {
 
     const fetchQuotations = async (page) => {        
         try {
-            let response;
-
-            if (role === roles.ADMIN || role === roles.MD) {
-                if (salesFilter !== '') {
-                    response = await axios.get(`/my-quotation`, {
-                        params: {
-                            sales_person_id: salesFilter,
-                            role,
-                            page,
-                            limit: 25
-                        }
-                    });
+            const response = await axios.get(`/fetch-quotations`, {
+                params: {
+                    page,
+                    limit: 25,
+                    search: debouncedSearchTerm,
+                    ca: salesFilter
                 }
-                else {
-                    response = await axios.get(`/admin/all-quotations`, {
-                        params: { role, page, limit: 25 }
-                    });
-                }
-            } else if (role === roles.SALES) {
-                response = await axios.get(`/my-quotation`, {
-                    params: {
-                        sales_person_id: userId,
-                        role,
-                        page,
-                        limit: 25
-                    }
-                });
-            } else if (role == roles.TEAML) {
-                response = await axios.get("/teamLead/quotations", {
-                    params: {
-                        name: userId,
-                        role,
-                        page,
-                        limit: 25,
-                    }
-                })
-            }
+            });
 
-            if (response?.data) {
-                setQuotaData(response.data.data);
-                setPagination(response.data.pagination);
+            const jsonData = response.data;
+            if(jsonData.data.length > 0 ){
+                setQuotaData(jsonData.data);
+                setPagination(jsonData.pagination);
+            } else {
+                setQuotaData([]);
+                setPagination({})
             }
         } catch (e) {
             console.log("Error fetching quotation data:", e);
@@ -218,9 +177,18 @@ function AllQuotation() {
     };
 
     useEffect(() => {
+        if (role === roles.ADMIN || role === roles.MD || role === roles.TEAML) {
+            fetchCas();
+        }
+    }, [role, username]);
+
+    useEffect(() => {
         fetchQuotations(currentPage);
-        (role === roles.ADMIN || role === roles.MD) && fetchCas();
-    }, [currentPage, role, salesFilter, modalData]);
+    }, [currentPage, salesFilter, modalData, debouncedSearchTerm]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearchTerm]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -243,73 +211,531 @@ function AllQuotation() {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
         });
     }
+    const getSerialNumber = (index) => {
+        return (pagination.currentPage - 1) * pagination.itemsPerPage + index + 1;
+    };
 
     return (
-        <div className={`container mx-auto w-half p-2 md:p-6 ${selectedRow ? 'relative' : ''}`}>
+        <div className={`min-h-screen bg-gray-100 ${selectedRow ? 'relative' : ''}`}>
             {/* Backdrop with blur effect when operations panel is open */}
             {selectedRow && (
-                <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-10" onClick={closeOperationsPanel}></div>
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" onClick={closeOperationsPanel}></div>
             )}
 
-            {/* Test Drive Status Modal */}
-            {modalData.show && (
-                <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                        <div className={`text-center ${modalData.success ? 'text-green-600' : 'text-red-600'}`}>
-                            <svg
-                                className={`mx-auto h-12 w-12 ${modalData.success ? 'text-green-500' : 'text-red-500'}`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                {modalData.success ? (
+            {/* Header */}
+            <div className="max-w-7xl flex justify-center mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">All Quotations</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+                {/* Filter Section */}
+                <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+
+                        {/* Search */}
+                        <div
+                            className={`col-span-1 ${uniqueCas.length > 0 && (role === roles.ADMIN || localStorage.role === roles.MD)
+                                    ? 'sm:col-span-1 lg:col-span-2'
+                                    : 'sm:col-span-2 lg:col-span-4'
+                                }`}
+                        >
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Search</label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder={`Search by model or customer...`}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none  focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <svg
+                                    className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth={2}
-                                        d="M5 13l4 4L19 7"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                                     />
-                                ) : (
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                )}
+                                </svg>
+                            </div>
+                        </div>
+
+                        {/* Filter by CA */}
+                        {(uniqueCas.length > 0 && (localStorage.role === roles.ADMIN || localStorage.role === roles.MD)) && (
+                            <div className="col-span-1 sm:col-span-1 lg:col-span-2">
+                                <label className="block text-xs font-medium text-gray-700 mb-1">Filter by CA:</label>
+                                <select
+                                    value={salesFilter}
+                                    onChange={(e) => setSalesFilter(e.target.value)}
+                                    className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="" className="">All CAs</option>
+                                    {uniqueCas.map(([id, name]) => (
+                                        <option key={id} value={id}>
+                                            {name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Clear Filters */}
+                    <div className="mt-4 flex justify-end">
+                        <button
+                            onClick={() => {
+                                setSearchTerm('');
+                                setSalesFilter('');
+                                setCurrentPage(1);
+                            }}
+                            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                        >
+                            Clear Filters
+                        </button>
+                    </div>
+                </div>
+
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
+                    <div className="bg-white rounded-lg shadow-sm p-2 md:p-4">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm font-medium text-gray-500">Total Quotations</p>
+                                <p className="text-xl font-semibold text-gray-900">{pagination.totalItems}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow-sm p-2 md:p-4">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm font-medium text-gray-500">Current Page</p>
+                                <p className="text-xl font-semibold text-gray-900">{pagination.currentPage} of {pagination.totalPages}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow-sm p-2 md:p-4">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm font-medium text-gray-500">Showing</p>
+                                <p className="text-xl font-semibold text-gray-900">{quotaData.length} records</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Table Section */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    {quotaData.length > 0 ? (
+                        <>
+                            {/* Desktop Table */}
+                            <div className="hidden lg:block">
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S.No</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quotation ID</th>
+                                                {role !== roles.SALES && (
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales Person</th>
+                                                )}
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Model</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {quotaData.map((row, index) => (
+                                                <tr
+                                                    key={index}
+                                                    className={`cursor-pointer transition-colors duration-150 ${selectedRow === row
+                                                        ? 'bg-blue-50 border-l-4 border-blue-400'
+                                                        : row.status === 0
+                                                            ? 'hover:bg-yellow-50 bg-yellow-25'
+                                                            : row.status === 1
+                                                                ? 'hover:bg-green-50 bg-green-25'
+                                                                : 'hover:bg-gray-50'
+                                                        }`}
+                                                    onClick={() => handleRowClick(row)}
+                                                >
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        {getSerialNumber(index)}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        {setToIst(row.date)}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            {row.quotation_id}
+                                                        </span>
+                                                    </td>
+                                                    {role !== roles.SALES && (
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            {row.username}
+                                                        </td>
+                                                    )}
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                                                        {row.CX_NAME}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        {row.variant}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <button className="text-blue-600 hover:text-blue-900 font-medium cursor-pointer">
+                                                            View Details
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Mobile Card View */}
+                            <div className="lg:hidden">
+                                <div className="divide-y divide-gray-200">
+                                    {quotaData.map((row, index) => (
+                                        <div
+                                            key={index}
+                                            className={`px-4 py-4 cursor-pointer transition-colors duration-150 ${selectedRow === row
+                                                ? 'bg-blue-50 border-l-4 border-blue-400'
+                                                : row.status === 0
+                                                    ? 'hover:bg-yellow-50 bg-yellow-25'
+                                                    : row.status === 1
+                                                        ? 'hover:bg-green-50 bg-green-25'
+                                                        : 'hover:bg-gray-50'
+                                                }`}
+                                            onClick={() => handleRowClick(row)}
+                                        >
+                                            {/* Header Row */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center space-x-2">
+                                                    <span className="text-xs font-medium text-gray-600">#{getSerialNumber(index)}</span>
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        {row.quotation_id}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center space-x-2 text-xs text-gray-500">
+                                                    {role !== roles.SALES && (
+                                                        <div className="text-xs font-semibold text-gray-900 lg:pr-5 flex items-center justify-end gap-1">
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="w-4 h-4 text-gray-500"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={2}
+                                                                    d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                                />
+                                                            </svg>
+                                                            <span>{row.username}</span>
+                                                      </div>
+                                                    )}
+                                                    <span>{setToIst(row.date)}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Main Content Grid */}
+                                            <div className="flex flex-col space-y-0.5">
+                                                <div className="flex justify-between items-start gap-6">
+                                                    <p className="text-sm font-semibold text-gray-900 ">
+                                                        {row.CX_NAME}
+                                                    </p>
+                                                    <p className="text-xs text-gray-900 leading-relaxed break-all whitespace-normal text-right">
+                                                        {row.variant}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Pagination */}
+                            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                                <div className="flex-1 flex justify-between items-center">
+                                    <div className="hidden sm:block">
+                                        <p className="text-sm text-gray-700">
+                                            Showing <span className="font-medium">{((pagination.currentPage - 1) * pagination.itemsPerPage) + 1}</span> to{' '}
+                                            <span className="font-medium">{Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)}</span> of{' '}
+                                            <span className="font-medium">{pagination.totalItems}</span> results
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={!pagination?.hasPreviousPage}
+                                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Previous
+                                        </button>
+
+                                        {/* Page Numbers */}
+                                        <div className="hidden sm:flex space-x-1">
+                                            <button
+                                                onClick={() => handlePageChange(1)}
+                                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === 1
+                                                    ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                1
+                                            </button>
+
+                                            {currentPage > 4 && <span className="px-2 py-2 text-gray-500">...</span>}
+
+                                            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                                                .filter((page) =>
+                                                    page === currentPage ||
+                                                    page === currentPage - 1 ||
+                                                    page === currentPage + 1
+                                                )
+                                                .map((page) => (
+                                                    page !== 1 && page !== pagination.totalPages && (
+                                                        <button
+                                                            key={page}
+                                                            onClick={() => handlePageChange(page)}
+                                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === page
+                                                                ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                                }`}
+                                                        >
+                                                            {page}
+                                                        </button>
+                                                    )
+                                                ))}
+
+                                            {currentPage < pagination.totalPages - 3 && <span className="px-2 py-2 text-gray-500">...</span>}
+
+                                            {pagination.totalPages > 1 && (
+                                                <button
+                                                    onClick={() => handlePageChange(pagination.totalPages)}
+                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === pagination.totalPages
+                                                        ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                        }`}
+                                                >
+                                                    {pagination.totalPages}
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={!pagination?.hasNextPage}
+                                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="text-center py-12">
+                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <h3 className="mt-4 text-lg font-medium">
+                            <h3 className="mt-2 text-sm font-medium text-gray-900">No quotations found</h3>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Operations Panel */}
+            {selectedRow && (
+                <div
+                    ref={operationsPanelRef}
+                    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl z-50 border border-gray-200 w-full max-w-md mx-4 overflow-hidden"
+                >
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-white">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-semibold">Quick Actions</h3>
+                                <p className="text-blue-100 text-sm">
+                                    {selectedRow.CX_ID} - {selectedRow.CX_NAME}
+                                </p>
+                            </div>
+                            <button
+                                onClick={closeOperationsPanel}
+                                className="text-white hover:text-gray-200 transition-colors"
+                            >
+                                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                        {!testDriveSelected ? (
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={handleOpenPDF}
+                                    className="flex flex-col items-center justify-center p-4 border-2 border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 rounded-lg transition-all duration-200 group"
+                                >
+                                    <svg className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="text-sm font-medium">View PDF</span>
+                                </button>
+
+                                <button
+                                    onClick={handleSendWhatsApp}
+                                    className="flex flex-col items-center justify-center p-4 border-2 border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300 rounded-lg transition-all duration-200 group"
+                                >
+                                    <svg className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    <span className="text-sm font-medium">WhatsApp</span>
+                                </button>
+
+                                <button
+                                    onClick={handleBooking}
+                                    className="flex flex-col items-center justify-center p-4 border-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-lg transition-all duration-200 group"
+                                >
+                                    <svg className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                    </svg>
+                                    <span className="text-sm font-medium">Book Now</span>
+                                </button>
+
+                                <button
+                                    onClick={() => setTestDriveSelected(true)}
+                                    className="flex flex-col items-center justify-center p-4 border-2 border-yellow-200 text-yellow-600 hover:bg-yellow-50 hover:border-yellow-300 rounded-lg transition-all duration-200 group"
+                                >
+                                    <svg className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span className="text-sm font-medium">Test Drive</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <h4 className="text-lg font-semibold text-gray-900">Schedule Test Drive</h4>
+                                    <p className="text-sm text-gray-500 mb-4">Select preferred date and time</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Preferred Date & Time
+                                    </label>
+                                    <input
+                                        type="datetime-local"
+                                        value={scheduledDateTime}
+                                        onChange={(e) => setScheduledDateTime(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                                    />
+                                </div>
+
+                                <div className="flex space-x-3 pt-2">
+                                    <button
+                                        onClick={() => handleTestDrive(selectedRow)}
+                                        className="flex-1 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-medium transition-colors"
+                                    >
+                                        Request Test Drive
+                                    </button>
+                                    <button
+                                        onClick={() => setTestDriveSelected(false)}
+                                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Success/Error Modal */}
+            {modalData.show && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+                        <div className={`p-6 text-center ${modalData.success ? 'bg-green-50' : 'bg-red-50'}`}>
+                            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${modalData.success ? 'bg-green-100' : 'bg-red-100'
+                                }`}>
+                                <svg
+                                    className={`w-8 h-8 ${modalData.success ? 'text-green-600' : 'text-red-600'}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    {modalData.success ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    )}
+                                </svg>
+                            </div>
+                            <h3 className={`text-xl font-semibold mb-2 ${modalData.success ? 'text-green-900' : 'text-red-900'}`}>
                                 {modalData.success ? 'Success!' : 'Request Failed'}
                             </h3>
-                            <p className="mt-2 text-sm text-gray-600">
+                            <p className="text-gray-600 mb-4">
                                 {modalData.message}
                             </p>
                             {modalData.model && (
-                                <p className="mt-1 text-sm text-gray-500">
-                                    Model: {modalData.model}
-                                </p>
+                                <div className="bg-white/50 rounded-lg p-3 mb-4">
+                                    <p className="text-sm text-gray-700">
+                                        <span className="font-medium">Model:</span> {modalData.model}
+                                    </p>
+                                </div>
                             )}
                         </div>
-                        {!modalData.success && (
-                            <div className="mt-6">
-                                <Link to='/test-drive'>
-                                    <button
-                                        className="w-full px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2"
-                                    >
-                                        Available Vehicles
+
+                        <div className="px-6 pb-6">
+                            {!modalData.success && (
+                                <Link to='/test-drive' className="block mb-3">
+                                    <button className="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-medium transition-colors">
+                                        View Available Vehicles
                                     </button>
                                 </Link>
-                            </div>
-                        )}
-                        <div className={modalData.success ? "mt-6" : "mt-2"}>
+                            )}
                             <button
                                 onClick={closeModal}
-                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium transition-colors"
                             >
                                 Close
                             </button>
@@ -318,246 +744,74 @@ function AllQuotation() {
                 </div>
             )}
 
-            <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800 uppercase">All Quotation Data</h2>
-
-            {/* Operations Panel */}
-            {selectedRow && (
-                <div
-                    ref={operationsPanelRef}
-                    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white py-4 px-4 rounded-lg shadow-md z-20 border border-gray-200 max-w-md w-full"
-                >
-                    {/* Close button */}
-                    <button
-                        onClick={closeOperationsPanel}
-                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-
-                    <div className="flex flex-col items-center justify-between mb-4">
-                        <div className="mb-4 text-sm text-center">
-                            <span className="font-semibold">Selected:</span> {selectedRow.CX_ID} - {selectedRow.CX_NAME}
+            {/* Status Modal */}
+            {statusModal.show && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+                        <div className="bg-blue-50 p-6">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-semibold text-center text-blue-900 mb-2">
+                                Test Drive Status
+                            </h3>
+                            <p className="text-center text-blue-700">
+                                A test drive request already exists for this quotation.
+                            </p>
                         </div>
 
-                        {/* 2x2 Button Grid */}
-                        <div className="grid grid-cols-2 grid-rows-2 gap-2 w-64 h-26">
-                            <button
-                                onClick={handleOpenPDF}
-                                className="bg-rose-400 text-white hover:bg-rose-500 text-sm rounded-lg flex items-center justify-center"
-                            >
-                                View PDF
-                            </button>
-                            <button
-                                onClick={handleSendWhatsApp}
-                                className="bg-green-500 text-white hover:bg-green-600 text-sm rounded-lg flex items-center justify-center"
-                            >
-                                WhatsApp
-                            </button>
-                            <button
-                                onClick={handleBooking}
-                                className="bg-blue-500 text-white hover:bg-blue-600 text-sm rounded-lg flex items-center justify-center"
-                            >
-                                Book
-                            </button>
-                            {!testDriveSelected ? (
+                        <div className="p-6 space-y-4">
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-sm font-medium text-gray-500">Current Status:</span>
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusModal.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                                        statusModal.status === 'PENDING' ? 'bg-blue-100 text-blue-800' :
+                                            statusModal.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                                                statusModal.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                                                    statusModal.status === 'COMPLETED' ? 'bg-purple-100 text-purple-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                        }`}>
+                                        {statusModal.status === 'REQUESTED' ? 'Requested' :
+                                            statusModal.status === 'PENDING' ? 'Pending (Accepted)' :
+                                                statusModal.status === 'APPROVED' ? 'Approved' :
+                                                    statusModal.status === 'REJECTED' ? 'Rejected' :
+                                                        statusModal.status === 'COMPLETED' ? 'Completed' : 'Unknown'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-sm font-medium text-gray-500">Remarks:</span>
+                                    <p className="text-sm text-gray-700 mt-1">
+                                        {statusModal.remark || 'No remarks available'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex space-x-3">
                                 <button
-                                    onClick={() => setTestDriveSelected(true)}
-                                    className="bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg flex items-center justify-center"
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-colors"
+                                    onClick={() => {
+                                        requestTestDrive(statusModal.row);
+                                        setStatusModal({ show: false, status: null, remark: null, row: null });
+                                    }}
                                 >
-                                Test Drive
-                            </button>
-                            ) : 
-                            (
-                                <div className="col-span-2">
-                                <label className="text-xs font-medium text-gray-600 mb-1 block">Schedule Test Drive</label>
-                                <input
-                                  type="datetime-local"
-                                  value={scheduledDateTime}
-                                  onChange={(e) => setScheduledDateTime(e.target.value)}
-                                  className="w-full border rounded px-2 py-1 text-sm mb-2"
-                                />
-                                <button
-                                  onClick={() => handleTestDrive(selectedRow)}
-                                  className="w-full bg-yellow-500 text-white hover:bg-yellow-600 text-sm rounded-lg px-4 py-2"
-                                >
-                                  Request Test Drive
+                                    Request Again
                                 </button>
-                              </div>
-                        )}
+                                <button
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium transition-colors"
+                                    onClick={() => setStatusModal({ show: false, status: null, remark: null, row: null })}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
-                        
                     </div>
-
                 </div>
             )}
-
-            <div className="overflow-x-auto">
-                {(uniqueCas.length > 0 && localStorage.role === roles.ADMIN || localStorage.role === roles.MD) && (
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Filter by CA:</label>
-                        <select
-                            value={salesFilter}
-                            onChange={(e) => setSalesFilter(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">All CAs</option>
-                            {uniqueCas
-                                .map(([id, name]) => (
-                                    <option key={id} value={id}>
-                                        {name}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-                )}
-
-                {quotaData.length > 0 && (
-                    <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Date & Time</th>
-                                <th className="px-2 py-2 text-left text-sm md:text-md font-medium text-gray-700">ID</th>
-                                {role !== roles.SALES && (
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Sales Person</th>
-                                )}
-                                <th className="px-4 py-2 text-left text-sm md:text-md font-medium text-gray-700">Customer Name</th>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Variant</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {quotaData?.map((row, index) => (
-                                <tr
-                                    key={index}
-                                    className={`border-b cursor-pointer ${selectedRow === row ? 'bg-blue-50' : ''} ${row[8] === 0 ? 'bg-yellow-100 hover:bg-yellow-200' : row[8] === 1 ? 'bg-green-100 hover:bg-green-200' : 'hover:bg-gray-50'}`}
-                                    onClick={() => handleRowClick(row)}
-                                >
-                                    <td className="px-4 py-2 text-xs md:text-md text-gray-900">{setToIst(row.date)}</td>
-                                    <td className="px-2 py-2 text-xs md:text-md text-gray-900">{row.quotation_id}</td>
-                                    {role !== roles.SALES && (
-                                        <td className="px-4 py-2 text-xs md:text-sm text-gray-900">{row.username}</td>
-                                    )}
-                                    <td className="px-4 py-2 text-sm text-gray-900">{row.CX_NAME}</td>
-                                    <td className="px-4 py-2 text-sm text-gray-900">{row.variant}</td>
-
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-                {statusModal.show && (
-                    <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                        <h3 className="text-lg text-center font-semibold mb-2">Test Drive Already Requested</h3>
-                        <hr className='pb-3 text-gray-400'/>
-                        <p className="text-sm text-center text-gray-700 mb-2">
-                            <strong>Current Status:</strong> {
-                            statusModal.status === 'REQUESTED' ? 'Requested' : 
-                            statusModal.status === 'PENDING' ? 'Pending (Request Accepted)':
-                            statusModal.status === 'APPROVED' ? 'Approved !!' :
-                            statusModal.status === 'REJECTED' ? 'Request Rejected' :
-                            statusModal.status === 'COMPLETED' ? 'Test Drive Completed' :  'Unknown'
-                            }
-                        </p>
-                        <p className="text-sm text-center text-gray-700 mb-4">
-                        <strong>Remarks:</strong> {statusModal.remark || 'No remarks'}
-                        </p>
-                        <div className="flex flex-end justify-end gap-2 pt-2">
-                            <button
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            onClick={() => {
-                                requestTestDrive(statusModal.row);
-                                setStatusModal({ show: false, status: null, remark: null, row: null });
-                            }}
-                            >
-                            Request Again
-                            </button>
-                            <button
-                            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                            onClick={() => setStatusModal({ show: false, status: null, remark: null, row: null })}
-                            >
-                            Cancel
-                            </button>
-                        </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Pagination */}
-            <div className="text-xs flex flex-wrap gap-2 justify-center mt-4">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={!pagination?.hasPreviousPage}
-                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                >
-                    Previous
-                </button>
-
-                {/* First Page */}
-                <button
-                    onClick={() => handlePageChange(1)}
-                    className={`px-3 py-1 rounded-lg ${currentPage === 1
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                >
-                    1
-                </button>
-
-                {/* Leading Ellipsis */}
-                {currentPage > 4 && <span className="px-2">...</span>}
-
-                {/* Middle Pages */}
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                    .filter((page) =>
-                        page === currentPage ||
-                        page === currentPage - 1 ||
-                        page === currentPage + 1
-                    )
-                    .map((page) => (
-                        page !== 1 && page !== pagination.totalPages && (
-                            <button
-                                key={page}
-                                onClick={() => handlePageChange(page)}
-                                className={`px-3 py-1 rounded-lg ${currentPage === page
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                    }`}
-                            >
-                                {page}
-                            </button>
-                        )
-                    ))}
-
-                {/* Trailing Ellipsis */}
-                {currentPage < pagination.totalPages - 3 && <span className="px-2">...</span>}
-
-                {/* Last Page */}
-                {pagination.totalPages > 1 && (
-                    <button
-                        onClick={() => handlePageChange(pagination.totalPages)}
-                        className={`px-3 py-1 rounded-lg ${currentPage === pagination.totalPages
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                    >
-                        {pagination.totalPages}
-                    </button>
-                )}
-
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={!pagination?.hasNextPage}
-                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
-
         </div>
     );
 }
+
 
 export default AllQuotation;

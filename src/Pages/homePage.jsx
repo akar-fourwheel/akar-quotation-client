@@ -2,9 +2,12 @@ import { Link, useNavigate } from "react-router";
 import { BellIcon,CubeIcon,PercentBadgeIcon,PencilSquareIcon,DocumentTextIcon,CurrencyRupeeIcon,TruckIcon,DocumentCheckIcon,ArrowPathIcon,WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 import { roles } from "../Routes/roles";
 import NotificationOverlay from "../Components/homePage/NotificationOverlay";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext} from "react";
+import { AuthContext } from '../context/auth/AuthProvider';
+
 const HomePage = () => {
   const [showOverlay, setShowOverlay] = useState(false);
+    const { role } = useContext(AuthContext);
 
   return (
     <>
@@ -96,7 +99,7 @@ const HomePage = () => {
                   </button>
                 </Link>
 
-                {localStorage.role === roles.AUDITOR && (
+                {(role === roles.AUDITOR || role === roles.ADMIN) && (
                   <>
                     <div className="col-span-full mt-6">
                       <div className = "flex items-center justify-center gap-2 mb-5">

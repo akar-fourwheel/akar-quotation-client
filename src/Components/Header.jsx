@@ -31,18 +31,18 @@ const Header = ({ toggleSidebar }) => {
   // },[])
 
   return (
-    <header className="bg-white shadow">
+    <header className="bg-white shadow-md">
       <div className=" mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             {/* Sidebar Toggle Button */}
             <button
               onClick={toggleSidebar}
-              className="pr-3 border-r border-white text-gray-500 focus:outline-none"
+              className="pr-3 border-r border-white text-gray-500 focus:outline-none cursor-pointer"
             >
               <span className="sr-only">Open sidebar</span>
               <svg
-                className="h-6 w-6"
+                className="h-6 w-6 cursor-pointer"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
