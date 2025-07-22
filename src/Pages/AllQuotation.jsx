@@ -237,11 +237,11 @@ function AllQuotation() {
 
                 {/* Filter Section */}
                 <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
 
                         {/* Search */}
                         <div
-                            className={`col-span-1 ${uniqueCas.length > 0 && (role === roles.ADMIN || localStorage.role === roles.MD)
+                            className={`col-span-1 ${uniqueCas.length > 0 && (role === roles.ADMIN || role === roles.MD)
                                     ? 'sm:col-span-1 lg:col-span-2'
                                     : 'sm:col-span-2 lg:col-span-4'
                                 }`}
