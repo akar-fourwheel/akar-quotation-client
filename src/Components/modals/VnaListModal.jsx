@@ -107,6 +107,9 @@ const VnaListModal = ({ onClose }) => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                     Request Date
                   </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                    Request Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -193,6 +196,11 @@ const VnaListModal = ({ onClose }) => {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {formatDate(row.created_on)}
+                      </div>
+                    </td>
+                    <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {row.booking_status || 'N/A'}
                       </div>
                     </td>
                   </tr>
