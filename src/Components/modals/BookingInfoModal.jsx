@@ -37,10 +37,18 @@ const BookingInfoModal = ({ bookingId, onClose }) => {
           <Loader />
         ) : bookingData ? (
           <>
-            <div className={`bg-gradient-to-r ${bookingData.stat === "cancelled" ? "from-red-600 to-rose-600" : "from-blue-600 to-indigo-600"} text-white rounded-xl px-5 py-6 flex items-center justify-between`}>
+            <div className={`bg-gradient-to-r ${bookingData.stat === "CANCELLED" ? "from-red-600 to-rose-600" : "from-blue-600 to-indigo-600"} text-white rounded-xl px-5 py-6 flex items-center justify-between`}>
               <div>
                 <h2 className="text-3xl font-semibold">
-                  {bookingData.stat === "cancelled" ? "Booking Cancelled" : "Booking Confirmed"}
+                {(() => {
+                  if (bookingData.stat === "CANCELLED") {
+                    return "Booking Cancelled";
+                  } else if (bookingData.stat === "CONFIRMED") {
+                    return "Booking Confirmed";
+                  } else if (bookingData.stat === "INPROGRESS") {
+                    return "Booking In Progress";
+                  }
+                })()}
                 </h2>
                 <p className="text-md opacity-80">
                   {bookingData.stat === "cancelled"
