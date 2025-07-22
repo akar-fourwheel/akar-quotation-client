@@ -119,23 +119,13 @@ function BookingPage() {
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Booking Management</h1>
-            {(role === roles.ADMIN || role === roles.MD) && (
-              <button
-                onClick={() => setShowVnaModal(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                View VNA List
-              </button>
-            )}
+            
           </div>
         </div>
 
         <div className="mb-6">
-          <div className="flex flex-wrap gap-2">
-            {[
+          <div className="flex flex-wrap justify-between gap-2">
+            <div className='flex flex-wrap gap-2'>{[
               { value: "all", label: "All Bookings" },
               { value: "active", label: "Active" },
               { value: "cancelled", label: "Cancelled" },
@@ -144,14 +134,26 @@ function BookingPage() {
               <button
                 key={option.value}
                 onClick={() => setFilterOption(option.value)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${filterOption === option.value
+                className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${filterOption === option.value
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
               >
                 {option.label}
               </button>
-            ))}
+            ))}</div>
+            {(role === roles.ADMIN || role === roles.MD) && 
+            <div className='flex flex-wrap gap-2'>
+              <button
+                onClick={() => setShowVnaModal(true)}
+                className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                View VNA List
+              </button>
+            </div>}
           </div>
         </div>
 
@@ -219,7 +221,7 @@ function BookingPage() {
                         <div className="flex justify-end space-x-2">
                           <button
                             onClick={() => handleViewInfo(row.id)}
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                           >
                             View Details
                           </button>
@@ -229,7 +231,7 @@ function BookingPage() {
                                 setSelectedRow(row);
                                 setShowCancelModal(true);
                               }}
-                              className="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition-colors"
+                              className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition-colors"
                             >
                               Cancel
                             </button>
