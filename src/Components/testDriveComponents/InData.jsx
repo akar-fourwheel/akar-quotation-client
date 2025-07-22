@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { showSuccess } from "../../utils/toast";
 
-const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) => {
+const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id, fetchDemoVehicles }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ inKM: "", model: model, photo: null, id: id });
   const [error, setError] = useState(null);
@@ -32,6 +32,7 @@ const InData = ({ model, setShow, show, onStatusUpdate, getData, alotId, id }) =
 
       if (pushData.status == 200) {
         showSuccess("Test drive completed.")
+        fetchDemoVehicles();
       } else {
         throw new Error("Failed to update vehicle status");
       }

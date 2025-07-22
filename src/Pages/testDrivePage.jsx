@@ -50,9 +50,9 @@ function TestDrivePage() {
   
     return () => clearInterval(interval);
   }, [fetchPendingRequests]);
-  
-  useEffect(() => {
-    axios.get("/test-drive/get-demo-vehicles")  
+
+  const fetchDemoVehicles = useCallback(() => {
+    axios.get("/test-drive/get-demo-vehicles")
       .then((response) => {
         setVehiclesData(response.data.rows);
       })
@@ -61,6 +61,10 @@ function TestDrivePage() {
         setError(error.message);
       });
   }, []);
+
+  useEffect(() => {
+    fetchDemoVehicles();
+  }, [fetchDemoVehicles]);
 
   const handleNotificationClick = () => {    
     // Reset audio to beginning
@@ -144,6 +148,7 @@ return (
                 data={vehiclesData || []}
                 pendingRequests={pendingRequests}
                 getData={fetchPendingRequests}
+                fetchDemoVehicles={fetchDemoVehicles}
               />
             </div>
           )}

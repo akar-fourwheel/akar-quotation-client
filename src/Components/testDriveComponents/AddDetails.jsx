@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { showSuccess } from "../../utils/toast";
 
-const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, getdata, pendingRequests = [] }) => {
+const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, getdata, pendingRequests = [], fetchDemoVehicles }) => {
   const [selectedRequestId, setSelectedRequestId] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null);
 
@@ -111,6 +111,7 @@ const AddDetails = ({ model, setShow, show, onStatusUpdate, initialData, id, get
           selectedStatus,
           formData.salesPerson
         );
+        fetchDemoVehicles();
       }
       handleClose();
     } catch (err) {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import AddDetails from "./AddDetails";
 import InData from "./InData";
 
-const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
+const TestDriveVehicleList = ({ data = [], getData, pendingRequests, fetchDemoVehicles }) => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showOut, setShowOut] = useState(false);
   const [showIn, setShowIn] = useState(false);
@@ -65,7 +65,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
                     ? "bg-yellow-500"
                     : "bg-red-500"
                 }`}>
-                  {row.status}
+                  {row.status == "WORKSHOP" || row.status == "BREAKDOWN" ? "Unavailable" : row.status}
                 </span>
                 {row.sales_person != null && <small className=" ml-4 bg-gray-200 rounded-full px-3 py-1">{`${row.sales_person.charAt(0).toUpperCase() + row.sales_person.slice(1)}`}</small>}
               </td>
@@ -112,6 +112,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
             initialData={updateData}
             pendingRequests={pendingRequests}
             onStatusUpdate={handleStatusUpdate}
+            fetchDemoVehicles={fetchDemoVehicles}
           />
           <InData
             model={selectedVehicle.parent_product}
@@ -122,6 +123,7 @@ const TestDriveVehicleList = ({ data = [], getData, pendingRequests }) => {
             id={selectedVehicle.id}
             alotId={selectedVehicle.alot_id}
             onStatusUpdate={handleStatusUpdate}
+            fetchDemoVehicles={fetchDemoVehicles}
           />
         </>
       )}
