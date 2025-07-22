@@ -283,9 +283,8 @@ const handleCustomerSelect = (customer) => {
     if (newCx && newAllot) {
       setNewCx(false);
       fetchCustomers();
-      setLoading(false);
-      return;
     }
+    setLoading(false);
 
     try {
       const response = await axios.get(`/quotation-data`, {
