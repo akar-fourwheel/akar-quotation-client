@@ -69,7 +69,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">
-                {user?.username}
+                {user?.username[0].toUpperCase() + user?.username.slice(1)}
               </p>
               <p className="text-xs text-gray-400">
                 ID: {user?.userId}
@@ -80,7 +80,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             onClick={toggleSidebar}
             className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
           >
-            <XIcon className="h-5 w-5" />
+            <XIcon className="cursor-pointer h-5 w-5" />
           </button>
         </div>
 
@@ -232,7 +232,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {(user.role === roles.ADMIN || user.role === roles.MD) && (
             <button
               onClick={() => navigate("/signup")}
-              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-800 transition-all duration-200"
+              className="cursor-pointer w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-800 transition-all duration-200"
             >
               <UserPlusIcon className="h-4 w-4 mr-2" />
               Add User
@@ -241,7 +241,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-all duration-200"
+            className="cursor-pointer w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-300 border border-gray-600 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition-all duration-200"
           >
             <LogoutIcon className="h-4 w-4 mr-2" />
             Sign Out
