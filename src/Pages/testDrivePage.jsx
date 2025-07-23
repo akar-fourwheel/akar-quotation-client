@@ -33,14 +33,21 @@ function TestDrivePage() {
     axios.get("/test-drive/pending-requests")
       .then((response) => {
         const jsonData = response.data;
-        if (jsonData.rows.length > 0) setHasNewRecords(true);
-        setPendingRequests(jsonData.rows);
+        if (jsonData.rows.length > 0) {
+          setHasNewRecords(true);
+          setPendingRequests(jsonData.rows);
+        }
+        else{
+          setHasNewRecords(false);
+          setPendingRequests([]);
+        }
         setStatusLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
         setError(error.message);
         setStatusLoading(false);
+        setHasNewRecords(false);
       });
   }, []);
   

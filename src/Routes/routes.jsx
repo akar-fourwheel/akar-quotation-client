@@ -50,10 +50,6 @@ export const routes = createBrowserRouter([
                         element: <HomePage />,
                     },
                     {
-                        path: '/test-drive',
-                        Component: testDrivePage
-                    },
-                    {
                         path: '/stock-sheet',
                         Component: StockPage
                     },
@@ -100,23 +96,33 @@ export const routes = createBrowserRouter([
                     {
                         path:'/book-test-drive',
                         Component:bookTestDrive
-                    },
-                    {
-                        path: '/test-drive-history',
-                        Component: TestDriveHistoryPage
                     }
                 ]
             }
         ]
     },
     {
-        element: <ProtectedRoute roles={[roles.GUARD]} />,
+        element: <ProtectedRoute roles={[roles.GUARD, roles.SALES, roles.TEAML, roles.MD, roles.ADMIN, roles.AUDITOR]} />,
         children: [
             {
                 element: <Layout />,
                 children: [
                     {
-                        path: '/guard/test-drive',
+                        path: '/test-drive-history',
+                        Component: TestDriveHistoryPage
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        element: <ProtectedRoute roles={[roles.GUARD, roles.MD, roles.ADMIN]} />,
+        children: [
+            {
+                element: <Layout />,
+                children: [
+                    {
+                        path: '/test-drive',
                         Component: testDrivePage
                     }
                 ]
