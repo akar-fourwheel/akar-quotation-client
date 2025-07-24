@@ -33,7 +33,7 @@ export default function BookTestDrivePage() {
                         name: DEFAULT_CA_ID,
                     }
                 });
-                setCustomerList(response.data);
+                setCustomerList(response.data.data);
             } catch (error) {
                 console.error('Error fetching customers:', error);
                 setMsg({ text: "Failed to fetch customers", ok: false });

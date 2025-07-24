@@ -33,14 +33,21 @@ function TestDrivePage() {
     axios.get("/test-drive/pending-requests")
       .then((response) => {
         const jsonData = response.data;
-        if (jsonData.rows.length > 0) setHasNewRecords(true);
-        setPendingRequests(jsonData.rows);
+        if (jsonData.rows.length > 0) {
+          setHasNewRecords(true);
+          setPendingRequests(jsonData.rows);
+        }
+        else{
+          setHasNewRecords(false);
+          setPendingRequests([]);
+        }
         setStatusLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
         setError(error.message);
         setStatusLoading(false);
+        setHasNewRecords(false);
       });
   }, []);
   
@@ -50,9 +57,9 @@ function TestDrivePage() {
   
     return () => clearInterval(interval);
   }, [fetchPendingRequests]);
-  
-  useEffect(() => {
-    axios.get("/test-drive/get-demo-vehicles")  
+
+  const fetchDemoVehicles = useCallback(() => {
+    axios.get("/test-drive/get-demo-vehicles")
       .then((response) => {
         setVehiclesData(response.data.rows);
       })
@@ -61,6 +68,10 @@ function TestDrivePage() {
         setError(error.message);
       });
   }, []);
+
+  useEffect(() => {
+    fetchDemoVehicles();
+  }, [fetchDemoVehicles]);
 
   const handleNotificationClick = () => {    
     // Reset audio to beginning
@@ -144,6 +155,7 @@ return (
                 data={vehiclesData || []}
                 pendingRequests={pendingRequests}
                 getData={fetchPendingRequests}
+                fetchDemoVehicles={fetchDemoVehicles}
               />
             </div>
           )}

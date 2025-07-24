@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/auth/AuthProvider';
-import axios from 'axios';
+import { useNavigate, useLocation } from 'react-router';
 
 const Header = ({ toggleSidebar }) => {
-  const user = useContext(AuthContext);
+  const {username} = useContext(AuthContext);
   const [target,setTarget] = useState(0);
   const [remainingTarget,setRemainingTarget] = useState('');
-
+  const navigate = useNavigate();
   const col =Number(remainingTarget.split(" ")[1]) <= target;
-
+  const location = useLocation();
   // useEffect(()=> {
   //   if(localStorage.role=="teamLead"){
   //     axios.get('/teamLead/tl-target',{
@@ -55,8 +55,8 @@ const Header = ({ toggleSidebar }) => {
                 />
               </svg>
             </button>
-            <div className="flex-shrink-0 flex items-center">
-              <h1 className="sm:text-xl sm:font-bold text-lg font-light text-gray-900">{user?.username}</h1>
+            <div className="flex-shrink-0 flex items-center" onClick={()=>{ if(location.pathname !== '/') navigate('/') }}>
+              <h1 className="cursor-pointer select-none sm:text-xl sm:font-bold text-lg font-light text-gray-900">{username[0].toUpperCase() + username.slice(1)}</h1>
             </div>
           </div>
           {/* { localStorage.role == "teamLead" &&

@@ -36,7 +36,7 @@ const Login = () => {
       let from = location.state?.from?.pathname || '/';
 
       if (localStorage.role === roles.GUARD) {
-        from = '/guard/test-drive';
+        from = '/test-drive';
       } else if (localStorage.role === roles.RECEPTION || localStorage.role === roles.CRE) {
         from = '/reception';
       }

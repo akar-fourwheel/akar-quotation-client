@@ -53,7 +53,7 @@ const HomePage = () => {
                 <Link to="/stock-sheet">
                   <button 
                   type="button"
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-slate-700 hover:bg-slate-800 shadow-lg transition">
+                  className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-slate-700 hover:bg-slate-800 shadow-lg transition">
                     <CubeIcon className="h-5 w-5" />
                     Stock Sheet
                   </button>
@@ -61,7 +61,7 @@ const HomePage = () => {
                 <Link to="/scheme-sheet">
                   <button 
                   type="button"
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-indigo-700 hover:bg-indigo-800 shadow-lg transition">
+                  className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-indigo-700 hover:bg-indigo-800 shadow-lg transition">
                     <PercentBadgeIcon className="h-5 w-5"/>
                     Scheme Sheet
                   </button>
@@ -69,7 +69,7 @@ const HomePage = () => {
                 <Link to="/quotation">
                   <button 
                   type="button"
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-blue-700 hover:bg-blue-800 shadow-lg transition">
+                  className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-blue-700 hover:bg-blue-800 shadow-lg transition">
                     <PencilSquareIcon className="h-5 w-5" />
                      Quotation
                   </button>
@@ -77,7 +77,7 @@ const HomePage = () => {
                 <Link to="/all-quotations">
                   <button 
                   type="button"
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-sky-700 hover:bg-sky-800 shadow-lg transition">
+                  className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-sky-700 hover:bg-sky-800 shadow-lg transition">
                     <DocumentTextIcon className="h-5 w-5"/>
                      Quotation List
                   </button>
@@ -85,7 +85,7 @@ const HomePage = () => {
                 <Link to="/price-list">
                   <button 
                   type="button"
-                  className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-gray-700 hover:bg-gray-800 shadow-lg transition">
+                  className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-gray-700 hover:bg-gray-800 shadow-lg transition">
                     <CurrencyRupeeIcon className="h-5 w-5" />
                      Price List
                   </button>
@@ -93,7 +93,7 @@ const HomePage = () => {
                 <Link to="/test-drive">
                   <button 
                   type="button"
-                    className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-violet-700 hover:bg-violet-800 shadow-lg transition">
+                    className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-violet-700 hover:bg-violet-800 shadow-lg transition">
                     <TruckIcon className="h-5 w-5" />
                      Test Drive
                   </button>
@@ -110,7 +110,7 @@ const HomePage = () => {
                         <Link to="/update-quotation">
                           <button 
                           type="button"
-                          className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-lg transition">
+                          className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-lg transition">
                             <DocumentCheckIcon className="h-5 w-5" />
                              Update Quotation
                           </button>
@@ -118,7 +118,7 @@ const HomePage = () => {
                         <Link to="/update-stock">
                           <button 
                           type="button"
-                          className="w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-lg transition">
+                          className="cursor-pointer w-full flex items-center justify-center gap-2 py-3 px-6 text-lg font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-lg transition">
                             <ArrowPathIcon className="h-5 w-5" />
                              Update Stock
                           </button>

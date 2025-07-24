@@ -28,9 +28,9 @@ const BookingForm = () => {
     setBookingError("");
     
     try {
-      await bookingCar();
+      await createBookingRequest();
     } catch (error) {
-      console.error("Booking error:", error);
+      console.error("Booking request error:", error);
       setErrorColor("red");
       setBookingError("An unexpected error occurred. Please try again.");
     } finally {
@@ -38,7 +38,7 @@ const BookingForm = () => {
     }
   };
 
-  const bookingCar = async () => {
+  const createBookingRequest = async () => {
     try {
       const bookingData = {
         quoteID,
@@ -57,18 +57,18 @@ const BookingForm = () => {
         remark
       };
 
-      const response = await axios.post('/booking-process', bookingData);
+      const response = await axios.post('/booking-request', bookingData);
       
       if (response.data.success) {
-        handleBookingSuccess(response.data);
+        handleBookingRequestSuccess(response.data);
       } else {
-        handleBookingError(response.data);
+        handleBookingRequestError(response.data);
       }
     } catch (error) {
       console.error("Booking request failed:", error);
       
       if (error.response?.data) {
-        handleBookingError(error.response.data);
+        handleBookingRequestError(error.response.data);
       } else {
         setErrorColor("red");
         setBookingError("Network error. Please check your connection and try again.");
@@ -76,13 +76,21 @@ const BookingForm = () => {
     }
   };
 
-  const handleBookingSuccess = (responseData) => {
+  const handleBookingRequestSuccess = (responseData) => {
     const { type, data, message } = responseData;
 
     switch (type) {
-      case 'booking':
-        // New booking created successfully - vehicle was available
-        navigate(`/booking-success/${data.id}`);
+      case 'booking_request_created':
+        setErrorColor("green");
+        setBookingError("Booking request submitted successfully! Your request is now pending team lead approval.");
+        setTimeout(() => {
+          navigate('/booking-list');
+        }, 3000);
+        break;
+        
+      case 'existing_requested':
+        setErrorColor("blue");
+        setBookingError("Booking request already exists and is pending approval from team lead.");
         break;
         
       case 'existing_confirmed':
@@ -91,45 +99,29 @@ const BookingForm = () => {
         setBookingError(`Booking already exists and is confirmed. Chassis No: ${data.chassisNo || 'N/A'}`);
         break;
         
-      case 'updated_to_confirmed':
-        // INPROGRESS booking updated to CONFIRMED - vehicle became available
-        setErrorColor("green");
-        setBookingError(`Great! Your booking has been confirmed. Vehicle is now available. Chassis No: ${data.chassisNo}`);
-        // Optionally navigate to success page after a delay
-        setTimeout(() => {
-          navigate(`/booking-success/${data.id}`);
-        }, 3000);
-        break;
-        
-      case 'vna':
-        // VNA request created or booking still in progress
-        setErrorColor("green");
-        setBookingError(message || "Booking request has been raised. Currently vehicle is not available in dealer stock. Please wait for the vehicle to be available in dealer stock.");
+      case 'existing_inprogress':
+        // Booking already exists and is in progress
+        setErrorColor("amber");
+        setBookingError("Booking already exists and is in progress. Please wait for vehicle availability.");
         break;
         
       default:
-        setErrorColor("amber");
-        setBookingError(message || "Booking request processed.");
+        setErrorColor("green");
+        setBookingError(message || "Booking request submitted successfully!");
     }
   };
 
-  const handleBookingError = (errorData) => {
-    if (errorData.error?.code === 'DUPLICATE_BOOKING') {
-      setErrorColor("red");
-      setBookingError("A confirmed booking with this quotation ID already exists.");
-    } else if (errorData.error?.code === 'VALIDATION_ERROR') {
+  const handleBookingRequestError = (errorData) => {
+    if (errorData.error?.code === 'VALIDATION_ERROR') {
       setErrorColor("red");
       const details = errorData.error.details ? ` Details: ${errorData.error.details.join(', ')}` : '';
       setBookingError(`Please fill in all required fields correctly.${details}`);
-    } else if (errorData.error?.code === 'STOCK_NOT_AVAILABLE') {
-      setErrorColor("amber");
-      setBookingError("Vehicle not available in dealer stock. Request has been raised.");
     } else if (errorData.error?.code === 'DATABASE_ERROR') {
       setErrorColor("red");
       setBookingError("Database error occurred. Please try again later.");
     } else {
       setErrorColor("red");
-      setBookingError(errorData.error?.message || "Booking failed. Please try again.");
+      setBookingError(errorData.error?.message || "Booking request failed. Please try again.");
     }
   };
 
@@ -199,7 +191,28 @@ const BookingForm = () => {
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4 sm:px-6 lg:px-8">
       <div className="bg-white shadow-lg rounded-2xl p-6 space-y-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Booking Details</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-gray-800">Booking Request</h2>
+        </div>
+
+        {/* Info Banner */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">
+                New Booking Process
+              </h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>Your booking request will be submitted to your team lead for approval. Once approved, the booking will be processed automatically if the vehicle is available in dealer stock.</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-gray-700">
           <Field label="Customer Name" value={resData.CUSTOMER_NAME} />
@@ -315,10 +328,10 @@ const BookingForm = () => {
           {isSubmitting ? (
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Processing...
+              Submitting Request...
             </div>
           ) : (
-            "Book Car"
+            "Submit Booking Request"
           )}
         </button>
       </div>
