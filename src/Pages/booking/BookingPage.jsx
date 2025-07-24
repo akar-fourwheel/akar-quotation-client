@@ -233,7 +233,7 @@ function BookingPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{row.username}</div>
+                        <div className="text-sm text-gray-900">{row.sales_advisor}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{row.CX_NAME}</div>
