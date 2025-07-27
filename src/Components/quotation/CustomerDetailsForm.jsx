@@ -83,7 +83,7 @@ const CustomerDetailsForm = ({
           />
         </div>
         {/* Customer List */}
-        <div className="max-h-60 overflow-y-auto border border-gray-300 rounded-md bg-white text-sm">
+        <div className="max-h-60 border border-gray-300 rounded-md bg-white text-sm">
           {filteredCustomers && filteredCustomers.length > 0 ? (
             <div className="divide-y divide-gray-100">
               {filteredCustomers.map((customer, index) => (
@@ -98,7 +98,7 @@ const CustomerDetailsForm = ({
                       : ''
                   }`}
                 >
-                  <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
+                  <div className="flex-1 min-w-0 flex items-center gap-3">
                     <span className="font-medium text-gray-800 truncate">{customer.name}</span>
                     <span className="text-gray-500 text-xs shrink-0">ID: {customer.id}</span>
                     {customer.phone && <span className="text-gray-500 truncate hidden md:inline">{customer.phone}</span>}

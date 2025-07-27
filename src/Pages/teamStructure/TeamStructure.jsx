@@ -1,26 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
-  Paper,
-  Typography,
-  Button,
-  Box,
-  Grid,
-  Alert,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Divider,
-  Card,
-  CardContent,
-  CardActions,
-  IconButton,
-  Tooltip
-} from '@mui/material';
-import {
   Add as AddIcon,
   Group as GroupIcon,
   Person as PersonIcon,
@@ -119,176 +98,169 @@ const TeamStructure = () => {
 
   if (loading) {
     return (
-      <Container>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-          <CircularProgress />
-        </Box>
-      </Container>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex justify-center items-center min-h-[200px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
     );
   }
 
+  const monthOptions = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - i);
+    const monthStr = date.toISOString().slice(0, 7);
+    return {
+      value: monthStr,
+      label: date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+    };
+  });
+
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-8">
       {/* Header */}
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h4" component="h1" gutterBottom>
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
             Team Structure Management
-          </Typography>
-          <Box display="flex" gap={2} alignItems="center">
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Month</InputLabel>
-              <Select
-                value={selectedMonth}
-                onChange={handleMonthChange}
-                label="Month"
-              >
-                {Array.from({ length: 12 }, (_, i) => {
-                  const date = new Date();
-                  date.setMonth(date.getMonth() - i);
-                  const monthStr = date.toISOString().slice(0, 7);
-                  return (
-                    <MenuItem key={monthStr} value={monthStr}>
-                      {date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-            <Tooltip title="Refresh Data">
-              <IconButton onClick={loadTeamData} color="primary">
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
+          </h1>
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <select
+              value={selectedMonth}
+              onChange={handleMonthChange}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {monthOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={loadTeamData}
+              className="px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
+              title="Refresh Data"
+            >
+              <RefreshIcon />
+            </button>
+          </div>
+        </div>
 
         {/* Action Buttons */}
-        <Box display="flex" gap={2} mb={3}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <button
             onClick={() => setAssignModalOpen(true)}
-            disabled={availableUsers.subordinates.length === 0 || availableUsers.managers.length === 0}
+            disabled={availableUsers.subordinates.length === 0}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
+            <AddIcon />
             Assign User
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<GroupIcon />}
+          </button>
+          <button
             onClick={() => setBulkAssignModalOpen(true)}
-            disabled={availableUsers.subordinates.length === 0 || availableUsers.managers.length === 0}
+            disabled={availableUsers.subordinates.length === 0}
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
           >
+            <GroupIcon />
             Bulk Assignment
-          </Button>
-        </Box>
+          </button>
+        </div>
 
         {/* Statistics Cards */}
-        <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'primary.light', color: 'white' }}>
-              <CardContent sx={{ pb: 1 }}>
-                <SupervisorIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4">{stats.totalManagers}</Typography>
-                <Typography variant="body2">Managers</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'secondary.light', color: 'white' }}>
-              <CardContent sx={{ pb: 1 }}>
-                <PersonIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4">{stats.totalUsers}</Typography>
-                <Typography variant="body2">Total Users</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'success.light', color: 'white' }}>
-              <CardContent sx={{ pb: 1 }}>
-                <GroupIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4">{stats.assignedUsers}</Typography>
-                <Typography variant="body2">Assigned Users</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'warning.light', color: 'white' }}>
-              <CardContent sx={{ pb: 1 }}>
-                <PersonIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4">{stats.unassignedUsers}</Typography>
-                <Typography variant="body2">Unassigned Users</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'info.light', color: 'white' }}>
-              <CardContent sx={{ pb: 1 }}>
-                <GroupIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4">{stats.teams}</Typography>
-                <Typography variant="body2">Active Teams</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Paper>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="bg-blue-500 text-white rounded-lg p-4 text-center">
+            <SupervisorIcon />
+            <div className="text-2xl font-bold mt-2">{stats.totalManagers}</div>
+            <div className="text-sm opacity-90">Managers</div>
+          </div>
+          <div className="bg-purple-500 text-white rounded-lg p-4 text-center">
+            <PersonIcon />
+            <div className="text-2xl font-bold mt-2">{stats.totalUsers}</div>
+            <div className="text-sm opacity-90">Total Users</div>
+          </div>
+          <div className="bg-green-500 text-white rounded-lg p-4 text-center">
+            <GroupIcon />
+            <div className="text-2xl font-bold mt-2">{stats.assignedUsers}</div>
+            <div className="text-sm opacity-90">Assigned Users</div>
+          </div>
+          <div className="bg-yellow-500 text-white rounded-lg p-4 text-center">
+            <PersonIcon />
+            <div className="text-2xl font-bold mt-2">{stats.unassignedUsers}</div>
+            <div className="text-sm opacity-90">Unassigned Users</div>
+          </div>
+          <div className="bg-indigo-500 text-white rounded-lg p-4 text-center col-span-2 sm:col-span-1">
+            <GroupIcon />
+            <div className="text-2xl font-bold mt-2">{stats.teams}</div>
+            <div className="text-sm opacity-90">Active Teams</div>
+          </div>
+        </div>
+      </div>
 
       {/* Alerts */}
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex justify-between items-center">
+          <span>{error}</span>
+          <button
+            onClick={() => setError('')}
+            className="text-red-500 hover:text-red-700"
+          >
+            ×
+          </button>
+        </div>
       )}
       
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
-          {success}
-        </Alert>
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-4 flex justify-between items-center">
+          <span>{success}</span>
+          <button
+            onClick={() => setSuccess('')}
+            className="text-green-500 hover:text-green-700"
+          >
+            ×
+          </button>
+        </div>
       )}
 
       {/* Team Hierarchy */}
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-2">
           Team Hierarchy - {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-        </Typography>
-        <Divider sx={{ mb: 3 }} />
+        </h2>
+        <div className="border-t border-gray-200 mb-6"></div>
         
         {teamStructure.length === 0 ? (
-          <Box textAlign="center" py={4}>
-            <Typography variant="h6" color="text.secondary">
+          <div className="text-center py-8">
+            <h3 className="text-lg font-medium text-gray-500 mb-2">
               No team structure found for this month
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            </h3>
+            <p className="text-sm text-gray-400">
               Start by assigning users to managers to build your team structure
-            </Typography>
-          </Box>
+            </p>
+          </div>
         ) : (
           <TeamHierarchyTree 
             structure={teamStructure} 
             onRefresh={loadTeamData}
           />
         )}
-      </Paper>
+      </div>
 
-      {/* Modals */}
-      <AssignUserModal
-        open={assignModalOpen}
-        onClose={() => setAssignModalOpen(false)}
-        availableUsers={availableUsers}
-        selectedMonth={selectedMonth}
-        onSuccess={handleAssignSuccess}
-        onError={handleError}
-      />
+      {/* Modal placeholders - you would implement actual modals here */}
+        <AssignUserModal
+          open={assignModalOpen}
+          onClose={() => setAssignModalOpen(false)}
+          onAssignSuccess={handleAssignSuccess}
+          availableUsers={availableUsers}
+        />
 
-      <BulkAssignModal
-        open={bulkAssignModalOpen}
-        onClose={() => setBulkAssignModalOpen(false)}
-        availableUsers={availableUsers}
-        selectedMonth={selectedMonth}
-        onSuccess={handleAssignSuccess}
-        onError={handleError}
-      />
-    </Container>
+        <BulkAssignModal
+          open={bulkAssignModalOpen}
+          onClose={() => setBulkAssignModalOpen(false)}
+          onAssignSuccess={handleAssignSuccess}
+          availableUsers={availableUsers}
+        />
+
+    </div>
   );
 };
 

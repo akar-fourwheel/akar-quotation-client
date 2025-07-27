@@ -11,17 +11,8 @@ const HomePage = () => {
 
   return (
     <>
-      <style>{`
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none; /* IE 10+ */
-      scrollbar-width: none; /* Firefox */
-    }
-  `}</style>
       <div
-        className="relative min-h-screen w-full bg-cover bg-center overflow-y-auto no-scrollbar p-6"
+        className="relative min-h-screen w-full bg-cover bg-center overflow-y-auto p-6"
         style={{
           backgroundImage: `url('/bgImage.jpg')`,
           scrollbarWidth:'none',
@@ -41,7 +32,7 @@ const HomePage = () => {
         </div> */}
         {showOverlay && <NotificationOverlay onClose={() => setShowOverlay(false)} />}
 
-        <div className="relative z-10 flex flex-col min-h-screen px-4 py-20 sm:py-4 overflow-y-auto no-scrollbar">
+        <div className="relative z-10 flex flex-col min-h-screen px-4 py-20 sm:py-4 overflow-y-auto">
           <div className="flex-grow flex items-center justify-center">
             <div className="backdrop-blur-sm bg-white/10 w-full max-w-5xl rounded-2xl shadow-xl p-6 sm:p-10 text-white">
               <div className="text-center mb-8">

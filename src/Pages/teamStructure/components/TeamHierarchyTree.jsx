@@ -1,26 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Avatar,
-  Collapse,
-  IconButton,
-  Grid,
-  Divider,
-  Tooltip,
-  Badge
-} from '@mui/material';
-import {
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
-  Person as PersonIcon,
-  SupervisorAccount as SupervisorIcon,
-  Group as GroupIcon,
-  AdminPanelSettings as AdminIcon
-} from '@mui/icons-material';
+import { ExpandMoreIcon, ExpandLessIcon, PersonIcon, SupervisorIcon, GroupIcon, AdminIcon } from '../../../utils/icons';
 
 const TeamHierarchyTree = ({ structure, onRefresh }) => {
   const [expandedNodes, setExpandedNodes] = useState(new Set());
@@ -55,16 +34,33 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
     switch (role) {
       case 'admin':
       case 'md':
-        return 'error';
+        return 'bg-red-500';
       case 'gm':
       case 'sm':
-        return 'warning';
+        return 'bg-yellow-500';
       case 'teamLead':
-        return 'primary';
+        return 'bg-blue-500';
       case 'sales':
-        return 'secondary';
+        return 'bg-purple-500';
       default:
-        return 'default';
+        return 'bg-gray-500';
+    }
+  };
+
+  const getRoleColorBorder = (role) => {
+    switch (role) {
+      case 'admin':
+      case 'md':
+        return 'border-red-200';
+      case 'gm':
+      case 'sm':
+        return 'border-yellow-200';
+      case 'teamLead':
+        return 'border-blue-200';
+      case 'sales':
+        return 'border-purple-200';
+      default:
+        return 'border-gray-200';
     }
   };
 
@@ -87,237 +83,178 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
     const currentPath = [...path, node.username];
 
     return (
-      <Box sx={{ ml: level > 0 ? 2 : 0, mb: 1 }}>
+      <div className={`${level > 0 ? 'ml-4 sm:ml-8' : ''} mb-2`}>
         {/* Connection Lines */}
         {level > 0 && (
-          <Box
-            sx={{
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                left: -16,
-                top: -8,
-                width: 16,
-                height: level === 1 ? 24 : 32,
-                borderLeft: '2px solid #e0e0e0',
-                borderBottom: '2px solid #e0e0e0',
-                borderBottomLeftRadius: 8
-              }
-            }}
-          />
+          <div className="relative">
+            <div className="absolute -left-4 sm:-left-8 top-0 w-4 sm:w-8 h-6 border-l-2 border-b-2 border-gray-300 rounded-bl-lg"></div>
+          </div>
         )}
 
         {/* Node Card */}
-        <Card
-          sx={{
-            mb: 1,
-            bgcolor: level === 0 ? 'primary.light' : 'background.paper',
-            color: level === 0 ? 'white' : 'text.primary',
-            border: level === 0 ? 'none' : '1px solid #e0e0e0',
-            boxShadow: level === 0 ? 3 : 1,
-            transition: 'all 0.2s ease-in-out',
-            '&:hover': {
-              boxShadow: level === 0 ? 4 : 2,
-              transform: 'translateY(-1px)'
-            }
-          }}
+        <div
+          className={`mb-2 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${
+            level === 0 
+              ? 'bg-blue-500 text-white shadow-lg' 
+              : 'bg-white border border-gray-200'
+          }`}
         >
-          <CardContent sx={{ py: 2, px: 2, '&:last-child': { pb: 2 } }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Box display="flex" alignItems="center" flex={1}>
+          <div className="p-3 sm:p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center flex-1 min-w-0">
                 {/* Avatar and User Info */}
-                <Avatar
-                  sx={{
-                    bgcolor: getRoleColor(node.role) + '.main',
-                    width: 40,
-                    height: 40,
-                    mr: 2
-                  }}
-                >
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white mr-2 sm:mr-3 flex-shrink-0 ${getRoleColor(node.role)}`}>
                   {getRoleIcon(node.role)}
-                </Avatar>
+                </div>
 
-                <Box flex={1}>
-                  <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                    <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                    <h3 className="text-sm sm:text-base font-semibold truncate">
                       {node.username}
-                    </Typography>
-                    <Chip
-                      label={getRoleDisplayName(node.role)}
-                      size="small"
-                      color={getRoleColor(node.role)}
-                      variant={level === 0 ? 'filled' : 'outlined'}
-                    />
-                  </Box>
+                    </h3>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                      level === 0 
+                        ? 'bg-white bg-opacity-20 text-black' 
+                        : `${getRoleColorBorder(node.role)} ${getRoleColor(node.role)} text-white`
+                    }`}>
+                      {getRoleDisplayName(node.role)}
+                    </span>
+                  </div>
 
-                  <Typography variant="body2" sx={{ opacity: 0.8, mb: 1 }}>
+                  <p className={`text-xs sm:text-sm mb-1 ${level === 0 ? 'text-blue-100' : 'text-gray-500'}`}>
                     ID: {node.user_id}
-                  </Typography>
+                  </p>
 
                   {node.team_name && (
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <GroupIcon sx={{ fontSize: 16 }} />
-                      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                    <div className="flex items-center gap-1">
+                      <GroupIcon />
+                      <p className={`text-xs sm:text-sm italic ${level === 0 ? 'text-blue-100' : 'text-gray-600'}`}>
                         Team: {node.team_name}
-                      </Typography>
-                    </Box>
+                      </p>
+                    </div>
                   )}
-                </Box>
+                </div>
 
                 {/* Subordinate Count Badge */}
                 {hasSubordinates && (
-                  <Badge
-                    badgeContent={node.subordinates.length}
-                    color="secondary"
-                    sx={{ mr: 1 }}
-                  >
+                  <div className="relative flex-shrink-0 mr-2">
                     <GroupIcon />
-                  </Badge>
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {node.subordinates.length}
+                    </span>
+                  </div>
                 )}
-              </Box>
+              </div>
 
               {/* Expand/Collapse Button */}
               {hasSubordinates && (
-                <Tooltip title={isExpanded ? 'Collapse' : 'Expand'}>
-                  <IconButton
-                    onClick={() => toggleExpanded(nodeId)}
-                    size="small"
-                    sx={{
-                      color: level === 0 ? 'white' : 'primary.main',
-                      '&:hover': {
-                        bgcolor: level === 0 ? 'rgba(255,255,255,0.1)' : 'primary.light'
-                      }
-                    }}
-                  >
-                    {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                  </IconButton>
-                </Tooltip>
+                <button
+                  onClick={() => toggleExpanded(nodeId)}
+                  className={`p-1 rounded-full transition-colors flex-shrink-0 ${
+                    level === 0 
+                      ? 'hover:bg-white hover:bg-opacity-10 text-white' 
+                      : 'hover:bg-blue-50 text-blue-600'
+                  }`}
+                  title={isExpanded ? 'Collapse' : 'Expand'}
+                >
+                  {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </button>
               )}
-            </Box>
+            </div>
 
             {/* Manager Information */}
             {node.manager && level > 0 && (
-              <Box sx={{ mt: 1, pt: 1, borderTop: '1px solid rgba(0,0,0,0.1)' }}>
-                <Typography variant="caption" color="text.secondary">
+              <div className="mt-2 pt-2 border-t border-gray-200 border-opacity-20">
+                <p className="text-xs text-gray-400">
                   Reports to: {node.manager.username} ({getRoleDisplayName(node.manager.role)})
-                </Typography>
-              </Box>
+                </p>
+              </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Subordinates */}
-        {hasSubordinates && (
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-            <Box sx={{ position: 'relative' }}>
-              {/* Vertical connector line */}
-              {isExpanded && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    left: -8,
-                    top: 0,
-                    bottom: 0,
-                    width: 2,
-                    bgcolor: 'divider',
-                    opacity: 0.3
-                  }}
-                />
-              )}
-
-              {node.subordinates.map((subordinate, index) => (
-                <TreeNode
-                  key={`${subordinate.user_id}-${level + 1}`}
-                  node={subordinate}
-                  level={level + 1}
-                  isLast={index === node.subordinates.length - 1}
-                  path={currentPath}
-                />
-              ))}
-            </Box>
-          </Collapse>
+        {hasSubordinates && isExpanded && (
+          <div className="relative">
+            {/* Vertical connector line */}
+            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-300 opacity-30"></div>
+            
+            {node.subordinates.map((subordinate, index) => (
+              <TreeNode
+                key={`${subordinate.user_id}-${level + 1}`}
+                node={subordinate}
+                level={level + 1}
+                isLast={index === node.subordinates.length - 1}
+                path={currentPath}
+              />
+            ))}
+          </div>
         )}
-      </Box>
+      </div>
     );
   };
 
   if (!structure || structure.length === 0) {
     return (
-      <Box textAlign="center" py={4}>
-        <GroupIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-        <Typography variant="h6" color="text.secondary" gutterBottom>
+      <div className="text-center py-8">
+        <div className="text-gray-400 mb-4">
+          <GroupIcon />
+        </div>
+        <h3 className="text-lg font-medium text-gray-500 mb-2">
           No team structure available
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
+        </h3>
+        <p className="text-sm text-gray-400">
           Team assignments will appear here once configured
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
-  return (
-    <Box>
-      {/* Quick Stats */}
-      <Box sx={{ mb: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'primary.light', color: 'white' }}>
-              <CardContent sx={{ py: 1 }}>
-                <Typography variant="h6">
-                  {structure.reduce((acc, node) => {
-                    const count = (n) => {
-                      let total = n.role === 'teamLead' ? 1 : 0;
-                      if (n.subordinates) {
-                        total += n.subordinates.reduce((sum, sub) => sum + count(sub), 0);
-                      }
-                      return total;
-                    };
-                    return acc + count(node);
-                  }, 0)}
-                </Typography>
-                <Typography variant="body2">Team Leads</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'secondary.light', color: 'white' }}>
-              <CardContent sx={{ py: 1 }}>
-                <Typography variant="h6">
-                  {structure.reduce((acc, node) => {
-                    const count = (n) => {
-                      let total = n.role === 'sales' ? 1 : 0;
-                      if (n.subordinates) {
-                        total += n.subordinates.reduce((sum, sub) => sum + count(sub), 0);
-                      }
-                      return total;
-                    };
-                    return acc + count(node);
-                  }, 0)}
-                </Typography>
-                <Typography variant="body2">Customer Advisors</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card sx={{ textAlign: 'center', bgcolor: 'success.light', color: 'white' }}>
-              <CardContent sx={{ py: 1 }}>
-                <Typography variant="h6">
-                  {structure.filter(node => 
-                    node.subordinates && node.subordinates.length > 0
-                  ).length}
-                </Typography>
-                <Typography variant="body2">Active Teams</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Box>
+  const countByRole = (structure, targetRole) => {
+    return structure.reduce((acc, node) => {
+      const count = (n) => {
+        let total = n.role === targetRole ? 1 : 0;
+        if (n.subordinates) {
+          total += n.subordinates.reduce((sum, sub) => sum + count(sub), 0);
+        }
+        return total;
+      };
+      return acc + count(node);
+    }, 0);
+  };
 
-      <Divider sx={{ mb: 3 }} />
+  return (
+    <div>
+      {/* Quick Stats */}
+      <div className="mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-blue-500 text-white rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold">
+              {countByRole(structure, 'teamLead')}
+            </div>
+            <div className="text-sm opacity-90">Team Leads</div>
+          </div>
+          <div className="bg-purple-500 text-white rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold">
+              {countByRole(structure, 'sales')}
+            </div>
+            <div className="text-sm opacity-90">Customer Advisors</div>
+          </div>
+          <div className="bg-green-500 text-white rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold">
+              {structure.filter(node => 
+                node.subordinates && node.subordinates.length > 0
+              ).length}
+            </div>
+            <div className="text-sm opacity-90">Active Teams</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200 mb-6"></div>
 
       {/* Hierarchy Tree */}
-      <Box>
+      <div>
         {structure.map((node, index) => (
           <TreeNode
             key={`${node.user_id}-0`}
@@ -326,8 +263,8 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
             isLast={index === structure.length - 1}
           />
         ))}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

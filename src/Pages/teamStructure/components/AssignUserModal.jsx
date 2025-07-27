@@ -77,7 +77,7 @@ const AssignUserModal = ({
   };
 
   const getSelectedManagerDetails = () => {
-    return availableUsers.managers.find(user => user.user_id === selectedManager);
+    return availableUsers.subordinates.find(user => user.user_id === selectedManager);
   };
 
   return (
@@ -107,6 +107,31 @@ const AssignUserModal = ({
         )}
 
         <Box sx={{ mt: 2 }}>
+
+          {/* Manager Selection */}
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel>Select Manager</InputLabel>
+            <Select
+              value={selectedManager}
+              onChange={(e) => setSelectedManager(e.target.value)}
+              label="Select Manager"
+              disabled={loading}
+              startAdornment={<SupervisorIcon sx={{ mr: 1, color: 'action.active' }} />}
+            >
+              <MenuItem value="">
+                <em>Choose a manager</em>
+              </MenuItem>
+              {availableUsers.subordinates.map((user) => (
+                <MenuItem key={user.user_id} value={user.user_id}>
+                  <Box display="flex" alignItems="center">
+                    <SupervisorIcon sx={{ mr: 1, fontSize: 18 }} />
+                    {user.username} ({hierarchyService.getRoleDisplayName(user.role)}) - ID: {user.user_id}
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           {/* Subordinate Selection */}
           <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel>Select Subordinate</InputLabel>
@@ -124,30 +149,6 @@ const AssignUserModal = ({
                 <MenuItem key={user.user_id} value={user.user_id}>
                   <Box display="flex" alignItems="center">
                     <PersonIcon sx={{ mr: 1, fontSize: 18 }} />
-                    {user.username} ({hierarchyService.getRoleDisplayName(user.role)}) - ID: {user.user_id}
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Manager Selection */}
-          <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel>Select Manager</InputLabel>
-            <Select
-              value={selectedManager}
-              onChange={(e) => setSelectedManager(e.target.value)}
-              label="Select Manager"
-              disabled={loading}
-              startAdornment={<SupervisorIcon sx={{ mr: 1, color: 'action.active' }} />}
-            >
-              <MenuItem value="">
-                <em>Choose a manager</em>
-              </MenuItem>
-              {availableUsers.managers.map((user) => (
-                <MenuItem key={user.user_id} value={user.user_id}>
-                  <Box display="flex" alignItems="center">
-                    <SupervisorIcon sx={{ mr: 1, fontSize: 18 }} />
                     {user.username} ({hierarchyService.getRoleDisplayName(user.role)}) - ID: {user.user_id}
                   </Box>
                 </MenuItem>
@@ -175,10 +176,10 @@ const AssignUserModal = ({
               </Typography>
               <Box sx={{ bgcolor: 'grey.50', p: 2, borderRadius: 1 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Subordinate:</strong> {getSelectedSubordinateDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedSubordinateDetails()?.role)}) - ID: {selectedSubordinate}
+                  <strong>Manager:</strong> {getSelectedManagerDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedManagerDetails()?.role)}) - ID: {selectedManager}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Manager:</strong> {getSelectedManagerDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedManagerDetails()?.role)}) - ID: {selectedManager}
+                  <strong>Subordinate:</strong> {getSelectedSubordinateDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedSubordinateDetails()?.role)}) - ID: {selectedSubordinate}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}>
                   <strong>Month:</strong> {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}

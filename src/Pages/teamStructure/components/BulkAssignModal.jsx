@@ -94,7 +94,7 @@ const BulkAssignModal = ({
   };
 
   const getManagerDetails = () => {
-    return availableUsers.managers.find(user => user.user_id === selectedManager);
+    return availableUsers.subordinates.find(user => user.user_id === selectedManager);
   };
 
   const getSubordinateDetails = (userId) => {
@@ -140,7 +140,7 @@ const BulkAssignModal = ({
             <MenuItem value="">
               <em>Choose a manager</em>
             </MenuItem>
-            {availableUsers.managers.map((user) => (
+            {availableUsers.subordinates.filter(user => user.role !== 'sales').map((user) => (
               <MenuItem key={user.user_id} value={user.user_id}>
                 <Box display="flex" alignItems="center">
                   <SupervisorIcon sx={{ mr: 1, fontSize: 18 }} />
