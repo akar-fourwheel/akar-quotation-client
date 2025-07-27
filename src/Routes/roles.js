@@ -6,5 +6,11 @@ export const roles = {
     GUARD: 'guard',
     RECEPTION: 'receptionist',
     CRE:'cre',
-    MD:'md'
+    MD:'md',
+    GM:'gm',
+    SM:'sm',
+    ACCOUNT:'account',
+    FINANCE:'finance',
+    INSURANCE:'insurance',
+    EDP:'edp'
 };
