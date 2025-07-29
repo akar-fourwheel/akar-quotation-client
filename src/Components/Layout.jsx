@@ -17,7 +17,7 @@ const Layout = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      <div className="flex-1 flex flex-col">
+      <div className="pt-16 flex-1 flex flex-col">
         <Header toggleSidebar={toggleSidebar} />
         <main className="flex-1 overflow-x-hidden no-scrollbar"
         onClick={closeSidebar}

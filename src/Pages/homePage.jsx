@@ -45,7 +45,7 @@ const HomePage = () => {
           <div className="flex-grow flex items-center justify-center">
             <div className="backdrop-blur-sm bg-white/10 w-full max-w-5xl rounded-2xl shadow-xl p-6 sm:p-10 text-white">
               <div className="text-center mb-8">
-                <img src="./logo.jpg" alt="Logo" className="h-28 mx-auto rounded-md shadow" />
+                <img src="/logo.jpg" alt="Logo" className="h-28 mx-auto rounded-md shadow" />
                 <h1 className="text-4xl sm:text-5xl font-extrabold text-center drop-shadow mt-4 mb-8">Welcome to Akar Motors</h1>
               </div>
 

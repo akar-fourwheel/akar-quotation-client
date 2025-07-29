@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo,useState } from "react";
 
 const AllRecords = ({
   data,
@@ -17,6 +17,9 @@ const AllRecords = ({
   setShowBreakdownRecords,
   onFilterChange
 }) => {
+  {console.log(data)}
+  const [selectedRecord, setSelectedRecord] = useState(null);
+
   const getDate = (ts) => {
     if (!ts) return '-';
     const date = new Date(ts);
@@ -122,13 +125,21 @@ const AllRecords = ({
                   onFilterChange();
                 }
               }}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             <button
               onClick={() => onFilterChange()}
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 py-2 rounded-md transition-all text-sm font-medium min-w-[80px]"
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2.5 rounded-md transition-all text-sm font-medium w-auto"
             >
-              Search
+              <svg
+                className="w-4 h-4 block"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+              </svg>
             </button>
             {(searchTerm || selectedStatus !== 'ALL' || showWorkshopRecords || showBreakdownRecords) && (
               <button
@@ -167,7 +178,7 @@ const AllRecords = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-100">
             <tr>
@@ -207,6 +218,66 @@ const AllRecords = ({
           </tbody>
         </table>
       </div>
+
+      {/* Mobile View */}
+      <div className="space-y-3 md:hidden">
+        {data.length > 0 ? (
+          data.map((record, index) => (
+            <div
+              key={record.id || index}
+              className="bg-white rounded-lg shadow-sm p-3 space-y-1 text-sm"
+            >
+              <div className="grid grid-cols-[1fr_auto] gap-4">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-black text-base truncate">
+                    {record.cx_name || '-'}</span>
+                  <span className="text-xs">Phone: {record.cx_phone}</span>
+                </div>
+                <div className="flex flex-col items-end justify-between space-y-2">
+                  <div>{getStatusBadge(record.status)}</div> 
+                  <div className="flex items-center text-gray-600 text-xs gap-1">
+                  <span className="text-gray-600 text-xs">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4 text-gray-500 inline mb-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                      <span className="font-medium"> {record.sales_person || '-'} </span>
+                  </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-gray-600 text-xs">
+                <span className="font-medium text-gray-800">{record.model || '-'}</span>{' '}
+              </div>
+
+              <div className="flex justify-end -mt-1">
+                <button
+                  onClick={() => setSelectedRecord(record)}
+                  className="px-3 py-1 border border-gray-200 text-sm rounded-md bg-gray-100 hover:bg-gray-200"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-4 text-gray-500 text-sm">
+            <i className="fas fa-info-circle mr-1 text-blue-500"></i>No records found matching your criteria
+          </div>
+        )}
+      </div>
+
 
       {pagination.totalPages > 1 && (
         <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg">
@@ -257,8 +328,38 @@ const AllRecords = ({
           </div>
         </div>
       )}
+
+      {selectedRecord && (
+        <div className="fixed inset-0 z-50 bg-black/30 bg-opacity-30 backdrop-blur-sm flex justify-center items-center p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-5 space-y-3 relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedRecord(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+            >
+              &times;
+            </button>
+
+            <h2 className="text-lg font-semibold">Details</h2>
+            <div className="space-y-1 text-sm text-gray-700">
+              <div><strong>Customer:</strong> {selectedRecord.cx_name || '-'}</div>
+              <div><strong>Phone:</strong> {selectedRecord.cx_phone || '-'}</div>
+              <div><strong>Model:</strong> {selectedRecord.model || '-'}</div>
+              <div><strong>Sales Person:</strong> {selectedRecord.sales_person || '-'}</div>
+              <div><strong>Status:</strong> {selectedRecord.status || '-'}</div>
+              <div><strong>Duration:</strong> {selectedRecord.in_time ? `${Math.abs(getDuration(selectedRecord.in_time, selectedRecord.out_time)).toFixed(1)} Hr` : '-'}</div>
+              <div><strong>Out KM:</strong> {selectedRecord.out_km ?? '-'}</div>
+              <div><strong>In KM:</strong> {selectedRecord.in_km ?? '-'}</div>
+              <div><strong>Total KM:</strong> {(selectedRecord.in_km != null && selectedRecord.out_km != null) ? selectedRecord.in_km - selectedRecord.out_km : '-'}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
+
+
 
 export default AllRecords;

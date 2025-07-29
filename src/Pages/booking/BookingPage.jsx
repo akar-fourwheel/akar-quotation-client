@@ -50,6 +50,14 @@ function BookingPage() {
     }
   };
 
+  const updateBookingStatus = (bookingId, newStatus) => {
+    setQuotaData((prevData) =>
+      prevData.map((item) =>
+        item.id === bookingId ? { ...item, STAT: newStatus } : item
+      )
+    );
+  };
+
   const handleApprovalComplete = () => {
     fetchBookings();
   };
@@ -136,18 +144,17 @@ function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2 sm:py-3">
+      <div className="max-w-full xl:max-w-7xl mx-auto px-2 sm:px-3 lg:px-4">
         <div className="mb-8">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Booking Management</h1>
-            
+            <h1 className="text-lg md:text-3xl font-bold text-gray-900">Booking Management</h1>
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="flex flex-wrap justify-between gap-2">
-            <div className='flex flex-wrap gap-2'>{[
+        <div className="flex flex-col-reverse lg:flex-row lg:items-center lg:justify-between gap-2 mb-6">
+          <div className="flex flex-wrap gap-2">
+            {[
               { value: "all", label: "All Bookings" },
               { value: "active", label: "Active" },
               { value: "requested", label: "Pending Approval" },
@@ -158,128 +165,175 @@ function BookingPage() {
               <button
                 key={option.value}
                 onClick={() => setFilterOption(option.value)}
-                className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${filterOption === option.value
+                className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${filterOption === option.value
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
               >
                 {option.label}
               </button>
-            ))}</div>
-            <div className='flex flex-wrap gap-2'>
-              {(role === roles.TEAML || role === roles.ADMIN || role === roles.MD) && (
-                <button
-                  onClick={() => setShowApprovalModal(true)}
-                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Approve Requests
-                </button>
-              )}
-              
-              {(role === roles.ADMIN || role === roles.MD || role === roles.TEAML) && (
-                <button
-                  onClick={() => setShowVnaModal(true)}
-                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  View VNA List
-                </button>
-              )}
-            </div>
+            ))}
           </div>
+
+          {(role === roles.TEAML || role === roles.ADMIN || role === roles.MD) && (
+            <div className="flex flex-wrap gap-2 justify-start lg:justify-end">
+              <button
+                onClick={() => setShowApprovalModal(true)}
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Approve Requests
+              </button>
+
+              <button
+                onClick={() => setShowVnaModal(true)}
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                View VNA List
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="bg-white shadow-sm rounded-lg overflow-hidden mt-10">
+
+
+        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           {filteredData.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 text-lg mb-2">No bookings found</div>
+            <div className="text-center py-8">
+              <div className="text-gray-400 text-sm">No bookings found</div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Booking ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Sales Advisor
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Vehicle Details
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredData.map((row) => (
-                    <tr key={row.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+            <>
+              {/* Desktop table view - compact */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">ID</th>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Advisor</th>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Customer</th>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Vehicle</th>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-right text-xs font-medium text-gray-600 uppercase">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredData.map((row) => (
+                      <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2">
+                          <div className="text-xs font-medium text-gray-900 truncate max-w-20 lg:max-w-none">{row.Quotation_ID}</div>
+                        </td>
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2">
+                          <div className="text-xs text-gray-900 truncate max-w-20 lg:max-w-none">{row.sales_advisor}</div>
+                        </td>
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2">
+                          <div className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.CX_NAME}</div>
+                        </td>
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2">
+                          <div className="text-xs">
+                            <div className="font-medium text-gray-900 truncate max-w-28 lg:max-w-none">{row.Product_Line}</div>
+                            <div className="text-gray-500 truncate">{row.Manufacturing_YR} • {row.VC_Color}</div>
+                            {row.Chasis_No && (
+                              <div className="text-gray-500 truncate">{row.Chasis_No}</div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2">
+                          {getStatusBadge(row.STAT)}
+                        </td>
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2 text-right">
+                          <div className="flex justify-end space-x-1">
+                            <button
+                              onClick={() => handleViewInfo(row.id)}
+                              className="px-1.5 lg:px-2 py-0.5 lg:py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              View
+                            </button>
+                            {(row.STAT === "CONFIRMED" || row.STAT === "INPROGRESS") && (
+                              <button
+                                onClick={() => {
+                                  setSelectedRow(row);
+                                  setShowCancelModal(true);
+                                }}
+                                className="px-1.5 lg:px-2 py-0.5 lg:py-1 text-xs border border-red-300 rounded text-red-700 bg-white hover:bg-red-50 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="md:hidden">
+                {filteredData.map((row) => (
+                  <div key={row.id} className="border-b border-gray-200 last:border-b-0">
+                    <div className="p-3 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs sm:text-sm font-semibold bg-blue-100 rounded-xl px-2 py-0.5 text-blue-700 whitespace-nowrap">
                           {row.Quotation_ID}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{row.sales_advisor}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{row.CX_NAME}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          <div className="font-medium">{row.Product_Line}</div>
-                          <div className="text-gray-500 text-xs">
-                            {row.Manufacturing_YR} • {row.VC_Color}
-                          </div>
-                          {row.Chasis_No && (
-                            <div className="text-gray-500 text-xs">
-                              Chassis: {row.Chasis_No}
-                            </div>
-                          )}
+
+                        <div className="flex items-center gap-2 text-right">
+                          <div className="text-xs sm:text-sm text-gray-500 truncate lg:pr-5 flex items-center justify-end gap-1">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-4 h-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>{row.sales_advisor}</div>
+                          {getStatusBadge(row.STAT)}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(row.STAT)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
+                      </div>
+
+                      <div className="text-xs sm:text-sm font-medium text-gray-900 mt-2 truncate">{row.CX_NAME}</div>
+
+                      <div className=" flex items-center justify-between">
+                        <div className="text-xs text-gray-600 mt-1">
+                          <span className="font-medium">{row.Product_Line}</span>
+                          <span className="text-gray-500 ml-2">{row.Manufacturing_YR} • {row.VC_Color}</span>
+                        </div>
+                        <div className="flex space-x-1">
                           <button
                             onClick={() => handleViewInfo(row.id)}
-                            className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            className="px-2 py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                           >
-                            View Details
+                            View
                           </button>
-                          { (row.STAT === "CONFIRMED" || row.STAT === "INPROGRESS") && (
+                          {(row.STAT === "CONFIRMED" || row.STAT === "INPROGRESS") && (
                             <button
                               onClick={() => {
                                 setSelectedRow(row);
                                 setShowCancelModal(true);
                               }}
-                              className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition-colors"
+                              className="px-2 py-1 text-xs border border-red-300 rounded text-red-700 bg-white hover:bg-red-50 transition-colors"
                             >
                               Cancel
                             </button>
                           )}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
@@ -295,6 +349,7 @@ function BookingPage() {
           <BookingInfoModal
             bookingId={selectedBookingId}
             onClose={() => setShowInfoModal(false)}
+            onBookingStatusUpdate={updateBookingStatus}
           />
         )}
 
