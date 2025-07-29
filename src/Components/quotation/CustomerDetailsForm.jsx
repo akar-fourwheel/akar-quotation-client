@@ -83,7 +83,7 @@ const CustomerDetailsForm = ({
           />
         </div>
         {/* Customer List */}
-        <div className="max-h-60 border border-gray-300 rounded-md bg-white text-sm">
+        <div className="max-h-60 overflow-y-auto border border-gray-300 rounded-md bg-white text-sm">
           {filteredCustomers && filteredCustomers.length > 0 ? (
             <div className="divide-y divide-gray-100">
               {filteredCustomers.map((customer, index) => (
