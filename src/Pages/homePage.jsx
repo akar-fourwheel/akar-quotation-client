@@ -11,8 +11,17 @@ const HomePage = () => {
 
   return (
     <>
+      <style>{`
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE 10+ */
+      scrollbar-width: none; /* Firefox */
+    }
+  `}</style>
       <div
-        className="relative min-h-screen w-full bg-cover bg-center overflow-y-auto p-6"
+        className="relative min-h-screen w-full bg-cover bg-center overflow-y-auto no-scrollbar p-6"
         style={{
           backgroundImage: `url('/bgImage.jpg')`,
           scrollbarWidth:'none',
