@@ -41,7 +41,7 @@ const HomePage = () => {
         </div> */}
         {showOverlay && <NotificationOverlay onClose={() => setShowOverlay(false)} />}
 
-        <div className="relative z-10 flex flex-col min-h-screen px-4 py-20 sm:py-4 overflow-y-auto">
+        <div className="relative z-10 flex flex-col min-h-screen px-4 py-20 sm:py-4 overflow-y-auto no-scrollbar">
           <div className="flex-grow flex items-center justify-center">
             <div className="backdrop-blur-sm bg-white/10 w-full max-w-5xl rounded-2xl shadow-xl p-6 sm:p-10 text-white">
               <div className="text-center mb-8">
