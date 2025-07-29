@@ -102,9 +102,9 @@ class HierarchyService {
       admin: 'Admin',
       md: 'Managing Director',
       gm: 'General Manager',
-      sm: 'Sales Manager',
-      teamLead: 'Team Lead',
-      sales: 'Customer Advisor'
+      sm: 'SM',
+      teamLead: 'TL',
+      sales: 'CA'
     };
     return roleNames[role] || role;
   }

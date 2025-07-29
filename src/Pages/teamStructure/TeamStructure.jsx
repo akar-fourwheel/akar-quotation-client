@@ -138,10 +138,10 @@ const TeamStructure = () => {
             </select>
             <button
               onClick={loadTeamData}
-              className="px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
+              className="px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors flex items-center justify-center"
               title="Refresh Data"
             >
-              <RefreshIcon />
+              <RefreshIcon className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -153,7 +153,7 @@ const TeamStructure = () => {
             disabled={availableUsers.subordinates.length === 0}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            <AddIcon />
+            <AddIcon className="w-4 h-4" />
             Assign User
           </button>
           <button
@@ -161,7 +161,7 @@ const TeamStructure = () => {
             disabled={availableUsers.subordinates.length === 0}
             className="flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
           >
-            <GroupIcon />
+            <GroupIcon className="w-4 h-4" />
             Bulk Assignment
           </button>
         </div>
@@ -169,28 +169,28 @@ const TeamStructure = () => {
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="bg-blue-500 text-white rounded-lg p-4 text-center">
-            <SupervisorIcon />
-            <div className="text-2xl font-bold mt-2">{stats.totalManagers}</div>
+            <SupervisorIcon className="w-8 h-8 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.totalManagers}</div>
             <div className="text-sm opacity-90">Managers</div>
           </div>
           <div className="bg-purple-500 text-white rounded-lg p-4 text-center">
-            <PersonIcon />
-            <div className="text-2xl font-bold mt-2">{stats.totalUsers}</div>
+            <PersonIcon className="w-8 h-8 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.totalUsers}</div>
             <div className="text-sm opacity-90">Total Users</div>
           </div>
           <div className="bg-green-500 text-white rounded-lg p-4 text-center">
-            <GroupIcon />
-            <div className="text-2xl font-bold mt-2">{stats.assignedUsers}</div>
+            <GroupIcon className="w-8 h-8 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.assignedUsers}</div>
             <div className="text-sm opacity-90">Assigned Users</div>
           </div>
           <div className="bg-yellow-500 text-white rounded-lg p-4 text-center">
-            <PersonIcon />
-            <div className="text-2xl font-bold mt-2">{stats.unassignedUsers}</div>
+            <PersonIcon className="w-8 h-8 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.unassignedUsers}</div>
             <div className="text-sm opacity-90">Unassigned Users</div>
           </div>
           <div className="bg-indigo-500 text-white rounded-lg p-4 text-center col-span-2 sm:col-span-1">
-            <GroupIcon />
-            <div className="text-2xl font-bold mt-2">{stats.teams}</div>
+            <GroupIcon className="w-8 h-8 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.teams}</div>
             <div className="text-sm opacity-90">Active Teams</div>
           </div>
         </div>
@@ -202,7 +202,7 @@ const TeamStructure = () => {
           <span>{error}</span>
           <button
             onClick={() => setError('')}
-            className="text-red-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700 text-xl leading-none"
           >
             ×
           </button>
@@ -214,7 +214,7 @@ const TeamStructure = () => {
           <span>{success}</span>
           <button
             onClick={() => setSuccess('')}
-            className="text-green-500 hover:text-green-700"
+            className="text-green-500 hover:text-green-700 text-xl leading-none"
           >
             ×
           </button>
@@ -245,21 +245,21 @@ const TeamStructure = () => {
         )}
       </div>
 
-      {/* Modal placeholders - you would implement actual modals here */}
-        <AssignUserModal
-          open={assignModalOpen}
-          onClose={() => setAssignModalOpen(false)}
-          onAssignSuccess={handleAssignSuccess}
-          availableUsers={availableUsers}
-        />
+      <AssignUserModal
+        open={assignModalOpen}
+        onClose={() => setAssignModalOpen(false)}
+        onAssignSuccess={handleAssignSuccess}
+        availableUsers={availableUsers}
+        selectedMonth={selectedMonth}
+      />
 
-        <BulkAssignModal
-          open={bulkAssignModalOpen}
-          onClose={() => setBulkAssignModalOpen(false)}
-          onAssignSuccess={handleAssignSuccess}
-          availableUsers={availableUsers}
-        />
-
+      <BulkAssignModal
+        open={bulkAssignModalOpen}
+        onClose={() => setBulkAssignModalOpen(false)}
+        onAssignSuccess={handleAssignSuccess}
+        availableUsers={availableUsers}
+        selectedMonth={selectedMonth}
+      />
     </div>
   );
 };

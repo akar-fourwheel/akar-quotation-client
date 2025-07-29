@@ -1,22 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Box,
-  Typography,
-  CircularProgress,
-  Alert,
-  Divider
-} from '@mui/material';
-import {
   Person as PersonIcon,
   SupervisorAccount as SupervisorIcon
 } from '@mui/icons-material';
@@ -27,8 +10,7 @@ const AssignUserModal = ({
   onClose, 
   availableUsers, 
   selectedMonth, 
-  onSuccess, 
-  onError 
+  onAssignSuccess 
 }) => {
   const [selectedSubordinate, setSelectedSubordinate] = useState('');
   const [selectedManager, setSelectedManager] = useState('');
@@ -63,7 +45,7 @@ const AssignUserModal = ({
         teamName.trim()
       );
 
-      onSuccess(response.message || 'User assigned successfully');
+      onAssignSuccess(response.message || 'User assigned successfully');
       handleClose();
     } catch (error) {
       setLocalError(error.message);
@@ -77,142 +59,132 @@ const AssignUserModal = ({
   };
 
   const getSelectedManagerDetails = () => {
-    return availableUsers.subordinates.find(user => user.user_id === selectedManager);
+    return availableUsers.managers.find(user => user.user_id === selectedManager);
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: { minHeight: '400px' }
-      }}
-    >
-      <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" component="div">
-          Assign User to Manager
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Assign a subordinate to a manager for {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-        </Typography>
-      </DialogTitle>
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Assign User to Manager</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Assign a subordinate to a manager for {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+          </p>
+        </div>
 
-      <DialogContent>
-        {localError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {localError}
-          </Alert>
-        )}
-
-        <Box sx={{ mt: 2 }}>
+        {/* Content */}
+        <div className="p-6">
+          {localError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+              {localError}
+            </div>
+          )}
 
           {/* Manager Selection */}
-          <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel>Select Manager</InputLabel>
-            <Select
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <SupervisorIcon className="inline w-4 h-4 mr-1" />
+              Select Manager
+            </label>
+            <select
               value={selectedManager}
               onChange={(e) => setSelectedManager(e.target.value)}
-              label="Select Manager"
               disabled={loading}
-              startAdornment={<SupervisorIcon sx={{ mr: 1, color: 'action.active' }} />}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <MenuItem value="">
-                <em>Choose a manager</em>
-              </MenuItem>
-              {availableUsers.subordinates.map((user) => (
-                <MenuItem key={user.user_id} value={user.user_id}>
-                  <Box display="flex" alignItems="center">
-                    <SupervisorIcon sx={{ mr: 1, fontSize: 18 }} />
-                    {user.username} ({hierarchyService.getRoleDisplayName(user.role)}) - ID: {user.user_id}
-                  </Box>
-                </MenuItem>
+              <option value="">Choose a manager</option>
+              {availableUsers.managers.sort((a, b) => a.role.localeCompare(b.role)).map((user) => (
+                <option key={user.user_id} value={user.user_id}>
+                  {user.username} ({hierarchyService.getRoleDisplayName(user.role)})
+                </option>
               ))}
-            </Select>
-          </FormControl>
+            </select>
+          </div>
 
           {/* Subordinate Selection */}
-          <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel>Select Subordinate</InputLabel>
-            <Select
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <PersonIcon className="inline w-4 h-4 mr-1" />
+              Select Subordinate
+            </label>
+            <select
               value={selectedSubordinate}
               onChange={(e) => setSelectedSubordinate(e.target.value)}
-              label="Select Subordinate"
               disabled={loading}
-              startAdornment={<PersonIcon sx={{ mr: 1, color: 'action.active' }} />}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <MenuItem value="">
-                <em>Choose a subordinate</em>
-              </MenuItem>
-              {availableUsers.subordinates.map((user) => (
-                <MenuItem key={user.user_id} value={user.user_id}>
-                  <Box display="flex" alignItems="center">
-                    <PersonIcon sx={{ mr: 1, fontSize: 18 }} />
-                    {user.username} ({hierarchyService.getRoleDisplayName(user.role)}) - ID: {user.user_id}
-                  </Box>
-                </MenuItem>
+              <option value="">Choose a subordinate</option>
+              {availableUsers.subordinates.sort((a, b) => b.role.localeCompare(a.role)).map((user) => (
+                <option key={user.user_id} value={user.user_id}>
+                  {user.username} ({hierarchyService.getRoleDisplayName(user.role)})
+                </option>
               ))}
-            </Select>
-          </FormControl>
+            </select>
+          </div>
 
           {/* Team Name */}
-          <TextField
-            fullWidth
-            label="Team Name (Optional)"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-            disabled={loading}
-            placeholder="Enter team name or leave blank"
-            sx={{ mb: 3 }}
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Team Name (Optional)
+            </label>
+            <input
+              type="text"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              disabled={loading}
+              placeholder="Enter team name or leave blank"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
           {/* Assignment Preview */}
           {selectedSubordinate && selectedManager && (
             <>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Assignment Preview
-              </Typography>
-              <Box sx={{ bgcolor: 'grey.50', p: 2, borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Manager:</strong> {getSelectedManagerDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedManagerDetails()?.role)}) - ID: {selectedManager}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Subordinate:</strong> {getSelectedSubordinateDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedSubordinateDetails()?.role)}) - ID: {selectedSubordinate}
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
+              <div className="border-t border-gray-200 my-4"></div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3">Assignment Preview</h3>
+              <div className="bg-gray-50 p-4 rounded-md">
+                <p className="text-sm mb-2">
+                  <strong>Manager:</strong> {getSelectedManagerDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedManagerDetails()?.role)})
+                </p>
+                <p className="text-sm mb-2">
+                  <strong>Subordinate:</strong> {getSelectedSubordinateDetails()?.username} ({hierarchyService.getRoleDisplayName(getSelectedSubordinateDetails()?.role)})
+                </p>
+                <p className="text-sm mb-2">
                   <strong>Month:</strong> {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-                </Typography>
+                </p>
                 {teamName && (
-                  <Typography variant="body2">
+                  <p className="text-sm">
                     <strong>Team Name:</strong> {teamName}
-                  </Typography>
+                  </p>
                 )}
-              </Box>
+              </div>
             </>
           )}
-        </Box>
-      </DialogContent>
+        </div>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button 
-          onClick={handleClose} 
-          disabled={loading}
-          color="inherit"
-        >
-          Cancel
-        </Button>
-        <Button 
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={loading || !selectedSubordinate || !selectedManager}
-          startIcon={loading ? <CircularProgress size={18} /> : null}
-        >
-          {loading ? 'Assigning...' : 'Assign User'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+          <button
+            onClick={handleClose}
+            disabled={loading}
+            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !selectedSubordinate || !selectedManager}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {loading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+            {loading ? 'Assigning...' : 'Assign User'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

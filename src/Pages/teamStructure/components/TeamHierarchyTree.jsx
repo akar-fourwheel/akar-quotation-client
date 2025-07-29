@@ -20,13 +20,13 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
       case 'md':
       case 'gm':
       case 'sm':
-        return <AdminIcon />;
+        return <AdminIcon className="w-4 h-4" />;
       case 'teamLead':
-        return <SupervisorIcon />;
+        return <SupervisorIcon className="w-4 h-4" />;
       case 'sales':
-        return <PersonIcon />;
+        return <PersonIcon className="w-4 h-4" />;
       default:
-        return <PersonIcon />;
+        return <PersonIcon className="w-4 h-4" />;
     }
   };
 
@@ -127,7 +127,7 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
 
                   {node.team_name && (
                     <div className="flex items-center gap-1">
-                      <GroupIcon />
+                      <GroupIcon className="w-4 h-4" />
                       <p className={`text-xs sm:text-sm italic ${level === 0 ? 'text-blue-100' : 'text-gray-600'}`}>
                         Team: {node.team_name}
                       </p>
@@ -138,7 +138,7 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
                 {/* Subordinate Count Badge */}
                 {hasSubordinates && (
                   <div className="relative flex-shrink-0 mr-2">
-                    <GroupIcon />
+                    <GroupIcon className="w-5 h-5" />
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {node.subordinates.length}
                     </span>
@@ -157,7 +157,7 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
                   }`}
                   title={isExpanded ? 'Collapse' : 'Expand'}
                 >
-                  {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {isExpanded ? <ExpandLessIcon className="w-5 h-5" /> : <ExpandMoreIcon className="w-5 h-5" />}
                 </button>
               )}
             </div>
@@ -198,7 +198,7 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
     return (
       <div className="text-center py-8">
         <div className="text-gray-400 mb-4">
-          <GroupIcon />
+          <GroupIcon className="w-12 h-12 mx-auto" />
         </div>
         <h3 className="text-lg font-medium text-gray-500 mb-2">
           No team structure available
