@@ -153,7 +153,7 @@ const CustomerList = () => {
                 </div>
 
                 {/* Desktop pagination */}
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div className="hidden lg:block sm:flex sm:flex-1 sm:items-center sm:justify-between">
                     <div>
                         <p className="text-sm text-gray-700">
                             Showing <span className="font-medium">{(currentPage - 1) * pagination.limit + 1}</span> to{' '}
@@ -207,10 +207,10 @@ const CustomerList = () => {
 
     // Mobile card component for better mobile experience
     const MobileCustomerCard = ({ customer, index }) => (
-        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
+        <div className="lg:hidden bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center space-x-2">
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                    <span className="text-blue-800 text-xs font-medium px-2 py-1 rounded">
                         #{getSerialNumber(index)}
                     </span>
                     <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${

@@ -136,11 +136,12 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         Quote ID: {request.quotationId}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        Requested on {formatDate(request.requestedAt)} by {request.requestedBy}
+                        Requested on {formatDate(request.requestedAt)} <br></br>
+                        Requested by {request.requestedBy}
                       </p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    <div className="flex items-center justify-center space-x-2">
+                      <span className="inline-block break-words w-fit text-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 leading-tight">
                         Pending Approval
                       </span>
                     </div>

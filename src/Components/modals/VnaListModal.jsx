@@ -7,6 +7,7 @@ const VnaListModal = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showStockDetails, setShowStockDetails] = useState(false);
   const [selectedStockData, setSelectedStockData] = useState(null);
+  const [bookingStatusFilter, setBookingStatusFilter] = useState('INPROGRESS');
 
   useEffect(() => {
     const fetchVnaData = async () => {
@@ -52,6 +53,8 @@ const VnaListModal = ({ onClose }) => {
     setShowStockDetails(true);
   };
 
+  const filteredData = vnaData.filter(row => row.booking_status?.trim().toLowerCase() === bookingStatusFilter.toLowerCase());
+
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-[#00000061] backdrop-blur-sm flex items-center justify-center z-50">
@@ -79,6 +82,29 @@ const VnaListModal = ({ onClose }) => {
           </button>
         </div>
 
+        <div className="flex gap-3 mb-4">
+          <button
+            onClick={() => setBookingStatusFilter('INPROGRESS')}
+            className={` px-3 py-1.5 rounded-lg text-sm font-medium ${bookingStatusFilter === 'INPROGRESS'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+          >
+            In Progress
+          </button>
+          <button
+            onClick={() => setBookingStatusFilter('CANCELLED')}
+            className={` px-3 py-1.5 rounded-lg text-sm font-medium ${bookingStatusFilter === 'CANCELLED'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+          >
+            Cancelled
+          </button>
+        </div>
+
+
+
         <div className="overflow-x-auto max-h-[70vh]">
           {vnaData.length === 0 ? (
             <div className="text-center py-12">
@@ -86,127 +112,222 @@ const VnaListModal = ({ onClose }) => {
               <div className="text-gray-500 text-sm">All vehicles are currently available in stock</div>
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Quotation ID
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Customer Details
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Sales Person
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Vehicle Details
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Stock Availability
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Request Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Request Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {vnaData.map((row, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.quotation_id}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        <div className="font-medium">{row.customer_name || 'N/A'}</div>
-                        <div className="text-gray-500 text-xs">
-                          {row.customer_phone || 'N/A'}
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Quotation ID
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Customer Details
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Sales Person
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Vehicle Details
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Stock Availability
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Request Date
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Request Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredData.map((row, index) => (
+                        <tr key={index} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {row.quotation_id}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              <div className="font-medium">{row.customer_name || 'N/A'}</div>
+                              <div className="text-gray-500 text-xs">
+                                {row.customer_phone || 'N/A'}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {row.sales_advisor || 'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="text-sm text-gray-900">
+                              <div className="font-medium">{row.product_line}</div>
+                              <div className="text-gray-500 text-xs">
+                                {row.manufacturing_yr} • {row.fuel} • {row.vc_color}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="text-sm text-gray-900">
+                              {row.stockAvailability && (
+                                <div className="space-y-1">
+                                  {row.stockAvailability.zawl_stock.length > 0 && (
+                                    <div className="flex items-center">
+                                      <button
+                                        onClick={() => handleStockClick(row.stockAvailability.zawl_stock, 'ZAWL')}
+                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2 hover:bg-green-200 cursor-pointer transition-colors"
+                                      >
+                                        ZAWL
+                                      </button>
+                                      <span className="text-xs text-gray-600">
+                                        {row.stockAvailability.zawl_stock.length} available
+                                      </span>
+                                    </div>
+                                  )}
+                                  {row.stockAvailability.zonal_stock.length > 0 && (
+                                    <div className="flex items-center">
+                                      <button
+                                        onClick={() => handleStockClick(row.stockAvailability.zonal_stock, 'ZONAL')}
+                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 hover:bg-blue-200 cursor-pointer transition-colors"
+                                      >
+                                        ZONAL
+                                      </button>
+                                      <span className="text-xs text-gray-600">
+                                        {row.stockAvailability.zonal_stock.length} available
+                                      </span>
+                                    </div>
+                                  )}
+                                  {row.stockAvailability.plant_stock.length > 0 && (
+                                    <div className="flex items-center">
+                                      <button
+                                        onClick={() => handleStockClick(row.stockAvailability.plant_stock, 'PLANT')}
+                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mr-2 hover:bg-purple-200 cursor-pointer transition-colors"
+                                      >
+                                        PLANT
+                                      </button>
+                                      <span className="text-xs text-gray-600">
+                                        {row.stockAvailability.plant_stock.length} available
+                                      </span>
+                                    </div>
+                                  )}
+                                  {row.stockAvailability.zawl_stock.length === 0 &&
+                                    row.stockAvailability.zonal_stock.length === 0 &&
+                                    row.stockAvailability.plant_stock.length === 0 && (
+                                      <span className="text-xs text-red-600">Not available in any stock</span>
+                                    )}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {formatDate(row.created_on)}
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {row.booking_status || 'N/A'}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="block lg:hidden space-y-2">
+                  {filteredData.map((row, index) => (
+                    <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm">
+                      {/* Header with Quotation ID and Status */}
+                      <div className="flex justify-between items-baseline mb-2">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {row.quotation_id}
+                        </div>
+                        <div className="flex flex-col items-end text-right min-w-[80px]">
+                          <div className="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
+                            {row.booking_status || 'N/A'}
+                          </div>
+                          <div className="text-xs text-gray-500 text-right md:break-all leading-tight">
+                            {formatDate(row.created_on)}
+                          </div>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {row.salesperson_name || 'N/A'}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
-                        <div className="font-medium">{row.product_line}</div>
-                        <div className="text-gray-500 text-xs">
-                          {row.manufacturing_yr} • {row.fuel} • {row.vc_color}
+
+                      {/* Main Content in Grid */}
+                      {/* Customer + Vehicle on left, Sales + Stock on right */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-2">
+                          {/* Customer */}
+                          <div>
+                            <div className="text-xs text-gray-600 mb-0.5">Customer</div>
+                            <div className="text-sm font-medium text-gray-900 leading-tight">{row.customer_name || 'N/A'}</div>
+                            <div className="text-xs text-gray-500">{row.customer_phone || 'N/A'}</div>
+                          </div>
+
+                          {/* Vehicle */}
+                          <div>
+                            <div className="text-xs text-gray-600 mb-0.5">Vehicle</div>
+                            <div className="text-sm font-medium text-gray-900 leading-tight break-all">{row.product_line}</div>
+                            <div className="text-xs text-gray-500">{row.manufacturing_yr} • {row.vc_color}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
-                        {row.stockAvailability && (
-                          <div className="space-y-1">
-                            {row.stockAvailability.zawl_stock.length > 0 && (
-                              <div className="flex items-center">
-                                <button
-                                  onClick={() => handleStockClick(row.stockAvailability.zawl_stock, 'ZAWL')}
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2 hover:bg-green-200 cursor-pointer transition-colors"
-                                >
-                                  ZAWL
-                                </button>
-                                <span className="text-xs text-gray-600">
-                                  {row.stockAvailability.zawl_stock.length} available
-                                </span>
+
+                        <div className="flex flex-col items-end justify-between text-right gap-2">
+                          {/* Sales Person */}
+                          <div>
+                            <div className="text-xs text-gray-600 mb-0.5">Sales Person</div>
+                            <div className="text-sm text-gray-900">{row.sales_advisor || 'N/A'}</div>
+                          </div>
+
+                          {/* Stock */}
+                          <div>
+                            <div className="text-xs text-gray-600 mb-0.5">Stock</div>
+                            {row.stockAvailability && (
+                              <div className="flex flex-wrap justify-end gap-1">
+                                {row.stockAvailability.zawl_stock.length > 0 && (
+                                  <button
+                                    onClick={() => handleStockClick(row.stockAvailability.zawl_stock, 'ZAWL')}
+                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200"
+                                  >
+                                    ZAWL ({row.stockAvailability.zawl_stock.length})
+                                  </button>
+                                )}
+                                {row.stockAvailability.zonal_stock.length > 0 && (
+                                  <button
+                                    onClick={() => handleStockClick(row.stockAvailability.zonal_stock, 'ZONAL')}
+                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                  >
+                                    ZONAL ({row.stockAvailability.zonal_stock.length})
+                                  </button>
+                                )}
+                                {row.stockAvailability.plant_stock.length > 0 && (
+                                  <button
+                                    onClick={() => handleStockClick(row.stockAvailability.plant_stock, 'PLANT')}
+                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200"
+                                  >
+                                    PLANT ({row.stockAvailability.plant_stock.length})
+                                  </button>
+                                )}
+                                {row.stockAvailability.zawl_stock.length === 0 &&
+                                  row.stockAvailability.zonal_stock.length === 0 &&
+                                  row.stockAvailability.plant_stock.length === 0 && (
+                                    <span className="text-xs text-red-600">Not available</span>
+                                  )}
                               </div>
-                            )}
-                            {row.stockAvailability.zonal_stock.length > 0 && (
-                              <div className="flex items-center">
-                                <button
-                                  onClick={() => handleStockClick(row.stockAvailability.zonal_stock, 'ZONAL')}
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 hover:bg-blue-200 cursor-pointer transition-colors"
-                                >
-                                  ZONAL
-                                </button>
-                                <span className="text-xs text-gray-600">
-                                  {row.stockAvailability.zonal_stock.length} available
-                                </span>
-                              </div>
-                            )}
-                            {row.stockAvailability.plant_stock.length > 0 && (
-                              <div className="flex items-center">
-                                <button
-                                  onClick={() => handleStockClick(row.stockAvailability.plant_stock, 'PLANT')}
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mr-2 hover:bg-purple-200 cursor-pointer transition-colors"
-                                >
-                                  PLANT
-                                </button>
-                                <span className="text-xs text-gray-600">
-                                  {row.stockAvailability.plant_stock.length} available
-                                </span>
-                              </div>
-                            )}
-                            {row.stockAvailability.zawl_stock.length === 0 && 
-                             row.stockAvailability.zonal_stock.length === 0 && 
-                             row.stockAvailability.plant_stock.length === 0 && (
-                              <span className="text-xs text-red-600">Not available in any stock</span>
                             )}
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {formatDate(row.created_on)}
-                      </div>
-                    </td>
-                    <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {row.booking_status || 'N/A'}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+                    </div>
+                  ))}
+                </div>
+              </>
+
           )}
         </div>
 
