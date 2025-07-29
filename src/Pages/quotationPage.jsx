@@ -771,7 +771,7 @@ onChange={(e) => {
   
 
       <div className="overflow-x-auto mt-6">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 ">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 overflow-y-hidden">
           {loading && <Loader/>}
           {Object.keys(finalData).map((key, i) => (
             <Fragment key={i}>
