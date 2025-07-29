@@ -25,6 +25,7 @@ import bookTestDrive from "../Pages/bookTestDrive";
 import TestDriveHistoryPage from "../Pages/TestDriveHistoryPage";
 import CustomerList from "../Pages/customerList";
 import CustomerAssignEditPage from '../Pages/CustomerAssignEditPage'
+import TeamStructure from "../Pages/teamStructure/TeamStructure";
 
 export const routes = createBrowserRouter([
     {
@@ -110,6 +111,20 @@ export const routes = createBrowserRouter([
                     {
                         path: '/test-drive-history',
                         Component: TestDriveHistoryPage
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        element: <ProtectedRoute roles={[roles.TEAML, roles.MD, roles.ADMIN, roles.GM, roles.SM]} />,
+        children: [
+            {
+                element: <Layout />,
+                children: [
+                    {
+                        path: '/team-structure',
+                        Component: TeamStructure
                     }
                 ]
             },

@@ -180,6 +180,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 `} />
             Customer List
           </Link>}
+          
+          {(role === roles.ADMIN || role === roles.MD || role === roles.GM || role === roles.SM || role === roles.TEAM_LEAD) && (
+            <Link
+              to="/team-structure"
+              onClick={toggleSidebar}
+              className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
+                ${isActivePath('/team-structure')
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }
+              `}
+            >
+              <EditIcon className={`
+                  h-5 w-5 mr-3 transition-colors
+                  ${isActivePath('/team-structure')
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-400 group-hover:text-gray-300'
+                  }
+                `} />
+                Team Structure
+              </Link>
+          )}
           {role !== roles.RECEPTION && <div className="space-y-1">
             <button
               onClick={() => toggleMenu('testDrive')}

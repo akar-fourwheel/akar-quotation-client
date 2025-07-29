@@ -681,7 +681,7 @@ const handleCustomerSelect = (customer) => {
       color,selectedColor,selectedVas,selectedHpn,totalAddOns,accTotal,loyaltyType,scrap,name,phoneNo,email,address,selectedSalesPerson]);
 
   return (
-    <div className="m-auto w-full max-w-4xl p-4">
+  <div className="m-auto w-full max-w-4xl p-4">
   <h2 className="text-2xl font-semibold text-center mb-6">Quotation Form</h2>
 
   {/* <div className="mb-6 flex items-center space-x-3">

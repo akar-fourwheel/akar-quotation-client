@@ -62,9 +62,9 @@ const Signup = () => {
       const selected = userInfo.find(user => user[0] === value);
       setFormData(prev => ({
         ...prev,
-        userId: value,
-        username: selected ? selected[1] : '',
-        role: selected ? selected[2] : ''
+        userId: value.trim(),
+        username: selected ? selected[1].trim() : '',
+        role: selected ? selected[2].trim() : ''
       }));
       setSelectedUser(selected || null);
     } else {
