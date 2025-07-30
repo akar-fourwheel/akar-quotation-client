@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router';
 import { roles } from '../../Routes/roles';
 import { AuthContext } from '../../context/auth/AuthProvider';
 import { showSuccess, showError } from "../../utils/toast.js";
@@ -8,11 +7,11 @@ import CancelModal from "../../Components/modals/CancelModal.jsx";
 import BookingInfoModal from "../../Components/modals/BookingInfoModal";
 import VnaListModal from "../../Components/modals/VnaListModal.jsx";
 import BookingApprovalModal from "../../Components/modals/BookingApprovalModal.jsx";
+import Pagination from '../../Components/common/Paginaton.jsx';
 
 function BookingPage() {
 
-  const navigate = useNavigate();
-  const {role,username} = useContext(AuthContext);
+  const { role, username } = useContext(AuthContext);
 
   const [quotaData,setQuotaData] = useState([]);
   const [filterOption, setFilterOption] = useState("all");
@@ -23,6 +22,9 @@ function BookingPage() {
   const [showVnaModal, setShowVnaModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10;
 
   const handleViewInfo = (id) => {
     setSelectedBookingId(id);
@@ -62,21 +64,25 @@ function BookingPage() {
     fetchBookings();
   };
 
-  const fetchBookings = async () => {
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchBookings(page);
+  };
+
+  const fetchBookings = async (page) => {
     try {
       setIsLoading(true);
-      let response;
 
-      if (role === roles.ADMIN || role === roles.MD || role === roles.AUDITOR) {
-        response = await axios.get('/admin/all-bookings');
-      } else if (role === roles.SALES) {
-        response = await axios.get('/my-bookings', {
-          params: { name: username }
+      const response = await axios.get('/all-bookings', {
+          params: {
+            page: page,
+            limit: pageSize
+          }
         });
-      }
 
       if (response?.data) {
-        setQuotaData(response.data);
+        setQuotaData(response.data.data);
+        setTotalPages(response.data.totalPages);
       }
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -87,7 +93,7 @@ function BookingPage() {
   };
 
   useEffect(() => {
-    fetchBookings();
+    fetchBookings(currentPage);
   }, [role, username]);
 
   const filteredData = quotaData.filter((row) => {
@@ -283,21 +289,23 @@ function BookingPage() {
                         </div>
 
                         <div className="flex items-center gap-2 text-right">
-                          <div className="text-xs sm:text-sm text-gray-500 truncate lg:pr-5 flex items-center justify-end gap-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="w-4 h-4 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
+                          {role !== roles.SALES && <div className="text-xs sm:text-sm text-gray-500 truncate lg:pr-5 flex items-center justify-end gap-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-4 h-4 text-gray-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
                                 d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                               />
-                            </svg>{row.sales_advisor}</div>
+                            </svg>
+                            <span className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.sales_advisor}</span>
+                          </div>}
                           {getStatusBadge(row.STAT)}
                         </div>
                       </div>
@@ -334,6 +342,13 @@ function BookingPage() {
                 ))}
               </div>
             </>
+          )}
+          {(
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
 
