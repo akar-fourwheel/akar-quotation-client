@@ -343,7 +343,7 @@ function BookingPage() {
               </div>
             </>
           )}
-          {(
+          {totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
