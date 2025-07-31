@@ -4,6 +4,7 @@ import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
 import useDebounce from '../hooks/useDebounce'; 
+import Pagination from '../Components/common/Paginaton';
 
 function AllQuotation() {
     const navigate = useNavigate();
@@ -136,17 +137,8 @@ function AllQuotation() {
 
     const fetchCas = async () => {
         try {
-            let cas;
-            if (role === roles.ADMIN || role === roles.MD) {
-                cas = await axios.get('/admin/get-all-ca')
-            } else if (role === roles.TEAML) {
-                cas = await axios.get('/teamLead/get-tl-ca', {
-                    params: {
-                        tl: username
-                    }
-                })
-            }
-            setUniqueCas(cas.data || []);
+            let allCas = await axios.get('/sales/get-all-ca')
+            setUniqueCas(allCas.data.data || []);
         } catch (e) {
             console.log("Error fetching CA data:", e);
         }
@@ -177,7 +169,7 @@ function AllQuotation() {
     };
 
     useEffect(() => {
-        if (role === roles.ADMIN || role === roles.MD || role === roles.TEAML) {
+        if (role === roles.ADMIN || role === roles.MD || role === roles.TEAML || role === roles.SM || role === roles.GM) {
             fetchCas();
         }
     }, [role, username]);
@@ -270,20 +262,20 @@ function AllQuotation() {
                                 </svg>
                             </div>
                         </div>
-
+                        
                         {/* Filter by CA */}
-                        {(uniqueCas.length > 0 && (localStorage.role === roles.ADMIN || localStorage.role === roles.MD)) && (
+                        {(uniqueCas.length > 0 && (role !== roles.SALES)) && (
                             <div className="col-span-1 sm:col-span-1 lg:col-span-2">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Filter by CA:</label>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">Filter by Sales Advisor:</label>
                                 <select
                                     value={salesFilter}
                                     onChange={(e) => setSalesFilter(e.target.value)}
                                     className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value="" className="">All CAs</option>
-                                    {uniqueCas.map(([id, name]) => (
-                                        <option key={id} value={id}>
-                                            {name}
+                                    {uniqueCas.map(({user_id, username}) => (
+                                        <option key={user_id} value={user_id}>
+                                            {username}
                                         </option>
                                     ))}
                                 </select>
@@ -485,85 +477,13 @@ function AllQuotation() {
                                 </div>
                             </div>
                             {/* Pagination */}
-                            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                                <div className="flex-1 flex justify-between items-center">
-                                    <div className="hidden sm:block">
-                                        <p className="text-sm text-gray-700">
-                                            Showing <span className="font-medium">{((pagination.currentPage - 1) * pagination.itemsPerPage) + 1}</span> to{' '}
-                                            <span className="font-medium">{Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)}</span> of{' '}
-                                            <span className="font-medium">{pagination.totalItems}</span> results
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center space-x-2">
-                                        <button
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            disabled={!pagination?.hasPreviousPage}
-                                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            Previous
-                                        </button>
-
-                                        {/* Page Numbers */}
-                                        <div className="hidden sm:flex space-x-1">
-                                            <button
-                                                onClick={() => handlePageChange(1)}
-                                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === 1
-                                                    ? 'bg-blue-50 border-blue-500 text-blue-600'
-                                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                    }`}
-                                            >
-                                                1
-                                            </button>
-
-                                            {currentPage > 4 && <span className="px-2 py-2 text-gray-500">...</span>}
-
-                                            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                                                .filter((page) =>
-                                                    page === currentPage ||
-                                                    page === currentPage - 1 ||
-                                                    page === currentPage + 1
-                                                )
-                                                .map((page) => (
-                                                    page !== 1 && page !== pagination.totalPages && (
-                                                        <button
-                                                            key={page}
-                                                            onClick={() => handlePageChange(page)}
-                                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === page
-                                                                ? 'bg-blue-50 border-blue-500 text-blue-600'
-                                                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                                }`}
-                                                        >
-                                                            {page}
-                                                        </button>
-                                                    )
-                                                ))}
-
-                                            {currentPage < pagination.totalPages - 3 && <span className="px-2 py-2 text-gray-500">...</span>}
-
-                                            {pagination.totalPages > 1 && (
-                                                <button
-                                                    onClick={() => handlePageChange(pagination.totalPages)}
-                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === pagination.totalPages
-                                                        ? 'bg-blue-50 border-blue-500 text-blue-600'
-                                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                        }`}
-                                                >
-                                                    {pagination.totalPages}
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        <button
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={!pagination?.hasNextPage}
-                                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <Pagination
+                                currentPage={pagination.currentPage}
+                                totalPages={pagination.totalPages}
+                                onPageChange={handlePageChange}
+                                itemsPerPage={pagination.itemsPerPage}
+                                totalItems={pagination.totalItems}
+                            />
                         </>
                     ) : (
                         <div className="text-center py-12">

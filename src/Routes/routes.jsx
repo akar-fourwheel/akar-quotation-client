@@ -12,7 +12,6 @@ import StockPage from '../Pages/stockPage';
 import SchemePage from '../Pages/schemePage';
 import QuotationPage from '../Pages/quotationPage';
 import AllQuotation from "../Pages/AllQuotation";
-import QuotationForBooking from '../Pages/quotationForBooking';
 import BookingPage from "../Pages/booking/BookingPage";
 import BookingForm from "../Pages/booking/bookingForm";
 import bookingSuccess from "../Pages/booking/bookingSuccess";
@@ -41,7 +40,7 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.ADMIN]} />,
+        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.GM, roles.SM, roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
@@ -61,10 +60,6 @@ export const routes = createBrowserRouter([
                     {
                         path: '/quotation',
                         Component: QuotationPage
-                    },
-                    {
-                        path: '/quotation-book',
-                        Component: QuotationForBooking
                     },
                     {
                         path: '/booking-list',
