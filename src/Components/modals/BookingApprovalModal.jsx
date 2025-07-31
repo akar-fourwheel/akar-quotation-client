@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { showSuccess, showError } from "../../utils/toast.js";
+import { roles } from '../../Routes/roles.js';
+import { AuthContext } from '../../context/auth/AuthProvider.jsx';
 
 const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -8,6 +10,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
   const [processingId, setProcessingId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectingId, setRejectingId] = useState(null);
+  const { role } = useContext(AuthContext);
 
   useEffect(() => {
     fetchPendingRequests();
@@ -92,7 +95,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-[#00000061] backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -228,6 +231,8 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                       </div>
                     ) : (
                       <>
+                      {(role === roles.TEAML || role === roles.SM || role === roles.ADMIN || role === roles.GM || role === roles.MD) && (
+                        <div className='flex gap-2' >
                         <button
                           onClick={() => handleApproval(request.id, 'approve')}
                           disabled={processingId === request.id}
@@ -257,6 +262,8 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                           </svg>
                           Reject
                         </button>
+                        </div>
+                      )}
                       </>
                     )}
                   </div>

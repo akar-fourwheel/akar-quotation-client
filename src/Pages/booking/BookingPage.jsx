@@ -181,7 +181,7 @@ function BookingPage() {
             ))}
           </div>
 
-          {(role === roles.TEAML || role === roles.ADMIN || role === roles.MD) && (
+          {(role === roles.TEAML || role === roles.SM || role === roles.GM || role === roles.ADMIN || role === roles.MD) && (
             <div className="flex flex-wrap gap-2 justify-start lg:justify-end">
               <button
                 onClick={() => setShowApprovalModal(true)}
@@ -205,8 +205,6 @@ function BookingPage() {
             </div>
           )}
         </div>
-
-
 
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
           {filteredData.length === 0 ? (
@@ -348,6 +346,8 @@ function BookingPage() {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
+              itemsPerPage={pageSize}
+              totalItems={filteredData.length}
             />
           )}
         </div>

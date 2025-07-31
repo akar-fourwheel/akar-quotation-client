@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, totalItems }) => {
   const pages = [];
 
   for (let i = 1; i <= totalPages && i <= 5; i++) {
@@ -9,93 +9,85 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   }
 
   return (
-    <>
-        {/* desktop size */}
-        <div className="hidden items-center justify-center space-x-3 mt-4 mb-4 text-sm sm:flex">
-            <button
-                onClick={() => {
-                    if(currentPage === 1) return;
-                    onPageChange(currentPage - 1);
-                }}
-                disabled={currentPage === 1}
-                className={`flex items-center space-x-1 ${
-                currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:text-black cursor-pointer"
-                }`}
-            >
-                <span><ChevronLeft size={16} /></span>
-                <span>Previous</span>
-            </button>
+    <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div className="flex-1 flex justify-between items-center">
+            <div className="hidden sm:block">
+                <p className="text-sm text-gray-700">
+                    Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+                    <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalItems)}</span> of{' '}
+                    <span className="font-medium">{totalItems}</span> results
+                </p>
+            </div>
 
-            {pages.map((page) => (
+            <div className="flex items-center space-x-2">
                 <button
-                key={page}
-                    onClick={() => {
-                        if(currentPage === page) return;
-                        onPageChange(page);
-                }}
-                className={`w-8 h-8 flex items-center justify-center rounded-full transition cursor-pointer ${
-                    currentPage === page
-                    ? "border border-gray-700 text-black shadow"
-                    : "text-black hover:bg-gray-100"
-                }`}
+                    onClick={() => onPageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                {page}
+                    Previous
                 </button>
-            ))}
 
-            <button
-                onClick={() => {
-                    if(currentPage === totalPages) return;
-                    onPageChange(currentPage + 1);
-                }}
-                disabled={currentPage === totalPages}
-                className={`flex items-center space-x-1 ${
-                currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-600 hover:text-black cursor-pointer"
-                }`}
-            >
-                <span>Next</span>
-                <span><ChevronRight size={16} /></span>
-            </button>
+                {/* Page Numbers */}
+                <div className="hidden sm:flex space-x-1">
+                    <button
+                            onClick={() => onPageChange(1)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === 1
+                            ? 'bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
+                    >
+                        1
+                    </button>
+
+                    {currentPage > 4 && <span className="px-2 py-2 text-gray-500">...</span>}
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter((page) =>
+                            page === currentPage ||
+                            page === currentPage - 1 ||
+                            page === currentPage + 1
+                        )
+                        .map((page) => (
+                            page !== 1 && page !== totalPages && (
+                                <button
+                                    key={page}
+                                    onClick={() => onPageChange(page)}
+                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === page
+                                        ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    {page}
+                                </button>
+                            )
+                        ))}
+
+                    {currentPage < totalPages - 3 && <span className="px-2 py-2 text-gray-500">...</span>}
+
+                    {totalPages > 1 && (
+                        <button
+                            onClick={() => onPageChange(totalPages)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === totalPages
+                                ? 'bg-blue-50 border-blue-500 text-blue-600'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                }`}
+                        >
+                            {totalPages}
+                        </button>
+                    )}
+                </div>
+
+                <button
+                    onClick={() => onPageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Next
+                </button>
+            </div>
         </div>
-
-        {/* mobile size */}
-        <div className="flex items-center justify-center space-x-3 mt-4 mb-4 text-sm sm:hidden">
-            <button
-                onClick={() => {
-                    if(currentPage === 1) return;
-                    onPageChange(currentPage - 1);
-                }}
-                disabled={currentPage === 1}
-                className={`border rounded-full p-1 w-8 h-8 flex items-center justify-center ${
-                currentPage === 1
-                    ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                    : "text-black hover:bg-gray-100 cursor-pointer"
-                }`}
-            >
-                <ChevronLeft size={12} />
-            </button>
-
-            <span className="text-gray-600">
-                Page <span className="font-medium">{currentPage}</span> of{" "}
-                <span className="font-bold">{totalPages}</span>
-            </span>
-
-            <button
-                onClick={() => {
-                    if(currentPage === totalPages) return;
-                    onPageChange(currentPage + 1);
-                }}
-                disabled={currentPage === totalPages}
-                className={`border rounded-full p-1 w-8 h-8 flex items-center justify-center ${
-                currentPage === totalPages
-                    ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                    : "text-black hover:bg-gray-100 cursor-pointer"
-                }`}
-            >
-                <ChevronRight size={12} />
-            </button>
-        </div>
-    </>
+    </div>
   );
 };
 
