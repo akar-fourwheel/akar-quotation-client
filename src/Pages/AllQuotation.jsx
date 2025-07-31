@@ -136,17 +136,8 @@ function AllQuotation() {
 
     const fetchCas = async () => {
         try {
-            let cas;
-            if (role === roles.ADMIN || role === roles.MD) {
-                cas = await axios.get('/admin/get-all-ca')
-            } else if (role === roles.TEAML) {
-                cas = await axios.get('/teamLead/get-tl-ca', {
-                    params: {
-                        tl: username
-                    }
-                })
-            }
-            setUniqueCas(cas.data || []);
+            let allCas = await axios.get('/sales/get-all-ca')
+            setUniqueCas(allCas.data.data || []);
         } catch (e) {
             console.log("Error fetching CA data:", e);
         }
@@ -177,7 +168,7 @@ function AllQuotation() {
     };
 
     useEffect(() => {
-        if (role === roles.ADMIN || role === roles.MD || role === roles.TEAML) {
+        if (role === roles.ADMIN || role === roles.MD || role === roles.TEAML || role === roles.SM || role === roles.GM) {
             fetchCas();
         }
     }, [role, username]);
@@ -270,20 +261,20 @@ function AllQuotation() {
                                 </svg>
                             </div>
                         </div>
-
+                        
                         {/* Filter by CA */}
-                        {(uniqueCas.length > 0 && (localStorage.role === roles.ADMIN || localStorage.role === roles.MD)) && (
+                        {(uniqueCas.length > 0 && (role !== roles.SALES)) && (
                             <div className="col-span-1 sm:col-span-1 lg:col-span-2">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Filter by CA:</label>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">Filter by Sales Advisor:</label>
                                 <select
                                     value={salesFilter}
                                     onChange={(e) => setSalesFilter(e.target.value)}
                                     className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value="" className="">All CAs</option>
-                                    {uniqueCas.map(([id, name]) => (
-                                        <option key={id} value={id}>
-                                            {name}
+                                    {uniqueCas.map(({user_id, username}) => (
+                                        <option key={user_id} value={user_id}>
+                                            {username}
                                         </option>
                                     ))}
                                 </select>
