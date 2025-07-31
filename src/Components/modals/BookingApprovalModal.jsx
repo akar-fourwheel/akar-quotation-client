@@ -231,7 +231,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                       </div>
                     ) : (
                       <>
-                      {(role === roles.TEAML || role === roles.SM || role === roles.ADMIN || role === roles.GM || role === roles.MD) && (
+                      {(role === roles.TEAML || role === roles.SM || role === roles.ADMIN) && (
                         <div className='flex gap-2' >
                         <button
                           onClick={() => handleApproval(request.id, 'approve')}
