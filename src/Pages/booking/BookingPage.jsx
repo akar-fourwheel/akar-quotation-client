@@ -233,10 +233,10 @@ function BookingPage() {
                           <div className="text-xs font-medium text-gray-900 truncate max-w-20 lg:max-w-none">{row.Quotation_ID}</div>
                         </td>
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
-                          <div className="text-xs text-gray-900 truncate max-w-20 lg:max-w-none">{row.sales_advisor}</div>
+                          <div className="text-xs text-gray-900 max-w-md lg:max-w-md">{row.sales_advisor}</div>
                         </td>
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
-                          <div className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.CX_NAME}</div>
+                          <div className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.customer_name}</div>
                         </td>
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
                           <div className="text-xs">
@@ -302,13 +302,13 @@ function BookingPage() {
                                 d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                               />
                             </svg>
-                            <span className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.sales_advisor}</span>
+                            <span className="text-xs text-gray-900 truncate">{row.sales_advisor}</span>
                           </div>}
                           {getStatusBadge(row.STAT)}
                         </div>
                       </div>
 
-                      <div className="text-xs sm:text-sm font-medium text-gray-900 mt-2 truncate">{row.CX_NAME}</div>
+                      <div className="text-xs sm:text-sm font-medium text-gray-900 mt-2 truncate">{row.customer_name}</div>
 
                       <div className=" flex items-center justify-between">
                         <div className="text-xs text-gray-600 mt-1">
