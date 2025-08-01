@@ -45,9 +45,8 @@ function ReceptionPage() {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const caResponse = await axios.get("/leads/ca-list?query=onlyCA");
-        
-        setCaList(caResponse.data || []);
+        const caResponse = await axios.get("/sales/get-all-ca");
+        setCaList(caResponse.data.data || []);
         setModelList(modelOptions);
 
       } catch (error) {
@@ -189,7 +188,7 @@ function ReceptionPage() {
                     <label htmlFor="ca" className="block text-gray-700 text-sm font-bold mb-2">CA <span className="text-red-500">*</span></label>
                     <select id="ca" name="ca" value={formData.ca} onChange={handleChange} className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.ca ? 'border-red-500' : 'border-gray-300'}`} required>
                       <option value="" disabled>Select a CA</option>
-                      {caList.map(ca => <option key={ca[0]} value={ca[0]}>{ca[1]}</option>)}
+                      {caList.map(ca => <option key={ca.user_id} value={ca.user_id}>{ca.username}</option>)}
                     </select>
                     {errors.ca && <p className="text-red-500 text-xs italic mt-1">{errors.ca}</p>}
                   </div>
