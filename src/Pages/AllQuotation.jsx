@@ -5,6 +5,7 @@ import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
 import useDebounce from '../hooks/useDebounce'; 
 import Pagination from '../Components/common/Paginaton';
+import Loader from '../Components/Loader/Loader'
 
 function AllQuotation() {
     const navigate = useNavigate();
@@ -13,7 +14,7 @@ function AllQuotation() {
     const [currentPage, setCurrentPage] = useState(1);
     const [uniqueCas, setUniqueCas] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
-    const [expandedRow, setExpandedRow] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [modalData, setModalData] = useState({ show: false, success: false, message: '', model: '' });
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -145,6 +146,7 @@ function AllQuotation() {
     }
 
     const fetchQuotations = async (page) => {        
+        setLoading(true);
         try {
             const response = await axios.get(`/fetch-quotations`, {
                 params: {
@@ -156,15 +158,19 @@ function AllQuotation() {
             });
 
             const jsonData = response.data;
-            if(jsonData.data.length > 0 ){
-                setQuotaData(jsonData.data);
-                setPagination(jsonData.pagination);
-            } else {
-                setQuotaData([]);
-                setPagination({})
-            }
+            setQuotaData(jsonData.data || []);
+            setPagination(jsonData.data.length > 0 ? jsonData.pagination : {
+                currentPage: 1,
+                totalPages: 1,
+                totalItems: 0,
+                itemsPerPage: 25,
+                hasNextPage: false,
+                hasPreviousPage: false
+            });
         } catch (e) {
             console.log("Error fetching quotation data:", e);
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -346,7 +352,8 @@ function AllQuotation() {
 
                 {/* Table Section */}
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    {quotaData.length > 0 ? (
+                    { loading ? (<Loader/>) :
+                    quotaData.length > 0 ? (
                         <>
                             {/* Desktop Table */}
                             <div className="hidden lg:block">
@@ -454,7 +461,7 @@ function AllQuotation() {
                                                                     d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                                                                 />
                                                             </svg>
-                                                            <span>{row.username}</span>
+                                                            <span className="truncate max-w-[6rem] sm:max-w-[12rem] lg:max-w-none">{row.username}</span>
                                                       </div>
                                                     )}
                                                     <span>{setToIst(row.date)}</span>

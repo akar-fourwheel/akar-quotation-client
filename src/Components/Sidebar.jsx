@@ -192,7 +192,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 }
               `}
             >
-              <EditIcon className={`
+              <TeamIcon className={`
                   h-5 w-5 mr-3 transition-colors
                   ${isActivePath('/team-structure')
                     ? 'bg-gray-700 text-white'
@@ -359,6 +359,25 @@ const EditIcon = (props) => (
     />
   </svg>
 );
+
+const TeamIcon = (props) => (
+  <svg
+    {...props}
+    className="w-5 h-5 mr-3"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="9" y="3" width="6" height="6" />
+    <rect x="3" y="15" width="6" height="6" />
+    <rect x="15" y="15" width="6" height="6" />
+    <path d="M12 9v6M12 15h-3M12 15h3" />
+  </svg>
+);
+
 
 
 
