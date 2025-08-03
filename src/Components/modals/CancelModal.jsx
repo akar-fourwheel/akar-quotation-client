@@ -12,13 +12,13 @@ const CancelModal = ({ onClose, onConfirm, selectedRow }) => {
         <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+            className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
           >
             Close
           </button>
           <button
             onClick={() => onConfirm(selectedRow.Quotation_ID)}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
+            className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
           >
             Confirm Cancel
           </button>

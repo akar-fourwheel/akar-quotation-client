@@ -150,9 +150,9 @@ const TeamHierarchyTree = ({ structure, onRefresh }) => {
               {hasSubordinates && (
                 <button
                   onClick={() => toggleExpanded(nodeId)}
-                  className={`p-1 rounded-full transition-colors flex-shrink-0 ${
+                  className={`p-1 rounded-full transition-colors flex-shrink-0 cursor-pointer ${
                     level === 0 
-                      ? 'hover:bg-white hover:bg-opacity-10 text-white' 
+                      ? 'hover:bg-white hover:bg-opacity-100 hover:text-black text-white' 
                       : 'hover:bg-blue-50 text-blue-600'
                   }`}
                   title={isExpanded ? 'Collapse' : 'Expand'}

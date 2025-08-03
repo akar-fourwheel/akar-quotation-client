@@ -59,8 +59,8 @@ export default function CustomerAssignEditPage() {
 
     const fetchDropdowns = async () => {
         try {
-            const caRes = await axios.get('/leads/ca-list?query=onlyCA');
-            setCaList(caRes.data || []);
+            const caRes = await axios.get('/sales/get-all-ca');
+            setCaList(caRes.data.data || []);
         } catch (err) {
             setStatus({ message: 'Failed to load dropdown data.', type: 'error' });
         }
@@ -238,7 +238,7 @@ export default function CustomerAssignEditPage() {
                                         >
                                         <option value="">Choose a CA...</option>
                                         {caList.map(ca => (
-                                            <option key={ca[0]} value={ca[0]}>{ca[1]}</option>
+                                            <option key={ca.user_id} value={ca.user_id}>{ca.username}</option>
                                         ))}
                                     </select>
                                 </div>

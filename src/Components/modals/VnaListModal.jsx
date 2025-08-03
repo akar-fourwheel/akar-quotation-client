@@ -74,7 +74,7 @@ const VnaListModal = ({ onClose }) => {
           <h2 className="text-xl font-semibold text-gray-900">Vehicle Not Available (VNA) List</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -85,7 +85,7 @@ const VnaListModal = ({ onClose }) => {
         <div className="flex gap-3 mb-4">
           <button
             onClick={() => setBookingStatusFilter('INPROGRESS')}
-            className={` px-3 py-1.5 rounded-lg text-sm font-medium ${bookingStatusFilter === 'INPROGRESS'
+            className={`cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium ${bookingStatusFilter === 'INPROGRESS'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
@@ -94,7 +94,7 @@ const VnaListModal = ({ onClose }) => {
           </button>
           <button
             onClick={() => setBookingStatusFilter('CANCELLED')}
-            className={` px-3 py-1.5 rounded-lg text-sm font-medium ${bookingStatusFilter === 'CANCELLED'
+            className={`cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium ${bookingStatusFilter === 'CANCELLED'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
@@ -334,7 +334,7 @@ const VnaListModal = ({ onClose }) => {
         <div className="mt-6 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+            className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
           >
             Close
           </button>
@@ -351,7 +351,7 @@ const VnaListModal = ({ onClose }) => {
               </h3>
               <button
                 onClick={() => setShowStockDetails(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -437,7 +437,7 @@ const VnaListModal = ({ onClose }) => {
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setShowStockDetails(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
               >
                 Close
               </button>
