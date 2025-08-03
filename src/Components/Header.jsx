@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/auth/AuthProvider';
 import { useNavigate, useLocation } from 'react-router';
+import { roles } from '../Routes/roles';
 
 const Header = ({ toggleSidebar }) => {
-  const {username} = useContext(AuthContext);
+  const {username,role} = useContext(AuthContext);
   const [target,setTarget] = useState(0);
   const [remainingTarget,setRemainingTarget] = useState('');
   const navigate = useNavigate();
@@ -55,7 +56,15 @@ const Header = ({ toggleSidebar }) => {
                 />
               </svg>
             </button>
-            <div className="flex-shrink-0 flex items-center" onClick={()=>{ if(location.pathname !== '/') navigate('/') }}>
+            <div className="flex-shrink-0 flex items-center" onClick={()=>{ 
+              if(location.pathname !== '/') {
+                 if(role === roles.RECEPTION)
+                 navigate('/reception');
+              else if(role === roles.GUARD)
+                navigate('/test-drive');
+              else navigate('/')
+              }
+            }}>
               <h1 className="cursor-pointer select-none sm:text-xl sm:font-bold text-lg font-light text-gray-900">{username[0].toUpperCase() + username.slice(1)}</h1>
             </div>
           </div>

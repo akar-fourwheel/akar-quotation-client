@@ -128,7 +128,7 @@ const TeamStructure = () => {
             <select
               value={selectedMonth}
               onChange={handleMonthChange}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
             >
               {monthOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -138,7 +138,7 @@ const TeamStructure = () => {
             </select>
             <button
               onClick={loadTeamData}
-              className="px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors flex items-center justify-center"
+              className="px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors flex items-center justify-center cursor-pointer"
               title="Refresh Data"
             >
               <RefreshIcon className="w-5 h-5" />
@@ -151,7 +151,7 @@ const TeamStructure = () => {
           <button
             onClick={() => setAssignModalOpen(true)}
             disabled={availableUsers.subordinates.length === 0}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             <AddIcon className="w-4 h-4" />
             Assign User
@@ -159,7 +159,7 @@ const TeamStructure = () => {
           <button
             onClick={() => setBulkAssignModalOpen(true)}
             disabled={availableUsers.subordinates.length === 0}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             <GroupIcon className="w-4 h-4" />
             Bulk Assignment

@@ -109,7 +109,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -215,7 +215,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         <button
                           onClick={() => handleApproval(request.id, 'reject')}
                           disabled={processingId === request.id}
-                          className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+                          className="cursor-pointer px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
                         >
                           {processingId === request.id ? 'Processing...' : 'Confirm Reject'}
                         </button>
@@ -224,7 +224,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                             setRejectingId(null);
                             setRejectionReason('');
                           }}
-                          className="px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
                         >
                           Cancel
                         </button>
@@ -236,7 +236,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         <button
                           onClick={() => handleApproval(request.id, 'approve')}
                           disabled={processingId === request.id}
-                          className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+                          className="cursor-pointer inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                         >
                           {processingId === request.id ? (
                             <>
@@ -255,7 +255,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         <button
                           onClick={() => setRejectingId(request.id)}
                           disabled={processingId === request.id}
-                          className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+                          className="cursor-pointer inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
                         >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
