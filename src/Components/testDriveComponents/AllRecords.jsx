@@ -1,6 +1,7 @@
 import React, { useMemo,useState } from "react";
 import Pagination from "../common/Pagination";
 import { DateTime } from "luxon";
+import getDate from "../../utils/getDate.js"
 
 const AllRecords = ({
   data,
@@ -21,12 +22,6 @@ const AllRecords = ({
 }) => {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const getDate = (ts) => {
-    if (!ts) return '-';
-    return DateTime.fromISO(ts, { zone: 'utc' })
-      .setZone('Asia/Kolkata')
-      .toFormat('dd-MM-yyyy, hh:mm a');
-  };
 
   const getDuration = (inTs, outTs) => {
     const inDateTime = DateTime.fromISO(inTs, { zone: 'utc' }).setZone('Asia/Kolkata');

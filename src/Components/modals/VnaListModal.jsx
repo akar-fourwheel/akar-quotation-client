@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { showError } from '../../utils/toast.js';
-import { DateTime } from "luxon";
+import getDate from '../../utils/getDate.js'
+
 
 const VnaListModal = ({ onClose }) => {
+
   const [vnaData, setVnaData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showStockDetails, setShowStockDetails] = useState(false);
@@ -37,14 +39,6 @@ const VnaListModal = ({ onClose }) => {
       return y2025 > 0 ? 'Available' : '-';
     }
   };
-
-  const getDate = (ts) => {
-      if (!ts) return '-';
-      return DateTime.fromISO(ts, { zone: 'utc' })
-        .setZone('Asia/Kolkata')
-        .toFormat('dd-MM-yyyy, hh:mm a');
-    };
-  
 
   const handleStockClick = (stockData, stockType) => {
     setSelectedStockData({ data: stockData, type: stockType });

@@ -8,7 +8,7 @@ import BookingInfoModal from "../../Components/modals/BookingInfoModal";
 import VnaListModal from "../../Components/modals/VnaListModal.jsx";
 import BookingApprovalModal from "../../Components/modals/BookingApprovalModal.jsx";
 import Pagination from '../../Components/common/Pagination.jsx';
-import { DateTime } from "luxon";
+import getDate from '../../utils/getDate.js'
 
 function BookingPage() {
 
@@ -155,14 +155,7 @@ function BookingPage() {
       </span>
     );
   };
-
-  const getDate = (ts) => {
-    if (!ts) return '-';
-    return DateTime.fromISO(ts, { zone: 'utc' })
-      .setZone('Asia/Kolkata')
-      .toFormat('dd-MM-yyyy, hh:mm a');
-  };
-
+  
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

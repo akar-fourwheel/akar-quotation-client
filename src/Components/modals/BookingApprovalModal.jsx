@@ -3,7 +3,7 @@ import axios from 'axios';
 import { showSuccess, showError } from "../../utils/toast.js";
 import { roles } from '../../Routes/roles.js';
 import { AuthContext } from '../../context/auth/AuthProvider.jsx';
-import { DateTime } from "luxon";
+import getDate from '../../utils/getDate.js';
 
 const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -83,13 +83,6 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(amount);
-  };
-
-  const getDate = (ts) => {
-    if (!ts) return '-';
-    return DateTime.fromISO(ts, { zone: 'utc' })
-      .setZone('Asia/Kolkata')
-      .toFormat('dd-MM-yyyy, hh:mm a');
   };
 
   return (
