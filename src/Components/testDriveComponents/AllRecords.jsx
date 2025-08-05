@@ -1,5 +1,7 @@
 import React, { useMemo,useState } from "react";
 import Pagination from "../common/Pagination";
+import { DateTime } from "luxon";
+import getDate from "../../utils/getDate.js"
 
 const AllRecords = ({
   data,
@@ -20,24 +22,26 @@ const AllRecords = ({
 }) => {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const getDate = (ts) => {
-    if (!ts) return '-';
-    const date = new Date(ts);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-  
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-  
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
-  };
 
   const getDuration = (inTs, outTs) => {
-    const inDateTime = new Date(inTs);
-    const outDateTime = new Date(outTs);
-    return (inDateTime - outDateTime) / 3600000;
-  };
+    const inDateTime = DateTime.fromISO(inTs, { zone: 'utc' }).setZone('Asia/Kolkata');
+    const outDateTime = DateTime.fromISO(outTs, { zone: 'utc' }).setZone('Asia/Kolkata');
+
+    const diff = inDateTime.diff(outDateTime, ['hours', 'minutes']).toObject();
+
+    if (diff.hours < 0 || diff.minutes < 0) return '-';
+
+    const hours = Math.floor(diff.hours);
+    const minutes = Math.floor(diff.minutes);
+
+    if (hours > 0 && minutes > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''} ${minutes} min${minutes > 1 ? 's' : ''}`;
+    } else if (hours > 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    } else {
+      return `${minutes} min${minutes > 1 ? 's' : ''}`;
+    }
+  }
 
   const getStatusBadge = (status) => {
     const statusColors = {
@@ -188,6 +192,7 @@ const AllRecords = ({
               <th className="px-4 py-2">Phone Number</th>
               <th className="px-4 py-2">Sales Person</th>
               <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Scheduled Time</th>
               <th className="px-4 py-2">Duration</th>
               <th className="px-4 py-2">Out KM</th>
               <th className="px-4 py-2">In KM</th>
@@ -203,7 +208,8 @@ const AllRecords = ({
                 <td className="px-4 py-2">{record.cx_phone || '-'}</td>
                 <td className={`px-4 py-2 ${record.sales_person == "WORKSHOP" || record.sales_person == "BREAKDOWN" ? "text-blue-600" : ""}`}>{record.sales_person || '-'}</td>
                 <td className="px-4 py-2">{getStatusBadge(record.status)}</td>
-                <td className="px-4 py-2">{record.in_time ? `${Math.abs(getDuration(record.in_time, record.out_time)).toFixed(1)} Hr` : '-'}</td>
+                <td className="px-4 py-2">{getDate(record.scheduled_at)}</td>
+                <td className="px-4 py-2">{record.in_time ? getDuration(record.in_time, record.out_time): '-'}</td>
                 <td className="px-4 py-2">{record.out_km ?? '-'}</td>
                 <td className="px-4 py-2">{record.in_km ?? '-'}</td>
                 <td className="px-4 py-2">{(record.in_km != null && record.out_km != null) ? record.in_km - record.out_km : '-'}</td>
@@ -306,7 +312,8 @@ const AllRecords = ({
                 <div><strong>Model:</strong> {selectedRecord.model || '-'}</div>
                 <div><strong>Sales Person:</strong> {selectedRecord.sales_person || '-'}</div>
                 <div><strong>Status:</strong> {selectedRecord.status || '-'}</div>
-                <div><strong>Duration:</strong> {selectedRecord.in_time ? `${Math.abs(getDuration(selectedRecord.in_time, selectedRecord.out_time)).toFixed(1)} Hr` : '-'}</div>
+                <div><strong>Scheduled Time:</strong> {getDate(selectedRecord.scheduled_at)}</div>
+                <div><strong>Duration:</strong> {selectedRecord.in_time ? getDuration(selectedRecord.in_time, selectedRecord.out_time) : '-'}</div>
                 <div><strong>Out KM:</strong> {selectedRecord.out_km ?? '-'}</div>
                 <div><strong>In KM:</strong> {selectedRecord.in_km ?? '-'}</div>
                 <div><strong>Total KM:</strong> {(selectedRecord.in_km != null && selectedRecord.out_km != null) ? selectedRecord.in_km - selectedRecord.out_km : '-'}</div>
@@ -315,7 +322,7 @@ const AllRecords = ({
               <div className="space-y-1 text-sm text-gray-700">
                 <div><strong className="text-lg font-semibold text-center text-blue-600">{selectedRecord.sales_person == "WORKSHOP" ? "WORKSHOP" : "BREAKDOWN"}</strong> </div>
                 <div><strong>Model:</strong> {selectedRecord.model || '-'}</div>
-                <div><strong>Duration:</strong> {selectedRecord.in_time ? `${Math.abs(getDuration(selectedRecord.in_time, selectedRecord.out_time)).toFixed(1)} Hr` : '-'}</div>
+                <div><strong>Duration:</strong> {selectedRecord.in_time ? getDuration(selectedRecord.in_time, selectedRecord.out_time) : '-'}</div>
                 <div><strong>Out KM:</strong> {selectedRecord.out_km ?? '-'}</div>
                 <div><strong>In KM:</strong> {selectedRecord.in_km ?? '-'}</div>
                 <div><strong>Total KM:</strong> {(selectedRecord.in_km != null && selectedRecord.out_km != null) ? selectedRecord.in_km - selectedRecord.out_km : '-'}</div>

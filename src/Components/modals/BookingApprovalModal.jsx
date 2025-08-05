@@ -3,6 +3,7 @@ import axios from 'axios';
 import { showSuccess, showError } from "../../utils/toast.js";
 import { roles } from '../../Routes/roles.js';
 import { AuthContext } from '../../context/auth/AuthProvider.jsx';
+import getDate from '../../utils/getDate.js';
 
 const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -84,16 +85,6 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   return (
     <div className="fixed inset-0 bg-[#00000061] backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
@@ -139,7 +130,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         Quote ID: {request.quotationId}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        Requested on {formatDate(request.requestedAt)} <br></br>
+                        Requested on {getDate(request.requestedAt)} <br></br>
                         Requested by {request.requestedBy}
                       </p>
                     </div>

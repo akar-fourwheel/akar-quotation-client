@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { showError } from '../../utils/toast.js';
+import getDate from '../../utils/getDate.js'
+
 
 const VnaListModal = ({ onClose }) => {
+
   const [vnaData, setVnaData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showStockDetails, setShowStockDetails] = useState(false);
@@ -35,17 +38,6 @@ const VnaListModal = ({ onClose }) => {
     } else if (year === '2025') {
       return y2025 > 0 ? 'Available' : '-';
     }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   const handleStockClick = (stockData, stockType) => {
@@ -224,7 +216,7 @@ const VnaListModal = ({ onClose }) => {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {formatDate(row.created_on)}
+                              {getDate(row.created_on)}
                             </div>
                           </td>
                           <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm whitespace-nowrap">
@@ -252,7 +244,7 @@ const VnaListModal = ({ onClose }) => {
                             {row.booking_status || 'N/A'}
                           </div>
                           <div className="text-xs text-gray-500 text-right md:break-all leading-tight">
-                            {formatDate(row.created_on)}
+                            {getDate(row.created_on)}
                           </div>
                         </div>
                       </div>

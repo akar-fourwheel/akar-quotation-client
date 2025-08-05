@@ -6,6 +6,7 @@ import { AuthContext } from '../context/auth/AuthProvider';
 import useDebounce from '../hooks/useDebounce'; 
 import Pagination from '../Components/common/Pagination';
 import Loader from '../Components/Loader/Loader'
+import getDate from '../utils/getDate';
 
 function AllQuotation() {
     const navigate = useNavigate();
@@ -198,19 +199,7 @@ function AllQuotation() {
         setSelectedRow(row === selectedRow ? null : row);        
     };
 
-    function setToIst(dateTime) {
-        const dt = new Date(dateTime);
-        const istOffset = 5.5 * 60; // IST is UTC+5:30
-        const utc = dt.getTime() + (dt.getTimezoneOffset() * 60000);
-        const istTime = new Date(utc + (istOffset * 60000));
-
-        return istTime.toLocaleString('en-GB', {
-            timeZone: 'Asia/Kolkata',
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    }
+    
     const getSerialNumber = (index) => {
         return (pagination.currentPage - 1) * pagination.itemsPerPage + index + 1;
     };
@@ -390,7 +379,7 @@ function AllQuotation() {
                                                         {getSerialNumber(index)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        {setToIst(row.date)}
+                                                        {getDate(row.date, 'dd-MM-yyyy')}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -464,7 +453,7 @@ function AllQuotation() {
                                                             <span className="truncate max-w-[6rem] sm:max-w-[12rem] lg:max-w-none">{row.username}</span>
                                                       </div>
                                                     )}
-                                                    <span>{setToIst(row.date)}</span>
+                                                    <span>{getDate(row.date, 'dd-MM-yyyy')}</span>
                                                 </div>
                                             </div>
 

@@ -8,6 +8,7 @@ import BookingInfoModal from "../../Components/modals/BookingInfoModal";
 import VnaListModal from "../../Components/modals/VnaListModal.jsx";
 import BookingApprovalModal from "../../Components/modals/BookingApprovalModal.jsx";
 import Pagination from '../../Components/common/Pagination.jsx';
+import getDate from '../../utils/getDate.js'
 
 function BookingPage() {
 
@@ -154,7 +155,7 @@ function BookingPage() {
       </span>
     );
   };
-
+  
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -237,6 +238,7 @@ function BookingPage() {
                       <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Customer</th>
                       <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Vehicle</th>
                       <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
+                      <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-left text-xs font-medium text-gray-600 uppercase">Booking Time</th>
                       <th className="px-2 lg:px-3 py-1.5 lg:py-2 text-right text-xs font-medium text-gray-600 uppercase">Actions</th>
                     </tr>
                   </thead>
@@ -247,7 +249,7 @@ function BookingPage() {
                           <div className="text-xs font-medium text-gray-900 truncate max-w-20 lg:max-w-none">{row.Quotation_ID}</div>
                         </td>
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
-                          <div className="text-xs text-gray-900 max-w-md lg:max-w-md">{row.sales_advisor}</div>
+                          <div className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.sales_advisor}</div>
                         </td>
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
                           <div className="text-xs text-gray-900 truncate max-w-24 lg:max-w-none">{row.customer_name}</div>
@@ -264,14 +266,19 @@ function BookingPage() {
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
                           {getStatusBadge(row.STAT)}
                         </td>
+                        <td className="px-2 lg:px-3 py-1.5 lg:py-2">
+                          <div className="text-xs text-gray-900">{getDate(row.booking_timestamp)}</div>
+                        </td>
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2 text-right">
                           <div className="flex justify-end space-x-1">
-                            <button
-                              onClick={() => handleViewInfo(row.id)}
-                              className="cursor-pointer px-1.5 lg:px-2 py-0.5 lg:py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              View
-                            </button>
+                            {(row.STAT != "REQUESTED") && (
+                              <button
+                                onClick={() => handleViewInfo(row.id)}
+                                className="cursor-pointer px-1.5 lg:px-2 py-0.5 lg:py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                View
+                              </button>
+                            )}
                             {(row.STAT === "CONFIRMED" || row.STAT === "INPROGRESS") && (
                               <button
                                 onClick={() => {
@@ -325,19 +332,21 @@ function BookingPage() {
                       </div>
 
                       <div className="text-xs sm:text-sm font-medium text-gray-900 mt-2 truncate">{row.customer_name}</div>
-
+                      <div className="text-xs sm:text-sm font-small text-gray-900 mt-2 truncate">{getDate(row.booking_timestamp)}</div>
                       <div className=" flex items-center justify-between">
                         <div className="text-xs text-gray-600 mt-1">
                           <span className="font-medium">{row.Product_Line}</span>
                           <span className="text-gray-500 ml-2">{row.Manufacturing_YR} • {row.VC_Color}</span>
                         </div>
                         <div className="flex space-x-1">
-                          <button
-                            onClick={() => handleViewInfo(row.id)}
-                            className="cursor-pointer px-2 py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                          >
-                            View
-                          </button>
+                          {(row.STAT != "REQUESTED") && (
+                            <button
+                              onClick={() => handleViewInfo(row.id)}
+                              className="cursor-pointer px-1.5 lg:px-2 py-0.5 lg:py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              View
+                            </button>
+                          )}
                           {(row.STAT === "CONFIRMED" || row.STAT === "INPROGRESS") && (
                             <button
                               onClick={() => {
