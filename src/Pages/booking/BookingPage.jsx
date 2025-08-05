@@ -136,7 +136,7 @@ function BookingPage() {
     }
     if (status === "REQUESTED") {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
           Pending Approval
         </span>
       );
@@ -300,11 +300,11 @@ function BookingPage() {
                           {row.Quotation_ID}
                         </div>
 
-                        <div className="flex items-center gap-2 text-right">
-                          {role !== roles.SALES && <div className="text-xs sm:text-sm text-gray-500 truncate lg:pr-5 flex items-center justify-end gap-1">
+                        <div className="flex items-center gap-2 justify-between min-w-0">
+                          {role !== roles.SALES && <div className="flex items-center gap-1 min-w-0">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-4 h-4 text-gray-400"
+                                className="w-4 h-4 text-gray-400 flex-shrink-0"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -318,7 +318,9 @@ function BookingPage() {
                             </svg>
                             <span className="text-xs text-gray-900 truncate">{row.sales_advisor}</span>
                           </div>}
-                          {getStatusBadge(row.STAT)}
+                          <div className="flex-shrink-0">
+                            {getStatusBadge(row.STAT)}
+                          </div>
                         </div>
                       </div>
 

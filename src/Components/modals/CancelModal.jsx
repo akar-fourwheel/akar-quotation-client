@@ -7,7 +7,7 @@ const CancelModal = ({ onClose, onConfirm, selectedRow }) => {
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Cancel Booking</h2>
         <p className="text-gray-700 mb-6">
-          Are you sure you want to cancel the booking for <strong>{selectedRow?.CX_NAME}</strong>?
+          Are you sure you want to cancel the booking for <strong>{selectedRow?.customer_name}</strong>?
         </p>
         <div className="flex justify-end space-x-4">
           <button
