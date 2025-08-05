@@ -2,7 +2,6 @@
 import React from 'react';
 
 const CancelModal = ({ onClose, onConfirm, selectedRow }) => {
-  console.log(selectedRow)
   return (
     <div className="fixed inset-0 bg-black/30 bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
