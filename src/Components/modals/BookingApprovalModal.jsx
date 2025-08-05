@@ -3,6 +3,7 @@ import axios from 'axios';
 import { showSuccess, showError } from "../../utils/toast.js";
 import { roles } from '../../Routes/roles.js';
 import { AuthContext } from '../../context/auth/AuthProvider.jsx';
+import { DateTime } from "luxon";
 
 const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -84,14 +85,11 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const getDate = (ts) => {
+    if (!ts) return '-';
+    return DateTime.fromISO(ts, { zone: 'utc' })
+      .setZone('Asia/Kolkata')
+      .toFormat('dd-MM-yyyy, hh:mm a');
   };
 
   return (
@@ -139,7 +137,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         Quote ID: {request.quotationId}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        Requested on {formatDate(request.requestedAt)} <br></br>
+                        Requested on {getDate(request.requestedAt)} <br></br>
                         Requested by {request.requestedBy}
                       </p>
                     </div>
