@@ -1,4 +1,5 @@
 import React, { useMemo,useState } from "react";
+import Pagination from "../common/Pagination";
 
 const AllRecords = ({
   data,
@@ -17,7 +18,6 @@ const AllRecords = ({
   setShowBreakdownRecords,
   onFilterChange
 }) => {
-  {console.log(data)}
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   const getDate = (ts) => {
@@ -160,12 +160,12 @@ const AllRecords = ({
 
         <div className="flex flex-wrap justify-between items-center pt-2 border-t border-gray-200">
           <div className="text-sm text-gray-600">
-            Showing {data.length} of {pagination.totalRecords} records
+            Showing {data.length} of {pagination.totalItems} records
           </div>
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-700">Show:</label>
             <select
-              value={pagination.recordsPerPage}
+              value={pagination.itemsPerPage}
               onChange={(e) => onRecordsPerPageChange(Number(e.target.value))}
               className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
@@ -201,7 +201,7 @@ const AllRecords = ({
                 <td className="px-4 py-2">{record.model || '-'}</td>
                 <td className="px-4 py-2">{record.cx_name || '-'}</td>
                 <td className="px-4 py-2">{record.cx_phone || '-'}</td>
-                <td className="px-4 py-2">{record.sales_person || '-'}</td>
+                <td className={`px-4 py-2 ${record.sales_person == "WORKSHOP" || record.sales_person == "BREAKDOWN" ? "text-blue-600" : ""}`}>{record.sales_person || '-'}</td>
                 <td className="px-4 py-2">{getStatusBadge(record.status)}</td>
                 <td className="px-4 py-2">{record.in_time ? `${Math.abs(getDuration(record.in_time, record.out_time)).toFixed(1)} Hr` : '-'}</td>
                 <td className="px-4 py-2">{record.out_km ?? '-'}</td>
@@ -278,56 +278,14 @@ const AllRecords = ({
         )}
       </div>
 
-
-      {pagination.totalPages > 1 && (
-        <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg">
-          <span className="text-sm text-gray-700">
-            Page {pagination.currentPage} of {pagination.totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => onPageChange(1)}
-              disabled={pagination.currentPage === 1}
-              className={`px-3 py-1 rounded text-sm font-medium transition-all ${pagination.currentPage === 1
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                }`}
-            >
-              First
-            </button>
-            <button
-              onClick={() => onPageChange(pagination.currentPage - 1)}
-              disabled={pagination.currentPage === 1}
-              className={`px-3 py-1 rounded text-sm font-medium transition-all ${pagination.currentPage === 1
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                }`}
-            >
-              Prev
-            </button>
-            <button
-              onClick={() => onPageChange(pagination.currentPage + 1)}
-              disabled={pagination.currentPage === pagination.totalPages}
-              className={`px-3 py-1 rounded text-sm font-medium transition-all ${pagination.currentPage === pagination.totalPages
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                }`}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => onPageChange(pagination.totalPages)}
-              disabled={pagination.currentPage === pagination.totalPages}
-              className={`px-3 py-1 rounded text-sm font-medium transition-all ${pagination.currentPage === pagination.totalPages
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                }`}
-            >
-              Last
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Pagination */}
+      <Pagination
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        onPageChange={onPageChange}
+        itemsPerPage={pagination.itemsPerPage}
+        totalItems={pagination.totalItems}
+      />
 
       {selectedRecord && (
         <div className="fixed inset-0 z-50 bg-black/30 bg-opacity-30 backdrop-blur-sm flex justify-center items-center p-4">
@@ -341,17 +299,28 @@ const AllRecords = ({
             </button>
 
             <h2 className="text-lg font-semibold">Details</h2>
-            <div className="space-y-1 text-sm text-gray-700">
-              <div><strong>Customer:</strong> {selectedRecord.cx_name || '-'}</div>
-              <div><strong>Phone:</strong> {selectedRecord.cx_phone || '-'}</div>
-              <div><strong>Model:</strong> {selectedRecord.model || '-'}</div>
-              <div><strong>Sales Person:</strong> {selectedRecord.sales_person || '-'}</div>
-              <div><strong>Status:</strong> {selectedRecord.status || '-'}</div>
-              <div><strong>Duration:</strong> {selectedRecord.in_time ? `${Math.abs(getDuration(selectedRecord.in_time, selectedRecord.out_time)).toFixed(1)} Hr` : '-'}</div>
-              <div><strong>Out KM:</strong> {selectedRecord.out_km ?? '-'}</div>
-              <div><strong>In KM:</strong> {selectedRecord.in_km ?? '-'}</div>
-              <div><strong>Total KM:</strong> {(selectedRecord.in_km != null && selectedRecord.out_km != null) ? selectedRecord.in_km - selectedRecord.out_km : '-'}</div>
-            </div>
+            {(selectedRecord.sales_person != "WORKSHOP" && selectedRecord.sales_person != "BREAKDOWN") ? (
+              <div className="space-y-1 text-sm text-gray-700">
+                <div><strong>Customer:</strong> {selectedRecord.cx_name != null ? selectedRecord.cx_name : "-"}</div>
+                <div><strong>Phone:</strong> {selectedRecord.cx_phone || '-'}</div>
+                <div><strong>Model:</strong> {selectedRecord.model || '-'}</div>
+                <div><strong>Sales Person:</strong> {selectedRecord.sales_person || '-'}</div>
+                <div><strong>Status:</strong> {selectedRecord.status || '-'}</div>
+                <div><strong>Duration:</strong> {selectedRecord.in_time ? `${Math.abs(getDuration(selectedRecord.in_time, selectedRecord.out_time)).toFixed(1)} Hr` : '-'}</div>
+                <div><strong>Out KM:</strong> {selectedRecord.out_km ?? '-'}</div>
+                <div><strong>In KM:</strong> {selectedRecord.in_km ?? '-'}</div>
+                <div><strong>Total KM:</strong> {(selectedRecord.in_km != null && selectedRecord.out_km != null) ? selectedRecord.in_km - selectedRecord.out_km : '-'}</div>
+              </div>
+              ) : (
+              <div className="space-y-1 text-sm text-gray-700">
+                <div><strong className="text-lg font-semibold text-center text-blue-600">{selectedRecord.sales_person == "WORKSHOP" ? "WORKSHOP" : "BREAKDOWN"}</strong> </div>
+                <div><strong>Model:</strong> {selectedRecord.model || '-'}</div>
+                <div><strong>Duration:</strong> {selectedRecord.in_time ? `${Math.abs(getDuration(selectedRecord.in_time, selectedRecord.out_time)).toFixed(1)} Hr` : '-'}</div>
+                <div><strong>Out KM:</strong> {selectedRecord.out_km ?? '-'}</div>
+                <div><strong>In KM:</strong> {selectedRecord.in_km ?? '-'}</div>
+                <div><strong>Total KM:</strong> {(selectedRecord.in_km != null && selectedRecord.out_km != null) ? selectedRecord.in_km - selectedRecord.out_km : '-'}</div>
+              </div>
+          )}
           </div>
         </div>
       )}

@@ -7,7 +7,7 @@ import CancelModal from "../../Components/modals/CancelModal.jsx";
 import BookingInfoModal from "../../Components/modals/BookingInfoModal";
 import VnaListModal from "../../Components/modals/VnaListModal.jsx";
 import BookingApprovalModal from "../../Components/modals/BookingApprovalModal.jsx";
-import Pagination from '../../Components/common/Paginaton.jsx';
+import Pagination from '../../Components/common/Pagination.jsx';
 
 function BookingPage() {
 
@@ -23,8 +23,15 @@ function BookingPage() {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10;
+
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10,
+    hasNextPage: false,
+    hasPreviousPage: false
+});
 
   const handleViewInfo = (id) => {
     setSelectedBookingId(id);
@@ -76,13 +83,20 @@ function BookingPage() {
       const response = await axios.get('/all-bookings', {
           params: {
             page: page,
-            limit: pageSize
+            limit: pagination.itemsPerPage
           }
         });
 
       if (response?.data) {
         setQuotaData(response.data.data);
-        setTotalPages(response.data.totalPages);
+        setPagination({
+          currentPage: response.data.pagination.currentPage,
+          itemsPerPage: response.data.pagination.itemsPerPage,
+          totalItems: response.data.pagination.totalItems,
+          totalPages: response.data.pagination.totalPages,
+          hasNextPage: response.data.pagination.hasNextPage,
+          hasPreviousPage: response.data.pagination.hasPreviousPage
+        });
       }
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -341,13 +355,13 @@ function BookingPage() {
               </div>
             </>
           )}
-          {totalPages > 1 && (
+          {pagination.totalPages > 1 && (
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
               onPageChange={handlePageChange}
-              itemsPerPage={pageSize}
-              totalItems={filteredData.length}
+              itemsPerPage={pagination.itemsPerPage}
+              totalItems={pagination.totalItems}
             />
           )}
         </div>

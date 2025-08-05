@@ -4,7 +4,7 @@ import axios from 'axios';
 import { roles } from '../Routes/roles';
 import { AuthContext } from '../context/auth/AuthProvider';
 import useDebounce from '../hooks/useDebounce'; 
-import Pagination from '../Components/common/Paginaton';
+import Pagination from '../Components/common/Pagination';
 import Loader from '../Components/Loader/Loader'
 
 function AllQuotation() {
