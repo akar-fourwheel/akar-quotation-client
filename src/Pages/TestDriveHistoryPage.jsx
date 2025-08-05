@@ -9,10 +9,12 @@ const TestDriveHistoryPage = () => {
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
-    recordsPerPage: 10,
-    totalRecords: 0,
-    totalPages: 1
-  });
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10,
+    hasNextPage: false,
+    hasPreviousPage: false
+});
 
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,7 +24,7 @@ const TestDriveHistoryPage = () => {
 
   const fetchAllRecords = useCallback((
     page = pagination.currentPage,
-    limit = pagination.recordsPerPage
+    limit = pagination.itemsPerPage
   ) => {
     setRecordsLoading(true);
     const queryParams = new URLSearchParams({
@@ -39,10 +41,12 @@ const TestDriveHistoryPage = () => {
       .then(response => {
         setRecords(response.data.data || []);
         setPagination({
-          currentPage: response.data.page,
-          recordsPerPage: response.data.limit,
-          totalRecords: response.data.totalCount,
-          totalPages: response.data.totalPages
+          currentPage: response.data.pagination.currentPage,
+          itemsPerPage: response.data.pagination.itemsPerPage,
+          totalItems: response.data.pagination.totalItems,
+          totalPages: response.data.pagination.totalPages,
+          hasNextPage: response.data.pagination.hasNextPage,
+          hasPreviousPage: response.data.pagination.hasPreviousPage
         });
         setRecordsLoading(false);
       })

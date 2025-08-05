@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, totalItems }) => {
   const pages = [];
@@ -23,7 +22,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, total
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Previous
                 </button>
@@ -31,7 +30,15 @@ const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, total
                 {/* Page Numbers */}
                 <div className="hidden sm:flex space-x-1">
                     <button
-                            onClick={() => onPageChange(1)}
+                        onClick={() => {
+                            if(totalPages === 1){
+                                return;
+                            } else if(currentPage === 1){
+                                return;
+                            } else {
+                                onPageChange(currentPage - 1);
+                            }
+                        }}
                         className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === 1
                             ? 'bg-blue-50 border-blue-500 text-blue-600'
                             : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
@@ -52,7 +59,13 @@ const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, total
                             page !== 1 && page !== totalPages && (
                                 <button
                                     key={page}
-                                    onClick={() => onPageChange(page)}
+                                    onClick={() => {
+                                        if(currentPage === page){
+                                            return;
+                                        } else {
+                                            onPageChange(page);
+                                        }
+                                    }}
                                     className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === page
                                         ? 'bg-blue-50 border-blue-500 text-blue-600'
                                         : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
@@ -67,7 +80,13 @@ const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, total
 
                     {totalPages > 1 && (
                         <button
-                            onClick={() => onPageChange(totalPages)}
+                            onClick={() => {
+                                if(totalPages === 1){
+                                    return;
+                                } else {
+                                    onPageChange(totalPages);
+                                }
+                            }}
                             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === totalPages
                                 ? 'bg-blue-50 border-blue-500 text-blue-600'
                                 : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
@@ -81,7 +100,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, itemsPerPage, total
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Next
                 </button>
