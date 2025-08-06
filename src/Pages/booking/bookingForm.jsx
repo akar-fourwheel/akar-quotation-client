@@ -11,8 +11,10 @@ const BookingForm = () => {
   const [resData, setResData] = useState(null);
   const [color, setColor] = useState("");
   const [colorList, setColorList] = useState([]);
-  const [orderCat, setOrderCat] = useState(["individual", "corporate"]);
+  const [orderCat, setOrderCat] = useState(["INDIVIDUAL", "CORPORATE"]);
   const [orderC, setOrderC] = useState("");
+  const [paymentMode, setPaymentMode] = useState(["CASH","CHEQUE","UPI","NETBANKING","CARD"]);
+  const [paymentM, setPaymentM] = useState("");
   const [bookingError, setBookingError] = useState("");
   const [errorColor, setErrorColor] = useState('');
   const [remark, setRemark] = useState(' ');
@@ -54,6 +56,7 @@ const BookingForm = () => {
         color,
         variant: resData.variant,
         orderC,
+        paymentM,
         remark
       };
 
@@ -173,6 +176,7 @@ const BookingForm = () => {
       bookingAmount > 0 &&
       color &&
       orderC &&
+      paymentM &&
       !isSubmitting
     );
   };
@@ -261,8 +265,8 @@ const BookingForm = () => {
             )}
           </div>
 
-      <div className="flex flex-col">
-      <label className="text-gray-600 mb-1 font-medium">Select Order Category</label>
+        <div className="flex flex-col">
+        <label className="text-gray-600 mb-1 font-medium">Select Order Category</label>
         <select
               className="p-2 border border-gray-300 rounded-lg"
               value={orderC}
@@ -281,6 +285,23 @@ const BookingForm = () => {
           <Field label="Total Discount" value={resData.TOTAL_DISCOUNT} />
           <Field label="Final Amount" value={resData.GRAND_TOTAL} />
 
+          <div className="flex flex-col">
+            <label className="text-gray-600 mb-1 font-medium">Select Payment Mode</label>
+            <select
+              className="p-2 border border-gray-300 rounded-lg"
+              value={paymentM}
+              onChange={(e) => setPaymentM(e.target.value)}
+              disabled={isSubmitting}
+            >
+              <option value="">Select Mode</option>
+              {paymentMode.map((mode, index) => (
+                <option key={index} value={mode}>
+                  {mode}
+                </option>
+              ))}
+            </select>
+          </div>
+          
           <div className="flex flex-col">
             <label className="text-gray-600 mb-1 font-medium">Booking Amount *</label>
             <input

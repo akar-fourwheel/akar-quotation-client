@@ -168,7 +168,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                     <div className="space-y-3">
                       <h4 className="font-medium text-gray-900">Booking Details</h4>
                       <div className="space-y-1 text-sm">
-                        <p><span className="text-gray-500">Booking Amount:</span> {formatCurrency(request.booking.amount)}</p>
+                        <p><span className="text-gray-500">Booking Amount:</span> {formatCurrency(request.booking.amount)} [{request.booking.paymentMode}]</p>
                         <p><span className="text-gray-500">Remaining:</span> {formatCurrency(request.booking.remainingAmount)}</p>
                         <p><span className="text-gray-500">Category:</span> {request.booking.orderCategory || 'N/A'}</p>
                         {request.booking.optiId && (
