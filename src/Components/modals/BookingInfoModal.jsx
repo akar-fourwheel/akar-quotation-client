@@ -124,7 +124,7 @@ const BookingInfoModal = ({ bookingId, onClose, onBookingStatusUpdate }) => {
               <Info label="Fuel Type" value={bookingData.fuel} />
               <Info label="Variant" value={bookingData.product_line} />
               <Info label="Color" value={bookingData.vc_color} />
-              <Info label="Booking Amount" value={bookingData.booking_amount === 0 ? "None" : "₹" + bookingData.booking_amount} highlight />
+              <Info label="Booking Amount" value={bookingData.booking_amount === 0 ? "None" : "₹" + bookingData.booking_amount + " [" + bookingData.payment_mode + "]"} highlight/>
               <Info label="Remaining Amount" value={bookingData.remaining_amount === 0 ? "None" : "₹" + bookingData.remaining_amount} highlight />
               <Info label="Final Amount" value={"₹" + (Number(bookingData.booking_amount) + Number(bookingData.remaining_amount)).toFixed(2)} highlight />
             </div>
