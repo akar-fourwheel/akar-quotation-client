@@ -25,6 +25,7 @@ import TestDriveHistoryPage from "../Pages/TestDriveHistoryPage";
 import CustomerList from "../Pages/customerList";
 import CustomerAssignEditPage from '../Pages/CustomerAssignEditPage'
 import TeamStructure from "../Pages/teamStructure/TeamStructure";
+import DashboardSelector from "../Pages/dashboards/DashboardSelector";
 
 export const routes = createBrowserRouter([
     {
@@ -40,7 +41,7 @@ export const routes = createBrowserRouter([
         Component: Unauthorized
     },
     {
-        element: <ProtectedRoute roles={[roles.MD,roles.SALES, roles.TEAML, roles.AUDITOR, roles.GM, roles.SM, roles.ADMIN]} />,
+        element: <ProtectedRoute roles={[roles.SALES, roles.TEAML, roles.SM, roles.GM, roles.AUDITOR, roles.MD, roles.ADMIN]} />,
         children: [
             {
                 element: <Layout />,
@@ -48,6 +49,10 @@ export const routes = createBrowserRouter([
                     {
                         path: '/',
                         element: <HomePage />,
+                    },
+                    {
+                        path: '/dashboard',
+                        element: <DashboardSelector />,
                     },
                     {
                         path: '/stock-sheet',
