@@ -150,7 +150,7 @@ export const routes = createBrowserRouter([
                         Component: ReceptionPage
                     }, 
                     {
-                        path: '/reception/edit',
+                        path: '/reception/edit/:phone?',
                         Component: CustomerAssignEditPage
                     },
 

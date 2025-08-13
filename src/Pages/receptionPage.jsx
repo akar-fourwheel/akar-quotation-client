@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { modelOptions } from '../Components/quotation/staticQuotOptions';
+import { useNavigate } from 'react-router';
+
 
 const genderOptions = [
   { label: 'Male', value: 'M' },
@@ -10,13 +12,7 @@ const genderOptions = [
 
 function ReceptionPage() {
   const userRole = localStorage.getItem('role');
-  
-  const getLeadType = () => {
-    if (userRole === 'cre') {
-      return 'digital';
-    }
-    return 'reception'; 
-  };
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -24,10 +20,11 @@ function ReceptionPage() {
     gender: '',
     email: '',
     address: '',
-    exchange: '',
+    exchange_make: '',
+    exchange_model: '',
+    exchange_year: '',
     ca: '',
     model: '',
-    leadType: getLeadType(), 
     exeName: localStorage.getItem('userId')
   });
   
@@ -39,7 +36,7 @@ function ReceptionPage() {
   const [isLoading, setIsLoading] = useState(true); 
   const [fetchError, setFetchError] = useState(null); 
   const [submitStatus, setSubmitStatus] = useState({ message: '', type: '' });
-  const [showExchange, setShowExchange] = useState(true);
+  const [showExchange, setShowExchange] = useState(false);
 
 
   useEffect(() => {
@@ -64,7 +61,9 @@ function ReceptionPage() {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: name === 'exchange_year'
+        ? value.replace(/\D/g, '') // Keep only numbers
+        : value,
     }));
   };
 
@@ -73,7 +72,19 @@ function ReceptionPage() {
     
     if (!formData.name.trim()) newErrors.name = 'Customer name is required.';
     if (!formData.address.trim()) newErrors.address = 'Address is required.';
-    if (showExchange && !formData.exchange.trim()) newErrors.exchange = 'Exchange is required.';
+    if (showExchange) {
+      if (!formData.exchange_make.trim()) {
+        newErrors.exchange_make = 'Vehicle make is required.';
+      }
+      if (!formData.exchange_model.trim()) {
+        newErrors.exchange_model = 'Vehicle model is required.';
+      }
+      if (!formData.exchange_year) {
+        newErrors.exchange_year = 'Vehicle year is required.';
+      } else if (!/^\d{4}$/.test(formData.exchange_year)) {
+        newErrors.exchange_year = 'Enter a valid 4-digit year.';
+      }
+    }    
     if (!formData.gender) newErrors.gender = 'Please select a gender.';
     if (!formData.ca) newErrors.ca = 'Please select a CA.'; // Validation for CA
     if (!formData.model) newErrors.model = 'Please select a model.'; // Validation for Model
@@ -101,17 +112,29 @@ function ReceptionPage() {
       setIsSubmitting(true);
       axios.post('/leads/reception-new-customer', formData)
         .then(response => {
-          setSubmitStatus({ message: 'Customer added successfully!', type: 'success' });
+
+          if (response.data.message == "Customer already exists."){
+            navigate(`/reception/edit/${formData.phone}`);
+            setSubmitStatus({ message : 'Customer already exists.', type: 'error'})
+          } else {
+            setSubmitStatus({ message: 'Customer added successfully!', type: 'success' });
+          }
+
+          setTimeout(() => {
+            setSubmitStatus({ message: '', type: '' });
+          }, 2000);
+          
           setFormData({
             name: '', 
             phone: '', 
             gender: '', 
             email: '', 
             address: '', 
-            exchange: '',
+            exchange_make: '',
+            exchange_model: '',
+            exchange_year: '',
             ca: '', 
             model: '',
-            leadType: getLeadType(), // Reset leadType based on user role
             exeName: localStorage.getItem('userId')
           });
           setErrors({});
@@ -224,10 +247,15 @@ function ReceptionPage() {
                           onChange={() => {
                             setShowExchange((prev) => {
                               const newState = !prev;
-                              setFormData((data) => ({
-                                ...data,
-                                exchange: newState ? '' : null,
-                              }));
+                              if (!newState) {
+                                // Clear exchange fields when hiding
+                                setFormData((data) => ({
+                                  ...data,
+                                  exchange_make: '',
+                                  exchange_model: '',
+                                  exchange_year: '',
+                                }));
+                              }
                               return newState;
                             });
                           }}
@@ -240,21 +268,46 @@ function ReceptionPage() {
 
                     {showExchange && (
                       <>
-                        <label htmlFor="exchange" className="block text-gray-700 text-sm font-bold mt-4">
-                          Exchange <span className="text-red-500">*</span>
+                        <label className="block text-gray-700 text-sm font-bold mt-4">
+                          Vehicle Make <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
-                          id="exchange"
-                          name="exchange"
-                          value={formData.exchange}
+                          name="exchange_make"
+                          value={formData.exchange_make}
                           onChange={handleChange}
                           className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             errors.exchange ? 'border-red-500' : 'border-gray-300'
                           }`}
-                          placeholder="Enter exchange"
+                          placeholder="Enter vehicle make"
                           required
                         />
+                          <label className="block text-gray-700 text-sm font-bold mt-4">
+                            Vehicle Model <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="exchange_model"
+                              value={formData.exchange_model}
+                            onChange={handleChange}
+                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.exchange ? 'border-red-500' : 'border-gray-300'
+                              }`}
+                            placeholder="Enter vehicle model"
+                            required
+                          />
+                          <label className="block text-gray-700 text-sm font-bold mt-4">
+                            Vehicle Year <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="exchange_year"
+                            value={formData.exchange_year}
+                            onChange={handleChange}
+                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.exchange ? 'border-red-500' : 'border-gray-300'
+                              }`}
+                            placeholder="Enter vehicle year"
+                            required
+                          />
                         {errors.exchange && (
                           <p className="text-red-500 text-xs italic mt-1">{errors.exchange}</p>
                         )}
