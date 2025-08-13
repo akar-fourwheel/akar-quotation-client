@@ -288,7 +288,7 @@ export default function CustomerAssignEditPage() {
                                         <tbody>
                                             {allotments.map(allot => (
                                                 <tr key={allot.ALOT_ID} className="border-b border-white/20 hover:bg-white/20 transition-colors">
-                                                    <td className="p-3 sm:p-4 font-medium text-gray-800 text-xs sm:text-sm">{allot.CA_NAME}</td>
+                                                    <td className="p-3 sm:p-4 font-medium text-gray-700 text-xs sm:text-sm">{allot.sales_advisor.username} ({allot.CA_NAME})</td>
                                                     <td className="p-3 sm:p-4 text-gray-700 text-xs sm:text-sm">{allot.MODEL}</td>
                                                     <td className="p-3 sm:p-4 text-gray-700 text-xs sm:text-sm">
                                                         {allot.exchangeInfo != null ? (
