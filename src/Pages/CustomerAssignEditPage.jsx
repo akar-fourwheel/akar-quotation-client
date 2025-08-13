@@ -216,11 +216,11 @@ export default function CustomerAssignEditPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <div>
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Name</label>
-                                        <p className="text-gray-800 font-semibold">{customer.name || '-'}</p>
+                                        <p className="text-gray-800 font-medium">{customer.name || '-'}</p>
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Phone</label>
-                                        <p className="text-gray-800 font-semibold">{customer.phone || '-'}</p>
+                                        <p className="text-gray-800 font-medium">{customer.phone || '-'}</p>
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Address</label>
