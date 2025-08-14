@@ -60,12 +60,17 @@ export default function CustomerAssignEditPage() {
             if (res.data.success) {
                 setCustomer(res.data.customer);
                 setAllotments(res.data.allotments || []);
+
                 const exData = (res.data.allotments || [])
                     .map(allot => allot.exchangeInfo)
                     .filter(ex => ex && ex.id != null);
 
-                setExchanges(exData);
-                console.log('fdsfg', exchanges)
+                const uniqueExchanges = exData.filter(
+                    (ex, index, self) =>
+                        index === self.findIndex(e => e.id === ex.id)
+                );
+
+                setExchanges(uniqueExchanges);
                 fetchDropdowns();
                 showStatus('Customer found successfully!', 'success');
             } else {
