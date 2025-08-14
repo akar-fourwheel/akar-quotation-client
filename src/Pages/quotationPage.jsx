@@ -209,8 +209,8 @@ const handleCustomerSelect = (customer) => {
     try {
       const response = await axios.post(`/create-allotment`, payload);
       if (response.data.success) {
-        setcxAllot(response.data.insertedId);
-        return { success: true, insertedId: response.data.insertedId };
+        setcxAllot(response.data.allotment.ALOT_ID);
+        return { success: true, insertedId: response.data.allotment.ALOT_ID };
       }
       else if (response.data.message == "Same allotment already exists. Change model/CA") {
         setcxAllot(response.data.existingAllotId);
