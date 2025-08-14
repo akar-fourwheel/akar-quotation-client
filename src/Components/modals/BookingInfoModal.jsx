@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { roles } from "../../Routes/roles";
+import { AuthContext } from '../../context/auth/AuthProvider';
 
 const Info = ({ label, value, highlight = false }) => (
   <div className="flex flex-col">
@@ -16,7 +18,8 @@ const BookingInfoModal = ({ bookingId, onClose, onBookingStatusUpdate }) => {
   const [bookingData, setBookingData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState({ message: '', type: '' });
-
+  const { role } = useContext(AuthContext);
+  
   const showStatus = (message, type) => {
     setStatus({ message, type });
     setTimeout(() => {
@@ -134,7 +137,7 @@ const BookingInfoModal = ({ bookingId, onClose, onBookingStatusUpdate }) => {
                 : "Thank you for booking. We'll be in touch soon!"}
             </div>
             <div className="flex justify-end mt-4">
-              {bookingData.stat === "INPROGRESS" && ( 
+              {(bookingData.stat === "INPROGRESS" && role !== roles.SALES) && ( 
                 < button
                   onClick={() => retryBooking(bookingData)}
                   className="cursor-pointer hover:bg-blue-400 bg-blue-600 py-2 px-4 mx-2 rounded text-white text-md"

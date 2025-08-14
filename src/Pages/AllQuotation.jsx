@@ -45,12 +45,11 @@ function AllQuotation() {
     const operationsPanelRef = useRef(null);
 
     const handleTestDrive = async(selectedRow) => {
-        // fetch status
         const response = await axios.get(`/test-drive/status/${selectedRow.ALOT_ID}`);
         const responseStatus = response.data;
         setTestDriveSelected(false);
         
-        if (!responseStatus.status) { // if no record found
+        if (!responseStatus.status) {
             requestTestDrive(selectedRow);
         } else {
             setStatusModal({

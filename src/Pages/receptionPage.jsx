@@ -110,7 +110,7 @@ function ReceptionPage() {
 
     if (validateForm()) {
       setIsSubmitting(true);
-      axios.post('/leads/reception-new-customer', formData)
+      axios.post('/reception-new-customer', formData)
         .then(response => {
 
           if (response.data.message == "Customer already exists."){

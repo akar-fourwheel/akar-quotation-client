@@ -30,7 +30,7 @@ axios.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
         
-        const response = await axios.post(`${API_URL}/refresh-token`, { refreshToken });
+        const response = await axios.post(`${API_URL}/user/auth/refresh-token`, { refreshToken });
         const { accessToken } = response.data.data.auth;
         
         localStorage.setItem('accessToken', accessToken);
@@ -51,7 +51,7 @@ axios.interceptors.response.use(
 export const signup = async (userData) => {
   try {
         
-    const response = await axios.post('/auth/signup', userData);
+    const response = await axios.post('user/auth/signup', userData);
     const { data } = response.data;
     
     // Store user data
@@ -73,7 +73,7 @@ export const signup = async (userData) => {
 // Login and store tokens
 export const login = async (credentials) => {
   try {
-    const response = await axios.post('/auth/login', credentials);
+    const response = await axios.post('user/auth/login', credentials);
     const { data } = response.data;
     
     // Store user data
@@ -115,7 +115,7 @@ export const verifyToken = async () => {
   if (!token) return null;
 
   try {
-    const response = await axios.get('/auth/verify');
+    const response = await axios.get('user/auth/verify');
     
     if (response.status===200) {
       // Return user data in the same format as login 
