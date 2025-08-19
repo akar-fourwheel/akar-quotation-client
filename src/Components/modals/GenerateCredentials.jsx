@@ -15,7 +15,7 @@ const CredentialModal = ({ isOpen, onClose, user }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post('/admin/generate-credentials', {
+      const res = await axios.post('/user/generate-credentials', {
         name: user[1], // Full name
         phone: user[0], // Using userId as phone for now
         role: 'sales'

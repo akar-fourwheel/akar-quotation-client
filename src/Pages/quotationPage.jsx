@@ -1,4 +1,4 @@
-import React, {useEffect, useState,Fragment,useMemo } from 'react';
+import React, { useEffect, useState, Fragment, useMemo, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router";
 import Select from "react-select";
@@ -8,6 +8,7 @@ import VehicleSelector from '../Components/quotation/VehicleSelector';
 import { discounts, corpOfferOptions, rtoOptions, ewOptions, vasOptions, hpnOptions } from '../Components/quotation/staticQuotOptions';
 import { showSuccess, showError, showInfo } from '../utils/toast';
 import Loader from '../Components/Loader/Loader'
+import { AuthContext } from '../context/auth/AuthProvider';
 
 const QuotationPage = ()=>{
   const [getYear, setGetYear] = useState([]);
@@ -63,7 +64,12 @@ const QuotationPage = ()=>{
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
   const [mdmrDisc, setMdmrDisc] = useState(0);
-  const isManagerRole = ['admin', 'audit'].includes(localStorage.getItem('role'));
+  const [hasExchange, setHasExchange] = useState(false);
+  const [exchangeMake, setExchangeMake] = useState('');
+  const [exchangeModel, setExchangeModel] = useState('');
+  const [exchangeYear, setExchangeYear] = useState('');
+  const { role, userId } = useContext(AuthContext);
+  const isManagerRole = ['admin', 'audit'].includes(role);
   const [errors, setErrors] = useState({
     name: false,
     address: false,
@@ -162,8 +168,8 @@ const handleCustomerSelect = (customer) => {
     try {
       const response = await axios.get('/customer-info', {
         params: {
-          role: localStorage.role,
-          name: localStorage.userId
+          role: role,
+          name: userId
         }
       });
       const customerData = response.data
@@ -192,18 +198,19 @@ const handleCustomerSelect = (customer) => {
   };
 
   const createNewAllotment = async (cxIxd) => {
-    const cxAll = {
-      cx_id: cxIxd,
-      lead_type: 'outside',
-      exe_name: 'self',
-      ca_name: localStorage.userId,
-      model,
+    const payload = {
+      cxId: cxIxd,
+      leadType: 'outside',
+      exeName: userId,
+      caName: userId,
+      model
     };
+
     try {
-      const response = await axios.post(`/create-allot`, cxAll);
+      const response = await axios.post(`/create-allotment`, payload);
       if (response.data.success) {
-        setcxAllot(response.data.insertedId);
-        return { success: true, insertedId: response.data.insertedId };
+        setcxAllot(response.data.allotment.ALOT_ID);
+        return { success: true, insertedId: response.data.allotment.ALOT_ID };
       }
       else if (response.data.message == "Same allotment already exists. Change model/CA") {
         setcxAllot(response.data.existingAllotId);
@@ -244,9 +251,13 @@ const handleCustomerSelect = (customer) => {
       const cxData = {
         name: name.toUpperCase(),
         gender,
-        mobile: phoneNo,
+        phone: phoneNo,
         email: email || null,
-        address: address
+        address: address,
+        model,
+        exchange_make: hasExchange ? exchangeMake : null,
+        exchange_model: hasExchange ? exchangeModel : null,
+        exchange_year: hasExchange ? exchangeYear : null
       };
       try {
         if (customerList.some(c => c[2] === phoneNo)) {
@@ -255,14 +266,16 @@ const handleCustomerSelect = (customer) => {
           return;
         }
 
-        const response = await axios.post(`/create-cx`, cxData);
+        const response = await axios.post(`/create-customer`, cxData);
         if (!response.data.success) {
           showError(response.data.message || 'Failed to create new customer.');
           setLoading(false);
           return;
         }
-        customerId = response.data.insertedId;
+        customerId = response.data.customerId;
+        setcxAllot(response.data.allotmentId);
         setCxId(customerId);
+        allotmentResult = { success: true }; // Mark as successful since allotment is already created
       } catch (e) {
         console.log(e);
         showError('Failed to create new customer. Please try again.');
@@ -271,9 +284,9 @@ const handleCustomerSelect = (customer) => {
       }
     }
 
-    if (customerId || newAllot) {
-      const idToAllot = customerId || cxId;
-      allotmentResult = await createNewAllotment(idToAllot);
+    // Only create separate allotment if it's for existing customer with new allotment
+    if (!customerId && newAllot) {
+      allotmentResult = await createNewAllotment(cxId);
       if (!allotmentResult.success) {
         setLoading(false);
         return;
@@ -741,6 +754,14 @@ onChange={(e) => {
       setYear={setYear}
       setFuel={setFuel}
       setVariant={setVariant}
+      hasExchange={hasExchange}
+      setHasExchange={setHasExchange}
+      exchangeMake={exchangeMake}
+      setExchangeMake={setExchangeMake}
+      exchangeModel={exchangeModel}
+      setExchangeModel={setExchangeModel}
+      exchangeYear={exchangeYear}
+      setExchangeYear={setExchangeYear}
     />
 
         <input
