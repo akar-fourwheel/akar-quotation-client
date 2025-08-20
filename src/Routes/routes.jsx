@@ -25,6 +25,7 @@ import TestDriveHistoryPage from "../Pages/TestDriveHistoryPage";
 import CustomerList from "../Pages/customerList";
 import CustomerAssignEditPage from '../Pages/CustomerAssignEditPage'
 import TeamStructure from "../Pages/teamStructure/TeamStructure";
+import AllocateVehicle from "../Pages/booking/AllocateVehicle";
 
 export const routes = createBrowserRouter([
     {
@@ -120,6 +121,20 @@ export const routes = createBrowserRouter([
                     {
                         path: '/team-structure',
                         Component: TeamStructure
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        element: <ProtectedRoute roles={[roles.ADMIN, roles.GM, roles.SM]} />,
+        children: [
+            {
+                element: <Layout />,
+                children: [
+                    {
+                        path: '/allocate-vehicle',
+                        Component: AllocateVehicle
                     }
                 ]
             },

@@ -17,7 +17,7 @@ const CancelModal = ({ onClose, onConfirm, selectedRow }) => {
             Close
           </button>
           <button
-            onClick={() => onConfirm(selectedRow.Quotation_ID)}
+            onClick={() => onConfirm(selectedRow.Quotation_ID || selectedRow.quotation_id)}
             className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
           >
             Confirm Cancel

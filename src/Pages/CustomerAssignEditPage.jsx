@@ -60,12 +60,17 @@ export default function CustomerAssignEditPage() {
             if (res.data.success) {
                 setCustomer(res.data.customer);
                 setAllotments(res.data.allotments || []);
+
                 const exData = (res.data.allotments || [])
                     .map(allot => allot.exchangeInfo)
                     .filter(ex => ex && ex.id != null);
 
-                setExchanges(exData);
-                console.log('fdsfg', exchanges)
+                const uniqueExchanges = exData.filter(
+                    (ex, index, self) =>
+                        index === self.findIndex(e => e.id === ex.id)
+                );
+
+                setExchanges(uniqueExchanges);
                 fetchDropdowns();
                 showStatus('Customer found successfully!', 'success');
             } else {
@@ -216,11 +221,11 @@ export default function CustomerAssignEditPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <div>
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Name</label>
-                                        <p className="text-gray-800 font-semibold">{customer.name || '-'}</p>
+                                        <p className="text-gray-800 font-medium">{customer.name || '-'}</p>
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Phone</label>
-                                        <p className="text-gray-800 font-semibold">{customer.phone || '-'}</p>
+                                        <p className="text-gray-800 font-medium">{customer.phone || '-'}</p>
                                     </div>
                                     <div>
                                         <label className="text-sm font-medium text-gray-600 mb-1 block">Address</label>
