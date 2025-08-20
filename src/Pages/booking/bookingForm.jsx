@@ -239,15 +239,7 @@ const BookingForm = () => {
 
           <div className="flex flex-col">
             <label className="text-gray-600 mb-1 font-medium">Color *</label>
-            {color && color !== "N/A" ? (
-              <select
-                className="p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
-                value={color}
-                disabled
-              >
-                <option value={color}>{color}</option>
-              </select>
-            ) : (
+            {(
               <select
                 className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={color}
