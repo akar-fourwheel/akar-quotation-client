@@ -818,7 +818,8 @@ onChange={(e) => {
                     <input className="w-full p-2 border border-gray-300 rounded-lg"
                       type="number"
                       value={ins}
-                      onChange={(e) => { setIns(e.target.value) }}
+                      min= '0'
+                      onChange={(e) => { setIns(Number(e.target.value)) }}
                     />}
                     <div>Select Insurance Add-ons:</div>
                     <Select
@@ -978,6 +979,7 @@ onChange={(e) => {
                       <input className="w-full p-2 border border-gray-300 rounded-lg"
                         type="number"
                         value={addDisc}
+                        min ="0"
                         onChange={handleAddDisc}
                       />
                       {showWarning && (
@@ -990,6 +992,7 @@ onChange={(e) => {
                     <input className="w-full p-2 border border-gray-300 rounded-lg"
                       type="number"
                       value={sss}
+                      min='0'
                       onChange={handleSss}
                     />
                     <div>Total Discount:</div>
@@ -1094,7 +1097,7 @@ onChange={(e) => {
                         {i === 31 && <>
                           <div>Total Price:</div>
                           <div className="w-full p-2 border border-gray-300 rounded-lg">
-                            {totalESP = finalData.ESP - totalDisc + (finalData[rto.value] ? finalData[rto.value] : 0) + totalAddOns + ins + tcs + (finalData[ew] ? finalData[ew] : 0) + accTotal + (selectedVas ? selectedVas.value : 0) + finalData.FastTag + cod}
+                            {totalESP = Number(finalData.ESP) - Number(totalDisc) + (finalData[rto.value] ? Number(finalData[rto.value]) : 0) + Number(totalAddOns) + Number(ins) + Number(tcs) + (finalData[ew] ? Number(finalData[ew]) : 0) + Number(accTotal) + (selectedVas ? Number(selectedVas.value) : 0) + Number(finalData.FastTag) + Number(cod)}
                           </div>
                         </>}
                       </>}
