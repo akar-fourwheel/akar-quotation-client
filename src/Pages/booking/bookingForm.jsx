@@ -7,7 +7,7 @@ const BookingForm = () => {
   const navigate = useNavigate();
 
   const [bookingAmount, setBookingAmount] = useState(0);
-  const [optiId, setOptiId] = useState('');
+  // const [optiId, setOptiId] = useState('');
   const [resData, setResData] = useState(null);
   const [color, setColor] = useState("");
   const [colorList, setColorList] = useState([]);
@@ -49,7 +49,6 @@ const BookingForm = () => {
         ALOT_ID: resData.ALOT_ID,
         cx_id: resData.customer_id,
         sales_adv: resData.CA_NAME,
-        optiId,
         year: resData.year,
         bookingAmount: bookingAmount,
         RemainingAmount: RemainingAmt,
@@ -138,10 +137,8 @@ const BookingForm = () => {
         });
         
         setResData(response.data[0]);
-        setColor(response.data[0].color);
-        
+        setColor(response.data[0].color || "");
         // Fetch color options if no color is set
-        if (!response.data[0].color || response.data[0].color === "N/A") {
           try {
             const colorResponse = await axios.get('/booking-color', {
               params: {
@@ -153,7 +150,7 @@ const BookingForm = () => {
           } catch (colorError) {
             console.error("Failed to fetch colors:", colorError);
           }
-        }
+
       } catch (error) {
         console.error("Failed to fetch booking data:", error);
         setErrorColor("red");
@@ -223,7 +220,7 @@ const BookingForm = () => {
           <Field label="Contact Number" value={resData.CUSTOMER_PHONE} />
           <Field label="Sales Executive" value={resData.CA_NAME} />
           
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <label className="text-gray-600 mb-1 font-medium">Opti ID</label>
             <input
               type="text"
@@ -232,7 +229,7 @@ const BookingForm = () => {
               onChange={(e) => setOptiId(e.target.value)}
               disabled={isSubmitting}
             />
-          </div>
+          </div> */}
           
           <Field label="Model Year" value={resData.year} />
           <Field label="Variant" value={resData.variant} />
@@ -300,6 +297,12 @@ const BookingForm = () => {
               type="number"
               className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={bookingAmount}
+              onFocus={(e) => {
+                if (e.target.value === "0") setBookingAmount("");
+              }}
+              onBlur={(e) => {
+                if (e.target.value === "") setBookingAmount("0");
+              }}
               onChange={(e) => setBookingAmount(e.target.value)}
               min="0"
               max={resData.GRAND_TOTAL}
