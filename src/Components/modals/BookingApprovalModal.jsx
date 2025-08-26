@@ -76,7 +76,11 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
       setProcessingId(null);
     }
   };
-
+  const handleOpenPDF = (fileUrl) => {
+    if (!fileUrl) return;
+    window.open(fileUrl, '_blank');
+  };
+  
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -163,6 +167,7 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                         <p><span className="text-gray-500">Color:</span> {request.vehicle.color}</p>
                       </div>
                     </div>
+                      
 
                     {/* Booking Information */}
                     <div className="space-y-3">
@@ -178,8 +183,21 @@ const BookingApprovalModal = ({ onClose, onApprovalComplete }) => {
                     </div>
                   </div>
 
+                  {/* PDF link */}
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-900">View Quotation PDF</h4>
+                    <div className="space-y-1 text-sm">
+                      <button
+                        onClick={()=>handleOpenPDF(request.quotation.fileUrl)}
+                        className="flex flex-col items-center justify-center p-2 border-2 border-gray-200 text-rose-700 hover:bg-rose-50 hover:border-rose-300 rounded-lg transition-all duration-200 group"
+                      >
+                        <span className="text-sm font-medium">View PDF</span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Sales Information */}
-                  <div className="mb-4">
+                  <div className="my-4">
                     <h4 className="font-medium text-gray-900 mb-2">Sales Information</h4>
                     <p className="text-sm"><span className="text-gray-500">Sales Advisor:</span> {request.salesAdvisor}</p>
                   </div>

@@ -76,7 +76,7 @@ const Signup = () => {
   };
 
   useEffect(() => {
-    axios.get('/admin/user-info')
+    axios.get('/user/user-info')
       .then(res => {
         setUserInfo(res.data);
       })

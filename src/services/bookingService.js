@@ -1,4 +1,5 @@
 import axiosInstance from '../utils/axiosInstance';
+import axios from 'axios';
 
 export const postBookingApproval = async (requestData) => {
     try {
@@ -20,19 +21,6 @@ export const fetchPendingRequests = async () => {
     }
 };
 
-export const retryBooking = async (bookingData) => {
-    try {
-      const response = await axiosInstance.post('/booking-process', {
-        quotation_id: bookingData.quotation_id,
-        id: bookingData.id
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Retry booking failed:', error);
-      return error;
-    }
-};
 
 export const fetchBookingDetails = async (bookingId) => {
     try {
@@ -111,4 +99,30 @@ export const fetchBookings = async (page, pageSize) => {
       console.error('Error fetching bookings:', error);
       return error;
     }
-  };
+};
+  
+export const retryBooking = async (bookingData) => {
+  try {
+    const response = await axios.post('/booking-process', {
+      quotation_id: bookingData.quotation_id,
+      id: bookingData.id
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Retry booking failed:', error);
+    return error;
+  }
+};
+
+export const handleGeneratePDF = async (id) => {
+  try {
+    const response = await axios.post('/generate-booking-pdf', {
+      bookingId : id
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Generate PDF failed:', error);
+    return error;
+  }
+};

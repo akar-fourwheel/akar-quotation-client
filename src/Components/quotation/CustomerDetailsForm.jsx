@@ -26,7 +26,15 @@ const CustomerDetailsForm = ({
   setModel,
   setYear,
   setFuel,
-  setVariant
+  setVariant,
+  hasExchange,
+  setHasExchange,
+  exchangeMake,
+  setExchangeMake,
+  exchangeModel,
+  setExchangeModel,
+  exchangeYear,
+  setExchangeYear
 }) => (
   <>
     {/* Toggle for New/Listed Customer */}
@@ -44,6 +52,11 @@ const CustomerDetailsForm = ({
               setYear && setYear('');
               setFuel && setFuel('');
               setVariant && setVariant('');
+              // Always clear exchange fields when switching
+              setHasExchange(false);
+              setExchangeMake('');
+              setExchangeModel('');
+              setExchangeYear('');
               if (e.target.checked) {
                 setNewAllot && setNewAllot(true);
                 setSelectedCustomer && setSelectedCustomer(null);
@@ -145,6 +158,10 @@ const CustomerDetailsForm = ({
                   setEmail('');
                   setAddress('');
                   setGender('');
+                  setHasExchange(false);
+                  setExchangeMake('');
+                  setExchangeModel('');
+                  setExchangeYear('');
                 }}
                 className="text-xs text-red-500 hover:underline ml-4"
               >
@@ -220,6 +237,73 @@ const CustomerDetailsForm = ({
       />
     </div>
     </div>
+
+    {/* Exchange Vehicle Section - Only for New Customers */}
+    {newCx && (
+      <div className="mt-6 space-y-4">
+        <div className="flex items-center space-x-3">
+          <label className="flex items-center cursor-pointer">
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={hasExchange}
+                onChange={(e) => {
+                  setHasExchange(e.target.checked);
+                  if (!e.target.checked) {
+                    setExchangeMake('');
+                    setExchangeModel('');
+                    setExchangeYear('');
+                  }
+                }}
+                className="sr-only"
+              />
+              <div className={`block w-14 h-8 rounded-full ${hasExchange ? 'bg-green-500' : 'bg-gray-300'} transition-colors duration-200`}></div>
+              <div className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-200 ${hasExchange ? 'transform translate-x-6' : ''}`}></div>
+            </div>
+            <span className="ml-3 text-lg font-medium text-gray-700">
+              Has Exchange Vehicle
+            </span>
+          </label>
+        </div>
+
+        {hasExchange && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Exchange Make:</label>
+              <input
+                type="text"
+                value={exchangeMake}
+                onChange={(e) => setExchangeMake(e.target.value)}
+                placeholder="e.g., Maruti, Hyundai"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Exchange Model:</label>
+              <input
+                type="text"
+                value={exchangeModel}
+                onChange={(e) => setExchangeModel(e.target.value)}
+                placeholder="e.g., Swift, i20"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Exchange Year:</label>
+              <input
+                type="number"
+                value={exchangeYear}
+                onChange={(e) => setExchangeYear(e.target.value)}
+                placeholder="e.g., 2020"
+                min="1990"
+                max={new Date().getFullYear()}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    )}
   </>
 );
 

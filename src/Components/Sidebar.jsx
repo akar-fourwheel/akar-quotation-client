@@ -203,6 +203,27 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 Team Structure
               </Link>
           )}
+          {(role === roles.ADMIN || role === roles.GM || role === roles.SM ) && (
+            <Link
+              to="/allocate-vehicle"
+              onClick={toggleSidebar}
+              className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
+                ${isActivePath('/allocate-vehicle')
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }
+              `}
+            >
+              <CarIcon className={`
+                  h-5 w-5 mr-3 transition-colors
+                  ${isActivePath('/allocate-vehicle')
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-400 group-hover:text-gray-300'
+                }
+                `} />
+              Vehicle Allocation
+            </Link>
+          )}
           {role !== roles.RECEPTION && <div className="space-y-1">
             <button
               onClick={() => toggleMenu('testDrive')}
