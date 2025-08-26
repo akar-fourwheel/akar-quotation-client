@@ -12,6 +12,7 @@ const CustomerList = () => {
     const [loading, setLoading] = useState(true);
     const [selectedRemark, setSelectedRemark] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [expandedCustomerIds, setExpandedCustomerIds] = useState(new Set());
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
@@ -44,11 +45,11 @@ const CustomerList = () => {
         setLoading(true);
         try {
             let url = `/customer-list?page=${page}&limit=10`;
-            
+
             if (searchTerm.trim()) {
                 url += `&search=${encodeURIComponent(searchTerm)}&searchType=${searchType}`;
             }
-            
+
             const response = await axios.get(url);
             setCustomers(response.data.customers || []);
             setPagination(response.data.pagination || {});
@@ -58,6 +59,18 @@ const CustomerList = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const toggleExpand = (customerId) => {
+        setExpandedCustomerIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(customerId)) {
+                newSet.delete(customerId);
+            } else {
+                newSet.add(customerId);
+            }
+            return newSet;
+        });
     };
 
     const handleSearchChange = (e) => {
@@ -75,7 +88,8 @@ const CustomerList = () => {
         fetchCustomers(1);
     };
 
-    const openRemarkModal = (remark, id) => {
+    const openRemarkModal = (remark, id, e) => {
+        e.stopPropagation();
         setSelectedRemark(remark);
         setId(id);
         setShowModal(true);
@@ -85,7 +99,7 @@ const CustomerList = () => {
         setLoading(true);
         try {
             const response = await axios.post(`/update-remark`, { id: id, remark: selectedRemark });
-            if(response.status === 200){
+            if (response.status === 200) {
                 showSuccess("Remark updated successfully");
                 closeModal();
                 fetchCustomers(pagination.currentPage, debouncedSearchTerm, searchType);
@@ -115,26 +129,25 @@ const CustomerList = () => {
     // Mobile card component for better mobile experience
     const MobileCustomerCard = ({ customer, index }) => (
         <div className="lg:hidden bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex justify-between items-start mb-3 cursor-pointer" onClick={() => toggleExpand(customer.id)}>
+                {/* existing header content */}
                 <div className="flex items-center space-x-2">
                     <span className="text-blue-800 text-xs font-medium px-2 py-1 rounded">
                         #{getSerialNumber(index)}
                     </span>
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        customer.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'
-                    }`}>
+                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${customer.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'}`}>
                         {customer.gender === 'F' ? 'Female' : 'Male'}
                     </span>
                 </div>
                 <span className="text-xs text-gray-500">ID: {customer.id}</span>
             </div>
-            
+
             <div className="space-y-2">
                 <div>
                     <span className="text-sm font-medium text-gray-900">{customer.name} <span className="pl-2 text-xs text-gray-500">Phone: {customer.phone}</span></span>
                 </div>
                 <div className="text-sm text-gray-600">
-                   
+
                 </div>
                 {customer.email && (
                     <div className="text-sm text-gray-600">
@@ -150,27 +163,43 @@ const CustomerList = () => {
                     </div>
                 )}
                 <div className="text-sm text-gray-600 flex items-center justify-end gap-2">
-                    {customer.remark ? (
+                    {customer.allotments.length > 0 && customer.allotments[0].remark ? (
                         <button
-                            onClick={() => openRemarkModal(customer.remark, customer.id)}
+                            onClick={(e) => openRemarkModal(customer.allotments[0].remark, customer.id, e)}
                             className="text-blue-600 hover:underline text-sm"
                         >
                             {role === roles.SALES ? 'Edit' : 'View'}
                         </button>
                     ) : (
-                        role === roles.SALES ? 
-                        <button 
-                            onClick={() => openRemarkModal('', customer.id)} 
-                            className="text-blue-600 hover:underline text-sm"
-                        >
-                            Add Remark
-                        </button> : 
-                        <span className="italic text-gray-400 text-sm">No Remark</span>
+                        role === roles.SALES ?
+                            <button
+                                onClick={(e) => openRemarkModal('', customer.id, e)}
+                                className="text-blue-600 hover:underline text-sm"
+                            >
+                                Add Remark
+                            </button> :
+                            <span className="italic text-gray-400 text-sm">No Remark</span>
                     )}
                 </div>
-                
-                
+
+
             </div>
+            {expandedCustomerIds.has(customer.id) && (
+                <div className="mt-3 border-t border-gray-200 pt-3">
+                    <h4 className="font-semibold mb-1">Allotments ({customer.allotments.length})</h4>
+                    {customer.allotments.length === 0 ? (
+                        <div className="italic text-gray-500 text-sm">No allotments available.</div>
+                    ) : (
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 max-h-40 overflow-auto">
+                            {customer.allotments.map((a, i) => (
+                                <li key={a.ALOT_ID || i}>
+                                    <strong>{a.MODEL || 'N/A'}</strong> - Assigned: {new Date(a.assignment_date).toLocaleDateString()} - CA: {a.CA_NAME || 'N/A'} {a.inactive && <span className="text-red-500">(Inactive)</span>}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            )}
         </div>
     );
 
@@ -280,47 +309,75 @@ const CustomerList = () => {
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
                                             {customers.map((cust, index) => (
-                                                <tr key={cust.id || index} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {getSerialNumber(index)}
-                                                    </td>
-                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{cust.id}</td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">{cust.name}</td>
-                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{cust.phone}</td>
-                                                    <td className="px-4 py-3 whitespace-nowrap">
-                                                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                                                            cust.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'
-                                                        }`}>
-                                                            {cust.gender === 'F' ? 'Female' : 'Male'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">
-                                                        {cust.email || <span className="italic text-gray-400">N/A</span>}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">{cust.username}</td>
-                                                    <td className="px-4 py-3 max-w-[12rem] text-sm text-gray-900">
-                                                        <div className="truncate" title={cust.address}>{cust.address}</div>
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm">
-                                                        {cust.remark ? (
-                                                            <button
-                                                                onClick={() => openRemarkModal(cust.remark, cust.id)}
-                                                                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                                                            >
-                                                                {role === roles.SALES ? 'Edit' : 'View'}
-                                                            </button>
-                                                        ) : (
-                                                            role === roles.SALES ? 
-                                                            <button 
-                                                                onClick={() => openRemarkModal('', cust.id)} 
-                                                                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                                                            >
-                                                                Add Remark
-                                                            </button> : 
-                                                            <span className="italic text-gray-400">No Remark</span>
-                                                        )}
-                                                    </td>
-                                                </tr>
+                                                <React.Fragment key={cust.id || index}>
+                                                    <tr
+                                                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                                        onClick={() => toggleExpand(cust.id)}
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        onKeyDown={e => { if (e.key === 'Enter') toggleExpand(cust.id); }}
+                                                    >
+                                                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                            {getSerialNumber(index)}
+                                                        </td>
+                                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{cust.id}</td>
+                                                        <td className="px-4 py-3 text-sm text-gray-900">{cust.name}</td>
+                                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{cust.phone}</td>
+                                                        <td className="px-4 py-3 whitespace-nowrap">
+                                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${cust.gender === 'F' ? 'text-pink-800 bg-pink-100' : 'text-blue-800 bg-blue-100'
+                                                                }`}>
+                                                                {cust.gender === 'F' ? 'Female' : 'Male'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm text-gray-900">
+                                                            {cust.email || <span className="italic text-gray-400">N/A</span>}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm text-gray-900">{cust.username}</td>
+                                                        <td className="px-4 py-3 max-w-[12rem] text-sm text-gray-900">
+                                                            <div className="truncate" title={cust.address}>{cust.address}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm">
+                                                            { cust.allotments.length > 0 && cust.allotments[0].remark ? (
+                                                                <button
+                                                                    onClick={(e) => openRemarkModal(cust.allotments[0].remark, cust.id, e)}
+                                                                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                                                                >
+                                                                    {role === roles.SALES ? 'Edit' : 'View'}
+                                                                </button>
+                                                            ) : (
+                                                                role === roles.SALES ?
+                                                                    <button
+                                                                        onClick={(e) => openRemarkModal('', cust.id, e)}
+                                                                        className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                                                                    >
+                                                                        Add Remark
+                                                                    </button> :
+                                                                    <span className="italic text-gray-400">No Remark</span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                    {expandedCustomerIds.has(cust.id) && (
+                                                        <tr>
+                                                            <td colSpan={9} className="bg-gray-50 p-4">
+                                                                <div>
+                                                                    <h4 className="font-semibold mb-2">Allotments ({cust.allotments.length})</h4>
+                                                                    {cust.allotments.length === 0 ? (
+                                                                        <div className="italic text-gray-500">No allotments available.</div>
+                                                                    ) : (
+                                                                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 max-h-48 overflow-auto">
+                                                                            {cust.allotments.map((a, i) => (
+                                                                                <li key={a.ALOT_ID || i}>
+                                                                                    <strong>{a.MODEL || 'N/A'}</strong> - Assigned: {new Date(a.assignment_date).toLocaleDateString()} {
+                                                                                    role != roles.SALES ? `- CA: ${a.CA_NAME || 'N/A'}` : ''} {a.inactive && <span className="text-red-500">(Inactive)</span>}
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </React.Fragment>
                                             ))}
                                         </tbody>
                                     </table>
@@ -344,8 +401,8 @@ const CustomerList = () => {
                     <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center">
                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800">Customer Remark</h3>
-                            <button 
-                                onClick={closeModal} 
+                            <button
+                                onClick={closeModal}
                                 className="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none"
                                 aria-label="Close modal"
                             >
@@ -358,9 +415,9 @@ const CustomerList = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Remark
                                     </label>
-                                    <textarea 
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical min-h-[120px]" 
-                                        value={selectedRemark} 
+                                    <textarea
+                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical min-h-[120px]"
+                                        value={selectedRemark}
                                         onChange={(e) => setSelectedRemark(e.target.value)}
                                         placeholder="Enter your remark here..."
                                         rows={4}
@@ -379,15 +436,15 @@ const CustomerList = () => {
                         </div>
                         <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
                             {role === roles.SALES && (
-                                <button 
-                                    onClick={handleSaveRemark} 
+                                <button
+                                    onClick={handleSaveRemark}
                                     disabled={loading}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                     {loading ? 'Saving...' : 'Save'}
                                 </button>
                             )}
-                            <button 
+                            <button
                                 onClick={closeModal}
                                 className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
                             >
