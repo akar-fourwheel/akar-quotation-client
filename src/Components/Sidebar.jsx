@@ -20,7 +20,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const menuItems = [
-    { to: '/', label: 'Dashboard', icon: HomeIcon },
+    { to: '/', label: 'Home', icon: HomeIcon },
+    { to: '/dashboard', label: 'Dashboard', icon: HomeIcon },
     { to: '/price-list', label: 'Price List', icon: PriceIcon },
     { to: '/scheme-sheet', label: 'Scheme Sheet', icon: schemeIcon },
     { to: '/quotation', label: 'Quotation', icon: QuotationIcon },
