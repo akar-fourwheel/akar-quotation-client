@@ -180,7 +180,7 @@ export const routes = createBrowserRouter([
     },
     {
         element: (
-            <ProtectedRoute roles={[roles.RECEPTION, roles.CRE, roles.MD, roles.ADMIN, roles.SALES, roles.TEAML, roles.AUDITOR]} />
+            <ProtectedRoute roles={[roles.RECEPTION, roles.SALES, roles.TEAML, roles.CRE, roles.AUDITOR, roles.SM, roles.GM, roles.MD, roles.ADMIN]} />
         ),
         children: [
             {
