@@ -2,6 +2,8 @@ import { useContext, useState } from 'react';
 import { AuthContext } from '../context/auth/AuthProvider';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { roles } from '../Routes/roles';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
+import BeenhereIcon from '@mui/icons-material/Beenhere';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const user = useContext(AuthContext);
@@ -20,7 +22,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const menuItems = [
-    { to: '/', label: 'Dashboard', icon: HomeIcon },
+    { to: '/', label: 'Home', icon: HomeIcon },
+    { to: '/dashboard', label: 'Dashboard', icon: InsertChartIcon },
     { to: '/price-list', label: 'Price List', icon: PriceIcon },
     { to: '/scheme-sheet', label: 'Scheme Sheet', icon: schemeIcon },
     { to: '/quotation', label: 'Quotation', icon: QuotationIcon },
@@ -161,7 +164,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               ))}
             </>
           )}
-          {(role === roles.ADMIN || role === roles.MD || role === roles.SALES || role === roles.RECEPTION) &&  <Link
+          {(role === roles.ADMIN || role === roles.MD || role === roles.SALES || role === roles.RECEPTION || role === roles.SM || role === roles.TEAM_LEAD) &&  <Link
               to="/customer-list"
               onClick={toggleSidebar}
               className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group
@@ -213,8 +216,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 }
               `}
             >
-              <CarIcon className={`
-                  h-5 w-5 mr-3 transition-colors
+              <BeenhereIcon className={`
+                  h-4 w-4 mr-3 transition-colors
                   ${isActivePath('/allocate-vehicle')
                   ? 'bg-gray-700 text-white'
                   : 'text-gray-400 group-hover:text-gray-300'
