@@ -104,7 +104,7 @@ export const routes = createBrowserRouter([
         ]
     },
     {
-        element: <ProtectedRoute roles={[roles.GUARD, roles.SALES, roles.TEAML, roles.MD, roles.ADMIN, roles.AUDITOR]} />,
+        element: <ProtectedRoute roles={[roles.GUARD, roles.SALES, roles.TEAML, roles.SM, roles.MD, roles.ADMIN, roles.AUDITOR]} />,
         children: [
             {
                 element: <Layout />,
