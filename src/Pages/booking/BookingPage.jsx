@@ -80,13 +80,15 @@ function BookingPage() {
   const fetchBookings = async (page) => {
     try {
       setIsLoading(true);
+      let params = {
+        page: page,
+        limit: pagination.itemsPerPage
+      };
+      if (filterOption && filterOption !== 'all') {
+        params.status = filterOption.toUpperCase();
+      }
 
-      const response = await axios.get('/all-bookings', {
-          params: {
-            page: page,
-            limit: pagination.itemsPerPage
-          }
-        });
+      const response = await axios.get('/all-bookings', { params });
 
       if (response?.data) {
         setQuotaData(response.data.data);
@@ -108,17 +110,9 @@ function BookingPage() {
   };
 
   useEffect(() => {
-    fetchBookings(currentPage);
-  }, [role, username]);
-
-  const filteredData = quotaData.filter((row) => {
-    if (filterOption === "cancelled") return row.STAT === "CANCELLED";
-    if (filterOption === "active") return !row.STAT || row.STAT === "CONFIRMED";
-    if (filterOption === "inprogress") return row.STAT === "INPROGRESS";
-    if (filterOption === "requested") return row.STAT === "REQUESTED";
-    if (filterOption === "rejected") return row.STAT === "REJECTED";
-    return true;
-  });
+    setCurrentPage(1);
+    fetchBookings(currentPage || 1);
+  }, [filterOption]);
 
   const getStatusBadge = (status) => {
     if (status === "CANCELLED") {
@@ -165,7 +159,7 @@ function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-2 sm:py-3">
+    <div className="min-h-screen bg-gray-50 py-2 sm:py-3 lg:pt-5">
       <div className="max-w-full xl:max-w-7xl mx-auto px-2 sm:px-3 lg:px-4">
         <div className="mb-8">
           <div className="flex justify-between items-center">
@@ -177,7 +171,7 @@ function BookingPage() {
           <div className="flex flex-wrap gap-2">
             {[
               { value: "all", label: "All Bookings" },
-              { value: "active", label: "Active" },
+              { value: "confirmed", label: "Active" },
               { value: "requested", label: "Pending Approval" },
               { value: "inprogress", label: "In Progress" },
               { value: "rejected", label: "Rejected" },
@@ -222,7 +216,7 @@ function BookingPage() {
         </div>
 
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-          {filteredData.length === 0 ? (
+          {quotaData.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 text-sm">No bookings found</div>
             </div>
@@ -243,7 +237,7 @@ function BookingPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredData.map((row) => (
+                    {quotaData.map((row) => (
                       <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-2 lg:px-3 py-1.5 lg:py-2">
                           <div className="text-xs font-medium text-gray-900 truncate max-w-20 lg:max-w-none">{row.Quotation_ID}</div>
@@ -299,7 +293,7 @@ function BookingPage() {
               </div>
 
               <div className="md:hidden">
-                {filteredData.map((row) => (
+                {quotaData.map((row) => (
                   <div key={row.id} className="border-b border-gray-200 last:border-b-0">
                     <div className="p-3 hover:bg-gray-50 transition-colors">
                       <div className="flex items-center justify-between">
