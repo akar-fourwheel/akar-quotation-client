@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/auth/AuthProvider';
-import { getTeamLeadDashboard, approveBookingRequest, getActivityFeed } from '../../services/dashboardService';
+import { getTeamLeadDashboard, getActivityFeed } from '../../services/dashboardService';
 import DashboardLayout from '../../Components/dashboard/DashboardLayout';
 import { BarChart, LineChart, DoughnutChart, ChartContainer } from '../../Components/dashboard/Charts';
 import IconComponent, { DashboardIcons } from '../../Components/common/IconComponent';
@@ -67,29 +67,29 @@ const TeamLeadDashboard = () => {
 
   // Handle booking approval
   const handleBookingApproval = async (bookingId, action, comments = '') => {
-    try {
-      setProcessingApproval(bookingId);
-      const requestData = {
-        bookingId,
-        action,
-        comments
-      };
+    // try {
+    //   setProcessingApproval(bookingId);
+    //   const requestData = {
+    //     bookingId,
+    //     action,
+    //     comments
+    //   };
       
-      const response = await approveBookingRequest(requestData);
+    //   const response = await approveBookingRequest(requestData);
 
-      if (response.success) {
-        toast.success(`Booking ${action}d successfully!`);
-        // Refresh dashboard data to reflect changes
-        await fetchDashboardData();
-      } else {
-        throw new Error(response.message || `Failed to ${action} booking`);
-      }
-    } catch (err) {
-      toast.error(err.message || `Failed to ${action} booking`);
-      console.error('Booking approval error:', err);
-    } finally {
-      setProcessingApproval(null);
-    }
+    //   if (response.success) {
+    //     toast.success(`Booking ${action}d successfully!`);
+    //     // Refresh dashboard data to reflect changes
+    //     await fetchDashboardData();
+    //   } else {
+    //     throw new Error(response.message || `Failed to ${action} booking`);
+    //   }
+    // } catch (err) {
+    //   toast.error(err.message || `Failed to ${action} booking`);
+    //   console.error('Booking approval error:', err);
+    // } finally {
+    //   setProcessingApproval(null);
+    // }
   };
 
   // Data formatting functions for charts

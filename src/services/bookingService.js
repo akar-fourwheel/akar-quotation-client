@@ -72,7 +72,7 @@ export const fetchBookingColor = async (year, variant) => {
 
 export const handleCancelBooking = async (bookingId) => {
     try {
-      const response = await axiosInstance.get('/booking-cancel', {
+      const response = await axios.get('/booking-cancel', {
         params: { bookingId }
       });
 
@@ -83,14 +83,9 @@ export const handleCancelBooking = async (bookingId) => {
     }
 };
 
-export const fetchBookings = async (page, pageSize) => {
+export const fetchBookings = async (params) => {
     try {
-      const response = await axiosInstance.get('/all-bookings', {
-          params: {
-            page: page,
-            limit: pageSize
-          }
-        });
+      const response = await axios.get('/all-bookings', { params });
 
       if (response?.data) {
         return response.data;

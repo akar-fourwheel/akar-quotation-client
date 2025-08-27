@@ -109,7 +109,7 @@ const AllocateVehicle = () => {
                         {vnaData.map((booking) => (
                             <div
                                 key={booking.quotation_id}
-                                className="bg-white rounded-lg shadow border transition-shadow hover:shadow-lg"
+                                className="bg-white rounded-lg shadow transition-shadow hover:shadow-lg"
                             >
                                 <div className="p-6 flex flex-col gap-4">
                                     <div className="flex flex-col sm:flex-row justify-between">

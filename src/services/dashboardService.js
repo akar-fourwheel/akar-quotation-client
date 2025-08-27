@@ -124,22 +124,6 @@ export const getTeamLeadDashboard = async (params = {}) => {
   }
 };
 
-export const approveBookingRequest = async (bookingData) => {
-  try {
-    setIsLoading(true);
-    const response = await axios.get('/pending-booking-requests');
-    
-    if (response.data.success) {
-      setPendingRequests(response.data.data);
-    }
-  } catch (error) {
-    console.error('Error fetching pending requests:', error);
-    showError('Failed to fetch pending requests');
-  } finally {
-    setIsLoading(false);
-  }
-};
-
 // Manager Dashboard APIs
 export const getManagerDashboard = async (params = {}) => {
   try {
@@ -224,7 +208,6 @@ export default {
   getSalesDashboard,
   getSalesPerformanceComparison,
   getTeamLeadDashboard,
-  approveBookingRequest,
   getManagerDashboard,
   getDetailedTeamReport,
   getAdminDashboard,
