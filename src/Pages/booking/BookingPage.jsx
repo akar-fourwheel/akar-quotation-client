@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import { roles } from '../../Routes/roles';
 import { AuthContext } from '../../context/auth/AuthProvider';
 import { showSuccess, showError } from "../../utils/toast.js";
@@ -9,6 +8,7 @@ import VnaListModal from "../../Components/modals/VnaListModal.jsx";
 import BookingApprovalModal from "../../Components/modals/BookingApprovalModal.jsx";
 import Pagination from '../../Components/common/Pagination.jsx';
 import getDate from '../../utils/getDate.js'
+import { fetchBookings as fetchBookingsApi, handleCancelBooking as handleCancelBookingApi } from '../../services/bookingService.js';
 
 function BookingPage() {
 
@@ -41,11 +41,9 @@ function BookingPage() {
 
   const handleCancelBooking = async (bookingId) => {
     try {
-      const response = await axios.get('/booking-cancel', {
-        params: { bookingId }
-      });
+      const response = await handleCancelBookingApi(bookingId);
 
-      showSuccess(response.data.message);
+      showSuccess(response.message);
       setShowCancelModal(false);
       setQuotaData((prev) =>
         prev.map((booking) =>
@@ -88,17 +86,17 @@ function BookingPage() {
         params.status = filterOption.toUpperCase();
       }
 
-      const response = await axios.get('/all-bookings', { params });
+      const response = await fetchBookingsApi(params);
 
-      if (response?.data) {
-        setQuotaData(response.data.data);
+      if (response) {
+        setQuotaData(response.data);
         setPagination({
-          currentPage: response.data.pagination.currentPage,
-          itemsPerPage: response.data.pagination.itemsPerPage,
-          totalItems: response.data.pagination.totalItems,
-          totalPages: response.data.pagination.totalPages,
-          hasNextPage: response.data.pagination.hasNextPage,
-          hasPreviousPage: response.data.pagination.hasPreviousPage
+          currentPage: response.pagination.currentPage,
+          itemsPerPage: response.pagination.itemsPerPage,
+          totalItems: response.pagination.totalItems,
+          totalPages: response.pagination.totalPages,
+          hasNextPage: response.pagination.hasNextPage,
+          hasPreviousPage: response.pagination.hasPreviousPage
         });
       }
     } catch (error) {
