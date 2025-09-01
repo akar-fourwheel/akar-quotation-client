@@ -62,16 +62,7 @@ npm run dev
 ```bash
 npm run build
 ```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-## Deployment
-
-- Deployed with [Vercel](https://vercel.com/). See `vercel.json` for configuration.
+build needs to be uploaded to the 'quotations' folder in cPanel. 
 
 ## Contributing
 
@@ -81,7 +72,11 @@ npm run lint
 4. Push to the branch (`git push origin feature/your-feature`)
 5. Create a new Pull Request
 
+## main branch
+- contains code for v1.
+## stag branch
+- contains the currently deployed code v2.
 
-## Links
+### Links
 
 - [Repository](https://github.com/akar-fourwheel/akar-quotation-client)
