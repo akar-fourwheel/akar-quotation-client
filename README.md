@@ -1,12 +1,87 @@
-# React + Vite
+# akar-quotation-client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for Akar Fourwheel Quotation Platform
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This repository contains the client-side application for the Akar Fourwheel Quotation platform. It provides the user interface for interacting with quotations, browsing data, and performing client-side operations.
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Modern web UI for managing quotations
+- Responsive and user-friendly design
+- Connects to the backend API for data operations
+
+## Tech Stack
+
+- **Language:** JavaScript
+- **Framework/Build Tool:** ( React )
+- **Other:** Uses Vite for build, ESLint for linting
+
+## Project Structure
+
+```
+/
+├── public/           # Static assets
+├── src/              # Source code (components, pages, etc.)
+├── carScheme.json    # Car scheme data
+├── salesPerson.json  # Salesperson data
+├── index.html        # Main HTML template
+├── package.json      # Project metadata and dependencies
+├── package-lock.json # Dependency lock file
+├── eslint.config.js  # Linting rules
+├── vite.config.js    # Vite configuration
+├── vercel.json       # Vercel deployment config
+├── .gitignore        # Git ignored files
+├── README.md         # Project documentation
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14+ recommended)
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/akar-fourwheel/akar-quotation-client.git
+cd akar-quotation-client
+npm install
+```
+
+### Running the App
+
+```bash
+npm run dev
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Deployment
+
+- Deployed with [Vercel](https://vercel.com/). See `vercel.json` for configuration.
+
+## Contributing
+
+1. Fork the repo
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Create a new Pull Request
+
+
+## Links
+
+- [Repository](https://github.com/akar-fourwheel/akar-quotation-client)
